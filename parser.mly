@@ -1,23 +1,34 @@
 (* Ocamlyacc parser for YeezyGraph*)
 
-%{
-open Ast;
-%}
+%{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
-%token PLUS MINUS TIMES DIVIDE PERCENT ASSIGN NOT
-%token DOT
+/* Punctuation tokens*/
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA COLON
+/* Arithmetic tokens */
+%token PLUS MINUS TIMES DIVIDE MOD ASSIGN NOT
+/* Logical tokens */
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
-%token RETURN IF ELSE FOR WHILE INT FLOAT STRING BOOL NULL VOID
-%token UNDERSCORE AT 
-%token PLUSPLUS MINUSMINUS ARROW NARROW
+/* Primitive datatype tokens */
+%token INT FLOAT STRING BOOL NULL
+/* Control flow tokens */
+%token IF ELSE FOR WHILE
+/* Function tokens */
+%token RETURN VOID MAIN FUN
 %token NODE GRAPH 
-%token STRUCT
-%token LIST QUEUE PQUEUE MAP  
-%token FUN
-%token MAIN
+/*Node tokens*/
+%token UNDERSCORE AT 
+/* Graph tokens */
+%token ADD_NODE REMOVE_NODE ADD_EDGE REMOVE_EDGE
+/*Collection tokens*/
+%token LIST QUEUE PQUEUE MAP STRUCT
+/* STRUCT/BUILT-IN FUNCTION tokens */
+%token DOT
+/*Infinity tokens*/  
 %token INT_MAX INT_MIN FLOAT_MAX FLOAT_MIN
-%token <int> LITERAL
+/*number literals*/
+%token <int> INT_LITERAL
+%token <int> FLOAT_LITERAL
+/* variable */
 %token <string> ID
 %token EOF
 
@@ -29,8 +40,13 @@ open Ast;
 %left EQ NEQ
 %left LT GT LEQ GEQ
 %left PLUS MINUS
-%left TIMES DIVIDE
+%left TIMES DIVIDE MOD
 %right NOT NEG
+%left DOT
+%nonassoc AT
+%left ADD_EDGE REMOVE_EDGE
+%nonassoc UNDERSCORE
+%left ADD_NODE REMOVE_NODE
 
 %start program
 %type <Ast.program> program
