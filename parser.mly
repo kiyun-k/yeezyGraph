@@ -1,13 +1,22 @@
-/* Ocamlyacc parser for MicroC */
+{* Ocamlyacc parser for YeezyGraph*}
 
 %{
-open Ast
+open Ast;
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
-%token PLUS MINUS TIMES DIVIDE ASSIGN NOT
+%token PLUS MINUS TIMES DIVIDE PERCENT ASSIGN NOT
+%token DOT
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL VOID
+%token RETURN IF ELSE FOR WHILE INT FLOAT STRING BOOL NULL VOID
+%token UNDERSCORE AT 
+%token PLUSPLUS MINUSMINUS ARROW NARROW
+%token NODE GRAPH 
+%token STRUCT
+%token LIST QUEUE PQUEUE MAP  
+%token FUN
+%token MAIN
+%token INT_MAX INT_MIN FLOAT_MAX FLOAT_MIN
 %token <int> LITERAL
 %token <string> ID
 %token EOF
