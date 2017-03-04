@@ -48,8 +48,10 @@
 %nonassoc UNDERSCORE
 %left ADD_NODE REMOVE_NODE
 
-%start program
-%type <Ast.program> program
+%start main
+%type <Ast.program> main
+
+/* Stopping Point */
 
 %%
 
