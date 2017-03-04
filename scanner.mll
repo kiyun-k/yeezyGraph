@@ -2,6 +2,9 @@
 
 { open Parser }
 
+let letter = ['a'-'z' 'A'-'Z']
+let digit = ['0'-'9']
+
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
 | "/*"     { comment lexbuf }           (* Comments *)
@@ -22,10 +25,10 @@ rule token = parse
 | '_' { UNDERSCORE }   | '@' { AT }                | "INT_MAX" { INT_MAX} 
 | "INT_MIN" { INT_MIN }| "FLOAT_MAX" { FLOAT_MAX } | "FLOAT_MIN" { FLOAT_MIN } 
 | '%'  { MOD }         | "++" { ADD_NODE }         | "--"  { REMOVE_NODE }
-| ':' { COLON }        | '.' { DOT }               | "\-\>" { ARROW }
-| "!\-\>" { NARROW }
-| ['0'-'9']+ as lxm { LITERAL(int_of_string lxm) }
-| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
+| ':' { COLON }        | '.' { DOT }               | "\-\>" { ADD_EDGE }
+| "!\-\>" { REMOVE_EDGE }
+| digit+ as lxm { LITERAL(int_of_string lxm) }
+| letter(letter|digit)* as lxm { ID(lxm) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
