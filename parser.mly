@@ -1,4 +1,4 @@
-{* Ocamlyacc parser for YeezyGraph*}
+(* Ocamlyacc parser for YeezyGraph*)
 
 %{
 open Ast;
