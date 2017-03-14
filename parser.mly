@@ -27,8 +27,10 @@
 %token INT_MAX INT_MIN FLOAT_MAX FLOAT_MIN
 /*number literals*/
 %token <int> INT_LITERAL
-%token <int> FLOAT_LITERAL
-/* variable */
+%token <float> FLOAT_LITERAL
+/*string literal*/
+%token <string> STR_LITERAL
+/* variable names*/
 %token <string> ID
 %token EOF
 
@@ -48,8 +50,8 @@
 %nonassoc UNDERSCORE
 %left ADD_NODE REMOVE_NODE
 
-%start main
-%type <Ast.program> main
+%start program /*what exactly does this do?*/
+%type <Ast.program> program
 
 /* Stopping Point */
 
@@ -81,6 +83,8 @@ formal_list:
 
 typ:
     INT { Int }
+  | FLOAT {Float }
+  | STRING { String }
   | BOOL { Bool }
   | VOID { Void }
 

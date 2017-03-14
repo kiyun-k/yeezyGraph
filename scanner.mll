@@ -27,8 +27,10 @@ rule token = parse
 | '%'  { MOD }         | "++" { ADD_NODE }         | "--"  { REMOVE_NODE }
 | ':' { COLON }        | '.' { DOT }               | "\-\>" { ADD_EDGE }
 | "!\-\>" { REMOVE_EDGE }
-| digit+ as lxm { LITERAL(int_of_string lxm) }
-| letter(letter|digit)* as lxm { ID(lxm) }
+| digit+ as lxm { INT_LITERAL(int_of_string lxm) } (* how do we express negative ints/floats? *)
+| digit+('.')digit+ as lxm {FLOAT_LITERAL(float_of_string lxm)}
+| '"'([^'"']* as lxm)'"' {STR_LITERAL(lxm)}
+| letter(letter|digit|'_')* as lxm { ID(lxm) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
 
