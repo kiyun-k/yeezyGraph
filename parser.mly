@@ -13,7 +13,7 @@
 /* Control flow tokens */
 %token IF ELSE FOR WHILE
 /* Function tokens */
-%token RETURN VOID MAIN FUN
+%token RETURN VOID MAIN
 %token NODE GRAPH 
 /*Node tokens*/
 %token UNDERSCORE AT 
@@ -67,6 +67,7 @@ decls:
  | decls vdecl { ($2 :: fst $1), snd $1 }
  | decls fdecl { fst $1, ($2 :: snd $1) }
 
+/* fun returntype functionname(arg1, arg2....)*/
 fdecl:
    typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
      { { typ = $1;
@@ -83,12 +84,22 @@ formal_list:
     typ ID                   { [($1,$2)] }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
+/* differentiation between primitive and derived types*/
 typ:
     INT { Int }
   | FLOAT {Float }
   | STRING { String }
   | BOOL { Bool }
   | VOID { Void }
+  /* Is it okay for the following to be listed as this, since we always have a collection of another type?*/
+  | QUEUE { Queue }
+  | PQUEUE {PQueue }
+  | LIST { List }
+  | MAP  { Map}
+  | STRUCT { Struct } /*Likewise, is this okay since a struct is a complex data type?*/
+  | GRAPH { Graph }
+  | NODE { Node }
+  /* include null? */
 
 vdecl_list:
     /* nothing */    { [] }
