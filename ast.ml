@@ -13,6 +13,7 @@ type sop = AccessStructField (* Dot *)
 type uop = Neg | Not
 
 type typ = Int | Bool | Void | String | Float | Node | Graph | List | Queue | PQueue | Map | Struct | Null
+(*should void and null be included as types?*)
 
 type bind = typ * string
 
@@ -32,16 +33,29 @@ type expr =
   | StructLit of expr list 
   | NodeLit of string * expr * expr * expr * expr
   (* Does expr has to be more specific, such as BoolLit, etc. *)
+  (* is this even correct?? ): *)
   | GraphLit of NodeLit list 
   (*check with TA : is GraphLit right? *)
+  (*NodeLit list or expr list?*)
   | Binop of expr * op * expr
+  (* how about for strings? are they a separate set of ops or not? 
+  since not all operators have meaning with strings or may be overloaded [such as +]*)
   | Unop of uop * expr
   | StructOp of expr * sop * expr
   (* Do we differentiate our struct/node/graph operation expressions? *)
+  (* since sop = dot is just punctuation, should it just be StructOp of expr * expr?
+     in such a case, should we merge sop with other ops? these questions also apply to NodeOp and GraphOp *)
   | NodeOp of expr * nop * expr
+  (* when we say g1_n1, it's a node literal
+     g1_n1 is an expression of type expr * expr, but when we say g1_n1@name should it 
+     be of type expr * expr, or expr * expr * string? Is this even the right way to think about this? *)
   | GraphOp of expr * gop * expr
+  (* same question as with StructOp and NodeOp
+      for adding an edge, expr * expr * (float | int), not just expr * expr. *)
   | Assign of string * expr
   | Call of string * expr list
+  | ObjectCall of expr * string * expr list
+  (* is this necessary / correct?? for stuff like list.get() *)
   | Noexpr
 
 type stmt =

@@ -50,7 +50,7 @@
 %nonassoc UNDERSCORE
 %left ADD_NODE REMOVE_NODE
 
-%start program /*what exactly does this do?*/
+%start program /*what exactly does this do? - start symbol for the context free grammar for our language*/
 %type <Ast.program> program
 
 /* Stopping Point */
