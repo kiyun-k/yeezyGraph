@@ -58,9 +58,14 @@ type expr =
   (* is this necessary / correct?? for stuff like list.get() *)
   | Noexpr
 
+  (*where do variable declarations go?????? and also other declarations?????? 
+  are these declarations statements or expressions?
+  for example: list<int> l;
+  what if i want to say list<int> l = [1,2,3]; ? is that a statement or expression? 
+  is it expressable in our language right now? *)
+
 type stmt =
     Block of stmt list
-
 
   | Expr of expr
   | Return of expr
@@ -81,5 +86,5 @@ type func_decl = {
     locals : bind list;
     body : stmt list;
   }
-
+(* is this right? *)
 type program = bind list * func_decl list
