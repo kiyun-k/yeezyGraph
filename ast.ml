@@ -4,10 +4,6 @@ type op = Add | Sub | Mult | Div | Equal | Neq | Less | Leq | Greater | Geq |
           And | Or 
 
 type nop = AccessNode (*underscore, e.g. g1_n1*) | AccessNodeField (* At, g1_n1@visited*)
-(* Do we need separate type operators for node,graph,struct? 
-Answer: Only if the whitespace matters for nop's and not for op's, or vice versa. If they
-can be parsed in exactly the same way, then no.
-*)
 
 
 type gop = AddNode | RemoveNode | AddEdge | RemoveEdge 
@@ -21,14 +17,6 @@ type typ = Int | Bool | Void | String | Float | Node | Graph | List | Queue | PQ
 
 type bind = typ * string
 
-(* Do we need to add in expressions for accessing Collections elements? 
-Answer: I'm not sure, it's up to you guys. Probably yes if it is built into your language, 
-But you also could maybe reuse other operators, unless, again, they need to be parsed differently
-*)
-(* Do we need to add in an expression representing the (string, int) pair value for the Map collection?
-Answer: No, you could use just expressions and then do the type checking in the analyzer:
-Map of expr * expr
- *)
 
 type intLit  = IntLit of int
 type floatLit = FloatLit of float 
