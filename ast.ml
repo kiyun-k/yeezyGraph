@@ -30,90 +30,54 @@ Answer: No, you could use just expressions and then do the type checking in the 
 Map of expr * expr
  *)
 
+type intLit  = IntLit of int
+type floatLit = FloatLit of float 
+type boolLit = BoolLit of bool
+type stringLit = StringLit of string
+type listLit = ListLit of expr list (* Can we use expr that has been defined after this section of code?*)
+type queueLit = QueueLit of expr list
+type pqueueLit = PQueueLit of expr list
+type mapLit = MapLit of (expr * expr) list
 
+(* Do we need a graph literal? How would we express it? *)
 type expr =
-  IntLit of int
-
-  | FloatLit of float 
-  | StringLit of string
-  | BoolLit of bool
+  
+  | intLit
+  | floatLit
+  | boolLit  
+  | stringLit 
+  | listLit
+  | queueLit (* is this supposed to be in blue lettering? Is this correct? *)
+  | pqueueLit 
+  | mapLit
+  | structLit
   | Id of string
-  | ListLit of expr list 
-  | QueueLit of expr list
-  | PQueueLit of expr list
-  | MapLit of (expr * expr) list
-  | StructLit of expr list 
-  | NodeLit of string * expr * expr * expr * expr
-  (* Does expr has to be more specific, such as BoolLit, etc. 
-  Answer: You need to include all forms of expressions, but maybe you can make a literal thing and 
-  then just type that as an expression. Eg:
-  type lit = ...
-  and then
-  type expr = lit | Binop...
-  *)
-  (* is this even correct?? ): *)
-  | GraphLit of NodeLit list 
-  (*check with TA : is GraphLit right? 
-  Answer: is is a literal? What does it look like? i don't know if it is right-- it is completely dependent on your langauge.
-  *)
-  (*NodeLit list or expr list?*)
+  (*| NodeLit of string * boolLit * mapLit * mapLit * structLit *)
+  (* Is NodeLit not a valid expression, since we will never see a node being constructed this way? *)
+  (*| GraphLit of NodeLit list *)
   | Binop of expr * op * expr
-  (* how about for strings? are they a separate set of ops or not? 
-  since not all operators have meaning with strings or may be overloaded [such as +]
-  Answer: this is language dependent. Up to you.
-  *)
   | Unop of uop * expr
-  | StructOp of expr * sop * expr
-  (* Do we differentiate our struct/node/graph operation expressions? 
-  Answer: this is language dependent. Up to you. Probably better to organize the AST better though,
-  this is really messy.
-  *)
-  (* since sop = dot is just punctuation, should it just be StructOp of expr * expr?
-     in such a case, should we merge sop with other ops? these questions also apply to NodeOp and GraphOp 
-  Answer: whitespace dependent. same as nop's above
-   *)
-  | NodeOp of expr * nop * expr
-  (* when we say g1_n1, it's a node literal
-     g1_n1 is an expression of type expr * expr, but when we say g1_n1@name should it 
-     be of type expr * expr, or expr * expr * string? Is this even the right way to think about this? 
-  Ansewr: whitespace dependent
-   *)
-  | GraphOp of expr * gop * expr
-  (* same question as with StructOp and NodeOp
-      for adding an edge, expr * expr * (float | int), not just expr * expr. *)
+  | StructOp of structLit * sop * expr (*Should it be structLit or expr?*)
+  | NodeOp of expr * nop * string (* should it be string or expr? *)
+  | GraphOp of expr * gop * expr 
+  | GraphOpAddEdge of expr * gop * (float | int) * expr (* Is this correct? *)
   | Assign of string * expr
   | Call of string * expr list
   | ObjectCall of expr * string * expr list
-  (* is this necessary / correct?? for stuff like list.get() 
-  Answer: if it is in your language, it is correct. but make sure you aren't getting confused with what goes
-  in the AST and what goes in the parser
-  *)
   | Noexpr
 
-  (*where do variable declarations go?????? and also other declarations?????? 
-  are these declarations statements or expressions?
-  for example: list<int> l;
-  what if i want to say list<int> l = [1,2,3]; ? is that a statement or expression? 
-  is it expressable in our language right now? *)
 
 type stmt =
     Block of stmt list
-
-
+    
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | For of expr * expr * stmt (* check with TA the correctness of expr whether you use stmt/stmt list*)
   (* Another possible for expression (iteration): for of string * expr * stmt (is this correct?)*)
-  (* should we also replace expr with Nodelit or graphlit? 
-  Answer: language dependent, up to you.
-  *)
   | While of expr * stmt
-  (*should we add statements for declaring collections, structs, nodes, or graphs? *)
-  (*for example, should we use something like NodeDef, GraphDef, etc.
-  create a new type- declarations!
-  *)
+
   
 
 type func_decl = {
@@ -124,4 +88,30 @@ type func_decl = {
     body : stmt list;
   }
 
-type program = bind list * func_decl list
+(*An example of how we intend to declare a struct*)
+(*type structLit = StructLit of string * string * expr list *)
+(* struct struct_name = { int a, int b, string c} *)
+(* struct_name s; s.a = x; s.b = y; s.c = "abc" *)
+type struct_decl = {
+  typ : Struct; (* Is putting struct instead of typ correct here? *)
+  sname : string;
+  body : bind list; (* Is bind list correct here? *)
+}
+
+(* how do we express Type T in List<T> in our declarations?  *)
+(* Should typ refer to the type List or the typ inside the container? *)
+type list_decl = {
+  typ : List; (* why isn't "List" blue here? *)
+}
+type map_decl
+type queue_decl
+type pqueue_decl
+
+
+type graph_decl = {
+  typ : Graph;
+  gname : string;
+}
+
+
+type program = bind list * func_decl list * struct_decl list * list_decl list * map_decl list * queue_decl list * pqueue_decl list * graph_decl list
