@@ -66,8 +66,9 @@ decls:
    /* nothing */ { [], [] }
  | decls vdecl { ($2 :: fst $1), snd $1 }
  | decls fdecl { fst $1, ($2 :: snd $1) }
+ /* need declarations for collections */
 
-/* fun returntype functionname(arg1, arg2....)*/
+/* returntype functionname(arg1, arg2....)*/
 fdecl:
    typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
      { { typ = $1;
