@@ -69,13 +69,12 @@ type expr =
 
 type stmt =
     Block of stmt list
-    
+
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
-  | For of expr * expr * expr * stmt
-  | For of expr * expr * stmt (* check with TA the correctness of expr whether you use stmt/stmt list*)
-  (* Another possible for expression (iteration): for of string * expr * stmt (is this correct?)*)
+  | For of expr * expr * expr * stmt (* for (int i = 0; i < 10; i++) {} *)
+  | For of expr * expr * stmt  (*for (node x : g) {}*) (* Is this correct? *)
   | While of expr * stmt
 
   
