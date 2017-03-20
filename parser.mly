@@ -1,6 +1,11 @@
-(* Ocamlyacc parser for YeezyGraph*)
+/* Ocamlyacc parser for YeezyGraph */
 
-%{ open Ast %}
+/* This is for accessing the elements of a 3-tuple */
+%{
+  let get_1_3 (a,_,_) = a
+  let get_2_3 (_,a,_) = a
+  let get_3_3 (_,_,a) = a
+%}
 
 /* Punctuation tokens*/
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA COLON
@@ -52,8 +57,9 @@
 
 
 
-%start program /*what exactly does this do? - start symbol for the context free grammar for our language*/
-%type <Ast.program> program
+
+%start program 
+%type <Ast.program> program /* Ask TA */
 
 /* Stopping Point */
 
@@ -63,12 +69,11 @@ program:
   decls EOF { $1 }
 
 decls:
-   /* nothing */ { [], [] }
- | decls vdecl { ($2 :: fst $1), snd $1 }
- | decls fdecl { fst $1, ($2 :: snd $1) }
- /* need declarations for collections */
+   /* nothing */ { [], [], [] }
+ | decls vdecl { ($2 :: fst $1), snd $1, get_3_3($1) }
+ | decls fdecl { fst $1, ($2 :: snd $1), get_3_3($1) }
+ | decls sdecl { fst $1, snd $1, $2 :: get_3_3($1) } 
 
-/* returntype functionname(arg1, arg2....)*/
 fdecl:
    typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
      { { typ = $1;
@@ -83,31 +88,49 @@ formals_opt:
 
 formal_list:
     typ ID                   { [($1,$2)] }
-  | formal_list COMMA typ ID { ($3,$4) :: $1 }
+  | formal_list COMMA typ ID { ($3,$4) :: $1 } 
 
-/* differentiation between primitive and derived types*/
+
+
 typ:
     INT { Int }
   | FLOAT {Float }
   | STRING { String }
   | BOOL { Bool }
   | VOID { Void }
-  /* Is it okay for the following to be listed as this, since we always have a collection of another type?*/
-  | QUEUE { Queue }
-  | PQUEUE {PQueue }
-  | LIST { List }
-  | MAP  { Map}
-  | STRUCT { Struct } /*Likewise, is this okay since a struct is a complex data type?*/
+  | LIST LT INT GT { ListOfInt}
+  | LIST LT FLOAT GT { ListOfFloat}
+  | LIST LT BOOL GT { ListOfBool}
+  | LIST LT STRING GT { ListOfString}
+  | MAP LT STRING COMMA INT GT  { MapOfStringInt }
+  | MAP LT STRING COMMA STRING GT  { MapOfStringString }
+  | QUEUE LT INT GT { QueueOfInt}
+  | QUEUE LT FLOAT GT { QueueOfFloat}
+  | QUEUE LT BOOL GT { QueueOfBool}
+  | QUEUE LT STRING GT { QueueOfString}
+  | PQUEUE LT INT GT { PQueueOfInt}
+  | PQUEUE LT FLOAT GT { PQueueOfFloat}
+  | PQUEUE LT BOOL GT { PQueueOfBool}
+  | PQUEUE LT STRING GT { PQueueOfString}
+  | STRUCT ID { $2 } /*Check again*/
   | GRAPH { Graph }
   | NODE { Node }
-  /* include null? */
 
+
+  
 vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
    typ ID SEMI { ($1, $2) }
+
+sdecl: 
+   STRUCT ID ASSIGN LBRACE formals_opt RBRACE
+      { {
+        sname = $2
+        body = $5 } } 
+
 
 stmt_list:
     /* nothing */  { [] }
@@ -122,6 +145,7 @@ stmt:
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
      { For($3, $5, $7, $9) }
+  | FOR LPAREN expr COLON expr RPAREN stmt {ForNode($3, $5, $7)}
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 
 expr_opt:
@@ -129,10 +153,13 @@ expr_opt:
   | expr          { $1 }
 
 expr:
-    LITERAL          { Literal($1) }
-  | TRUE             { BoolLit(true) }
+    INT_LITERAL           { IntLit($1) } 
+  | FLOAT_LITERAL         { FloatLit($1) } 
+  | STR_LITERAL        { StringLit($1) } 
+  | TRUE              { BoolLit(true) }
   | FALSE            { BoolLit(false) }
   | ID               { Id($1) }
+ /*  | LBRACKET actuals_opt RBRACKET {ListLit($2)} */ /* Check with TA about conflicts */
   | expr PLUS   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
   | expr TIMES  expr { Binop($1, Mult,  $3) }
@@ -145,6 +172,9 @@ expr:
   | expr GEQ    expr { Binop($1, Geq,   $3) }
   | expr AND    expr { Binop($1, And,   $3) }
   | expr OR     expr { Binop($1, Or,    $3) }
+  | expr DOT    expr { Binop($1, AccessStructField, $3) }
+  /* | expr UNDERSCORE ID/expr      expr { NodeOp($1, AccessNode, $3)} */ /*Check with TA*/
+ /* | expr AT expr      expr { NodeOp($1, AccessNodeField, $3)} */
   | MINUS expr %prec NEG { Unop(Neg, $2) }
   | NOT expr         { Unop(Not, $2) }
   | ID ASSIGN expr   { Assign($1, $3) }
