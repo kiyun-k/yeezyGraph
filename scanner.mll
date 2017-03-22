@@ -8,7 +8,8 @@ let digit = ['0'-'9']
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
 | "/*"     { comment lexbuf }           (* Comments *)
-| '(' { LPAREN }       | ')' { RPAREN }            
+| '(' { LPAREN }       | ')' { RPAREN }
+| '[' { LBRACKET }     | ']' { RBRACKET }      
 | '{' { LBRACE }       | '}' { RBRACE }       
 | ';' { SEMI }         | ',' { COMMA } 
 
@@ -40,7 +41,8 @@ rule token = parse
 | ':' { COLON }        | '.' { DOT }   
 
 | "++" { ADD_NODE }    | "--"  { REMOVE_NODE }            
-| "\-\>" { ADD_EDGE }  | "!\-\>" { REMOVE_EDGE }
+| '('digit+')'"->" { ADD_EDGE_INT } | '('digit+'.'digit+')'"->" {ADD_EDGE_FLOAT }
+| "!->" { REMOVE_EDGE }
 
 | digit+ as lxm { INT_LITERAL(int_of_string lxm) } (* how do we express negative ints/floats? *)
 | digit+('.')digit+ as lxm {FLOAT_LITERAL(float_of_string lxm)}
