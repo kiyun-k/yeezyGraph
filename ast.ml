@@ -5,32 +5,29 @@ type op = Add | Sub | Mult | Div |
           And | Or | 
           AccessStructField 
 
-
 type nop = AccessNode (*underscore, e.g. g1_n1*) | AccessNodeField (* At, g1_n1@visited*)
-
 
 type gop = AddNode | RemoveNode | AddEdge | RemoveEdge 
 
 type uop = Neg | Not
-type typ = Int | Bool | String | Float | Node | Graph | 
+
+type typ = Int | Bool | String | Float | 
+           Node | Graph | 
            ListOfInt | ListOfBool | ListOfString | ListOfFloat | 
            QueueOfInt | QueueOfBool | QueueOfString | QueueOfFloat |
            PQueueOfInt | PQueueOfBool | PQueueOfString | PQueueOfFloat | 
            MapOfStringInt | MapOfStringString |
-           Void | Struct 
+           Struct |
+           Void 
            
 type bind = typ * string
 
-
 type expr = 
-  IntLit of int 
+    IntLit of int 
   | FloatLit of float
   | BoolLit of bool 
   | StringLit of string 
   | ListLit of expr list 
-  (*| QueueLit of expr list 
-  | PQueueLit of expr list 
-  | MapLit of (expr * expr) list *) (*Check with TA *) 
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
@@ -46,7 +43,6 @@ type expr =
 
 type stmt =
     Block of stmt list
-
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
@@ -54,7 +50,6 @@ type stmt =
   | ForNode of bind * string * stmt  (*for (node x : g) {}*) (* Doublecheck with TA *)
   | While of expr * stmt
 
-  
 
 type func_decl = {
     typ : typ;

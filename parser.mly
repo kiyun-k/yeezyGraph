@@ -1,43 +1,49 @@
 /* Ocamlyacc parser for YeezyGraph */
 
-/* This is for accessing the elements of a 3-tuple */
+/* Accessing the elements of a 3-tuple */
 %{
   let get_1_3 (a,_,_) = a
   let get_2_3 (_,a,_) = a
   let get_3_3 (_,_,a) = a
+  let hello = ("a", "b", "c")
+  let _ = print_endline get_3_3(hello)
 %}
 
 /* Punctuation tokens*/
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA COLON
+%token SEMI LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE COMMA COLON
 /* Arithmetic tokens */
 %token PLUS MINUS TIMES DIVIDE MOD ASSIGN NOT
 /* Logical tokens */
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 /* Primitive datatype tokens */
-%token INT FLOAT STRING BOOL NULL
+%token INT FLOAT STRING BOOL 
 /* Control flow tokens */
 %token IF ELSE FOR WHILE
 /* Function tokens */
 %token RETURN VOID MAIN
 %token NODE GRAPH 
-/*Node tokens*/
+/* Node token s*/
 %token UNDERSCORE AT 
+
 /* Graph tokens */
 %token ADD_NODE REMOVE_NODE ADD_EDGE REMOVE_EDGE
-/*Collection tokens*/
+/* Collection tokens */
 %token LIST QUEUE PQUEUE MAP STRUCT
-/* STRUCT/BUILT-IN FUNCTION tokens */
+/* STUCT tokens */
+%token TILDE
+/* BUILT-IN FUNCTION tokens */
 %token DOT
-/*Infinity tokens*/  
+/* Infinity tokens */  
 %token INT_MAX INT_MIN FLOAT_MAX FLOAT_MIN
-/*number literals*/
+/* Number literals */
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
-/*string literal*/
+/* String literal */
 %token <string> STR_LITERAL
-/* variable names*/
+/* Variable names */
 %token <string> ID
 %token EOF
+
 
 %nonassoc NOELSE
 %nonassoc ELSE
@@ -50,6 +56,7 @@
 %left TIMES DIVIDE MOD
 %right NOT NEG
 %left DOT
+%left TILDE
 %nonassoc AT
 %left ADD_EDGE REMOVE_EDGE
 %nonassoc UNDERSCORE
@@ -125,6 +132,7 @@ vdecl_list:
 vdecl:
    typ ID SEMI { ($1, $2) }
 
+
 sdecl: 
    STRUCT ID ASSIGN LBRACE formals_opt RBRACE
       { {
@@ -148,39 +156,48 @@ stmt:
   | FOR LPAREN expr COLON expr RPAREN stmt {ForNode($3, $5, $7)}
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 
+
+expr:
+    INT_LITERAL                   { IntLit($1) } 
+  | FLOAT_LITERAL                 { FloatLit($1) } 
+  | STR_LITERAL                   { StringLit($1) } 
+  | TRUE                          { BoolLit(true) }
+  | FALSE                         { BoolLit(false) }
+  | ID                            { Id($1) }
+  | LBRACKET actuals_opt RBRACKET {ListLit($2)}  
+  | expr PLUS   expr              { Binop($1, Add,   $3) }
+  | expr MINUS  expr              { Binop($1, Sub,   $3) }
+  | expr TIMES  expr              { Binop($1, Mult,  $3) }
+  | expr DIVIDE expr              { Binop($1, Div,   $3) }
+  | expr EQ     expr              { Binop($1, Equal, $3) }
+  | expr NEQ    expr              { Binop($1, Neq,   $3) }
+  | expr LT     expr              { Binop($1, Less,  $3) }
+  | expr LEQ    expr              { Binop($1, Leq,   $3) }
+  | expr GT     expr              { Binop($1, Greater, $3) }
+  | expr GEQ    expr              { Binop($1, Geq,   $3) }
+  | expr AND    expr              { Binop($1, And,   $3) }
+  | expr OR     expr              { Binop($1, Or,    $3) }
+  | expr DOT    expr              { Binop($1, AccessStructField, $3) } /*it's really ID DOT ID but my ast says expr binop expr */
+  | expr UNDERSCORE ID            { NodeOp($1, AccessNode, $3) } /*check: should be ID/string/expr*/
+  | expr AT ID                    { NodeOp($1, AccessNodeField, $3) } /*check: should be ID/string/expr*/
+  | expr ADD_NODE expr            { GraphOp($1, AddNode, $3) }
+  | expr REMOVE_NODE expr         { GraphOp($1, RemoveNode, $3) }
+  /*| expr LBRACE INT_LITERAL RBRACE ADD_EDGE expr    { GraphOpAddEdgeInt($1, $3, AddEdge, $6) } )*/
+  /*| expr LPAREN FLOAT_LITERAL RPAREN ADD_EDGE expr  { GraphOpAddEdgeFloat($1, $3, AddEdge, $6) }*/
+  | expr REMOVE_EDGE expr         { GraphOp($1, RemoveEdge, $3) }
+  | MINUS expr %prec NEG          { Unop(Neg, $2) }
+  | NOT expr                      { Unop(Not, $2) }
+  | ID ASSIGN expr                { Assign($1, $3) }
+  | ID LPAREN actuals_opt RPAREN  { Call($1, $3) }
+  | ID TILDE ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }    /*shift reduce conflict*/
+  | LPAREN expr RPAREN            { $2 }
+
 expr_opt:
     /* nothing */ { Noexpr }
   | expr          { $1 }
 
-expr:
-    INT_LITERAL           { IntLit($1) } 
-  | FLOAT_LITERAL         { FloatLit($1) } 
-  | STR_LITERAL        { StringLit($1) } 
-  | TRUE              { BoolLit(true) }
-  | FALSE            { BoolLit(false) }
-  | ID               { Id($1) }
- /*  | LBRACKET actuals_opt RBRACKET {ListLit($2)} */ /* Check with TA about conflicts */
-  | expr PLUS   expr { Binop($1, Add,   $3) }
-  | expr MINUS  expr { Binop($1, Sub,   $3) }
-  | expr TIMES  expr { Binop($1, Mult,  $3) }
-  | expr DIVIDE expr { Binop($1, Div,   $3) }
-  | expr EQ     expr { Binop($1, Equal, $3) }
-  | expr NEQ    expr { Binop($1, Neq,   $3) }
-  | expr LT     expr { Binop($1, Less,  $3) }
-  | expr LEQ    expr { Binop($1, Leq,   $3) }
-  | expr GT     expr { Binop($1, Greater, $3) }
-  | expr GEQ    expr { Binop($1, Geq,   $3) }
-  | expr AND    expr { Binop($1, And,   $3) }
-  | expr OR     expr { Binop($1, Or,    $3) }
-  | expr DOT    expr { Binop($1, AccessStructField, $3) }
-  /* | expr UNDERSCORE ID/expr      expr { NodeOp($1, AccessNode, $3)} */ /*Check with TA*/
- /* | expr AT expr      expr { NodeOp($1, AccessNodeField, $3)} */
-  | MINUS expr %prec NEG { Unop(Neg, $2) }
-  | NOT expr         { Unop(Not, $2) }
-  | ID ASSIGN expr   { Assign($1, $3) }
-  | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
-  | LPAREN expr RPAREN { $2 }
 
+/* Comma-separated lists of things */
 actuals_opt:
     /* nothing */ { [] }
   | actuals_list  { List.rev $1 }
