@@ -39,6 +39,7 @@ rule token = parse
         
 | '_' { UNDERSCORE }   | '@' { AT } 
 | ':' { COLON }        | '.' { DOT }   
+| '~' { TILDE }
 
 | "++" { ADD_NODE }    | "--"  { REMOVE_NODE }            
 | '('digit+')'"->" { ADD_EDGE_INT } | '('digit+'.'digit+')'"->" {ADD_EDGE_FLOAT }
