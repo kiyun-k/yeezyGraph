@@ -29,10 +29,10 @@ type expr =
   | StringLit of string 
   | ListLit of expr list 
   | Id of string
-  | Binop of expr * op * expr
+  | Binop of expr * op * expr 
   | Unop of uop * expr
-  | NodeOp of expr * nop * string 
-  | GraphOp of expr * gop * expr 
+  | NodeOp of expr * nop * string (* g1_n1 / g1_n1@name *) 
+  | GraphOp of expr * gop * expr (* g1++n1*)
   | GraphOpAddEdgeInt of expr * int * gop * expr
   | GraphOpAddEdgeFloat of expr * float * gop *  expr
   | Assign of string * expr

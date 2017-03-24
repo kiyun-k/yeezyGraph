@@ -5,8 +5,6 @@
   let get_1_3 (a,_,_) = a
   let get_2_3 (_,a,_) = a
   let get_3_3 (_,_,a) = a
-  let hello = ("a", "b", "c")
-  let _ = print_endline get_3_3(hello)
 %}
 
 /* Punctuation tokens*/
@@ -29,7 +27,7 @@
 %token ADD_NODE REMOVE_NODE ADD_EDGE REMOVE_EDGE
 /* Collection tokens */
 %token LIST QUEUE PQUEUE MAP STRUCT
-/* STUCT tokens */
+/* STRUCT tokens */
 %token TILDE
 /* BUILT-IN FUNCTION tokens */
 %token DOT
@@ -66,9 +64,7 @@
 
 
 %start program 
-%type <Ast.program> program /* Ask TA */
-
-/* Stopping Point */
+%type <Ast.program> program 
 
 %%
 
@@ -101,7 +97,7 @@ formal_list:
 
 typ:
     INT { Int }
-  | FLOAT {Float }
+  | FLOAT { Float }
   | STRING { String }
   | BOOL { Bool }
   | VOID { Void }
@@ -119,7 +115,7 @@ typ:
   | PQUEUE LT FLOAT GT { PQueueOfFloat}
   | PQUEUE LT BOOL GT { PQueueOfBool}
   | PQUEUE LT STRING GT { PQueueOfString}
-  | STRUCT ID { $2 } /*Check again*/
+  | STRUCT ID { $2 }    /*Check again*/
   | GRAPH { Graph }
   | NODE { Node }
 
@@ -153,7 +149,7 @@ stmt:
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
      { For($3, $5, $7, $9) }
-  | FOR LPAREN expr COLON expr RPAREN stmt {ForNode($3, $5, $7)}
+  | FOR LPAREN expr COLON expr RPAREN stmt {ForNode($3, $5, $7)} /*check with TA*/
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 
 
@@ -182,14 +178,14 @@ expr:
   | expr AT ID                    { NodeOp($1, AccessNodeField, $3) } /*check: should be ID/string/expr*/
   | expr ADD_NODE expr            { GraphOp($1, AddNode, $3) }
   | expr REMOVE_NODE expr         { GraphOp($1, RemoveNode, $3) }
-  /*| expr LBRACE INT_LITERAL RBRACE ADD_EDGE expr    { GraphOpAddEdgeInt($1, $3, AddEdge, $6) } )*/
-  /*| expr LPAREN FLOAT_LITERAL RPAREN ADD_EDGE expr  { GraphOpAddEdgeFloat($1, $3, AddEdge, $6) }*/
+  | expr LBRACE INT_LITERAL RBRACE ADD_EDGE expr    { GraphOpAddEdgeInt($1, $3, AddEdge, $6) } 
+  /*| expr LPAREN FLOAT_LITERAL RPAREN ADD_EDGE expr  { GraphOpAddEdgeFloat($1, $3, AddEdge, $6) } */
   | expr REMOVE_EDGE expr         { GraphOp($1, RemoveEdge, $3) }
   | MINUS expr %prec NEG          { Unop(Neg, $2) }
   | NOT expr                      { Unop(Not, $2) }
   | ID ASSIGN expr                { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN  { Call($1, $3) }
-  | ID TILDE ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }    /*shift reduce conflict*/
+  | ID TILDE ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }    
   | LPAREN expr RPAREN            { $2 }
 
 expr_opt:
