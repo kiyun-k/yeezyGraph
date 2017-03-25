@@ -1,13 +1,13 @@
 (* Top-level of the yeezyGraph compiler: scan & parse the input,
    check the resulting AST, generate LLVM IR, and dump the module *)
 
-type action = Ast | LLVM | Compile
+type action = Ast | LLVM_IR | Compile
 
 let _ = 
 	let action = if Array.length Sys.argv > 1 then
 		List.assoc Sys.argv.(1) [("-a", Ast); (* Print the AST only *)
-			("-l", llvm); (* Generate LLVM, don't check *)
-			("-c", compile)] (* Generate, check LLVM IR *)
+			("-l", LLVM_IR); (* Generate LLVM, don't check *)
+			("-c", Compile)] (* Generate, check LLVM IR *)
 	else Compile in (* Go straight to compile if no options added *)
 	
 	let lexbuf = Lexing.from_channel stdin in (* lexbuf = tokens from scanner *)
@@ -16,7 +16,7 @@ let _ =
 
 	match action with
 		Ast -> print_string (Ast.string_of_program ast) (* print out string of ast *)
-	  | LLVM -> print_string (Llvm.string_of_llmodule (Codegen.translate ast)) (* print out llvm *)
+	  | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate ast)) (* print out llvm *)
 	  | Compile -> let m = Codegen.translate ast in
 	  	Llvm_analysis.assert_valid_module m;
 	  	print_string (Llvm.string_of_llmodule m)
