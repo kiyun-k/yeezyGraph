@@ -32,7 +32,7 @@ type expr =
   | Binop of expr * op * expr 
   | Unop of uop * expr
   | NodeOp of expr * nop * string (* g1_n1 / g1_n1@name *) 
-  | GraphOp of expr * gop * expr (* g1++n1*)
+  | GraphOp of string * gop * string (* g1++n1 *)
   | GraphOpAddEdgeInt of expr * int * gop * expr
   | GraphOpAddEdgeFloat of expr * float * gop *  expr
   | Assign of string * expr
@@ -46,8 +46,8 @@ type stmt =
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
-  | For of expr * expr * expr * stmt (* for (int i = 0; i < 10; i++) {} *)
-  | ForNode of bind * string * stmt  (*for (node x : g) {}*) (* Doublecheck with TA *)
+  | For of expr * expr * expr * stmt (* for (int i = 0; i < 10; i++) { ... } *)
+  | ForNode of bind * string * stmt  (* for (node x : g) { ... } *) (* Doublecheck with TA *)
   | While of expr * stmt
 
 

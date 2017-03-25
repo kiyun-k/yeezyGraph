@@ -77,13 +77,15 @@ decls:
  | decls fdecl { fst $1, ($2 :: snd $1), get_3_3($1) }
  | decls sdecl { fst $1, snd $1, $2 :: get_3_3($1) } 
 
+
+
 fdecl:
    typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
      { { typ = $1;
-   fname = $2;
-   formals = $4;
-   locals = List.rev $7;
-   body = List.rev $8 } }
+         fname = $2;
+         formals = $4;
+         locals = List.rev $7;
+         body = List.rev $8 } }
 
 formals_opt:
     /* nothing */ { [] }
@@ -129,11 +131,13 @@ vdecl:
    typ ID SEMI { ($1, $2) }
 
 
+
 sdecl: 
    STRUCT ID ASSIGN LBRACE formals_opt RBRACE
       { {
         sname = $2
         body = $5 } } 
+
 
 
 stmt_list:
@@ -151,6 +155,7 @@ stmt:
      { For($3, $5, $7, $9) }
   | FOR LPAREN expr COLON expr RPAREN stmt {ForNode($3, $5, $7)} /*check with TA*/
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
+
 
 
 expr:
@@ -173,24 +178,25 @@ expr:
   | expr GEQ    expr              { Binop($1, Geq,   $3) }
   | expr AND    expr              { Binop($1, And,   $3) }
   | expr OR     expr              { Binop($1, Or,    $3) }
-  | expr DOT    expr              { Binop($1, AccessStructField, $3) } /*it's really ID DOT ID but my ast says expr binop expr */
-  | expr UNDERSCORE ID            { NodeOp($1, AccessNode, $3) } /*check: should be ID/string/expr*/
-  | expr AT ID                    { NodeOp($1, AccessNodeField, $3) } /*check: should be ID/string/expr*/
-  | expr ADD_NODE expr            { GraphOp($1, AddNode, $3) }
-  | expr REMOVE_NODE expr         { GraphOp($1, RemoveNode, $3) }
-  | expr LBRACE INT_LITERAL RBRACE ADD_EDGE expr    { GraphOpAddEdgeInt($1, $3, AddEdge, $6) } 
-  /*| expr LPAREN FLOAT_LITERAL RPAREN ADD_EDGE expr  { GraphOpAddEdgeFloat($1, $3, AddEdge, $6) } */
-  | expr REMOVE_EDGE expr         { GraphOp($1, RemoveEdge, $3) }
+  | expr TILDE    expr              { Binop($1, AccessStructField, $3) }
+  | expr UNDERSCORE ID            { NodeOp($1, AccessNode, $3) } 
+  | expr AT ID                    { NodeOp($1, AccessNodeField, $3) } 
+  | ID ADD_NODE ID                { GraphOp($1, AddNode, $3) }
+  | ID REMOVE_NODE ID             { GraphOp($1, RemoveNode, $3) }
+  /* | expr LBRACE INT_LITERAL RBRACE ADD_EDGE expr    { GraphOpAddEdgeInt($1, $3, AddEdge, $6) } */
+  /* | expr LPAREN FLOAT_LITERAL RPAREN ADD_EDGE expr  { GraphOpAddEdgeFloat($1, $3, AddEdge, $6) } */
+  | ID REMOVE_EDGE ID             { GraphOp($1, RemoveEdge, $3) }
   | MINUS expr %prec NEG          { Unop(Neg, $2) }
   | NOT expr                      { Unop(Not, $2) }
   | ID ASSIGN expr                { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN  { Call($1, $3) }
-  | ID TILDE ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }    
+  | ID DOT ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }    
   | LPAREN expr RPAREN            { $2 }
 
 expr_opt:
     /* nothing */ { Noexpr }
   | expr          { $1 }
+
 
 
 /* Comma-separated lists of things */
