@@ -1,14 +1,15 @@
-(* yeezyGraph compiler *)
+(* Top-level of the yeezyGraph compiler: scan & parse the input,
+   check the resulting AST, generate LLVM IR, and dump the module *)
 
 type action = Ast | LLVM | Compile
 
 let _ = 
 	let action = if Array.length Sys.argv > 1 then
-		List.assoc Sys.argv.(1) [("-a", ast); (* print ast *)
-			("-l", llvm); (* generate llvm, no checking *)
-			("-c", compile)] (* generate, check llvm *)
-	else Compile in (* go straight to compile if no options added *)
-
+		List.assoc Sys.argv.(1) [("-a", Ast); (* Print the AST only *)
+			("-l", llvm); (* Generate LLVM, don't check *)
+			("-c", compile)] (* Generate, check LLVM IR *)
+	else Compile in (* Go straight to compile if no options added *)
+	
 	let lexbuf = Lexing.from_channel stdin in (* lexbuf = tokens from scanner *)
 	let ast = Parser.program Scanner.token lexbuf in (* ast = parser(lexbuf) *)
 	(*Semant.check ast; *) (* uncomment after we write semantic analyzer *)
