@@ -4,7 +4,7 @@
 ./microc.native < tests/test-add1.mc > test-add1.ll
 llc test-add1.ll > test-add1.s
 cc -o test-add1.exe test-add1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-add1-306139.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-add1-c26dbd.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-add1.exe
 diff -b test-add1.out tests/test-add1.out > test-add1.diff
 ###### SUCCESS
@@ -13,7 +13,7 @@ diff -b test-add1.out tests/test-add1.out > test-add1.diff
 ./microc.native < tests/test-arith1.mc > test-arith1.ll
 llc test-arith1.ll > test-arith1.s
 cc -o test-arith1.exe test-arith1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-arith1-e5a564.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-arith1-57c90f.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-arith1.exe
 diff -b test-arith1.out tests/test-arith1.out > test-arith1.diff
 ###### SUCCESS
@@ -22,7 +22,7 @@ diff -b test-arith1.out tests/test-arith1.out > test-arith1.diff
 ./microc.native < tests/test-arith2.mc > test-arith2.ll
 llc test-arith2.ll > test-arith2.s
 cc -o test-arith2.exe test-arith2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-arith2-a9d4f4.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-arith2-30eb54.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-arith2.exe
 diff -b test-arith2.out tests/test-arith2.out > test-arith2.diff
 ###### SUCCESS
@@ -31,7 +31,7 @@ diff -b test-arith2.out tests/test-arith2.out > test-arith2.diff
 ./microc.native < tests/test-arith3.mc > test-arith3.ll
 llc test-arith3.ll > test-arith3.s
 cc -o test-arith3.exe test-arith3.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-arith3-d15a9e.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-arith3-4948d1.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-arith3.exe
 diff -b test-arith3.out tests/test-arith3.out > test-arith3.diff
 ###### SUCCESS
@@ -40,7 +40,7 @@ diff -b test-arith3.out tests/test-arith3.out > test-arith3.diff
 ./microc.native < tests/test-fib.mc > test-fib.ll
 llc test-fib.ll > test-fib.s
 cc -o test-fib.exe test-fib.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-fib-4bf285.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-fib-9a28c2.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-fib.exe
 diff -b test-fib.out tests/test-fib.out > test-fib.diff
 ###### SUCCESS
@@ -49,7 +49,7 @@ diff -b test-fib.out tests/test-fib.out > test-fib.diff
 ./microc.native < tests/test-for1.mc > test-for1.ll
 llc test-for1.ll > test-for1.s
 cc -o test-for1.exe test-for1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-for1-48b0eb.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-for1-81364a.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-for1.exe
 diff -b test-for1.out tests/test-for1.out > test-for1.diff
 ###### SUCCESS
@@ -58,7 +58,7 @@ diff -b test-for1.out tests/test-for1.out > test-for1.diff
 ./microc.native < tests/test-for2.mc > test-for2.ll
 llc test-for2.ll > test-for2.s
 cc -o test-for2.exe test-for2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-for2-806ac5.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-for2-c2e280.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-for2.exe
 diff -b test-for2.out tests/test-for2.out > test-for2.diff
 ###### SUCCESS
@@ -67,7 +67,7 @@ diff -b test-for2.out tests/test-for2.out > test-for2.diff
 ./microc.native < tests/test-func1.mc > test-func1.ll
 llc test-func1.ll > test-func1.s
 cc -o test-func1.exe test-func1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func1-7dc113.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func1-96b24f.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-func1.exe
 diff -b test-func1.out tests/test-func1.out > test-func1.diff
 ###### SUCCESS
@@ -76,7 +76,7 @@ diff -b test-func1.out tests/test-func1.out > test-func1.diff
 ./microc.native < tests/test-func2.mc > test-func2.ll
 llc test-func2.ll > test-func2.s
 cc -o test-func2.exe test-func2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func2-919dc9.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func2-30c9bc.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-func2.exe
 diff -b test-func2.out tests/test-func2.out > test-func2.diff
 ###### SUCCESS
@@ -85,7 +85,7 @@ diff -b test-func2.out tests/test-func2.out > test-func2.diff
 ./microc.native < tests/test-func3.mc > test-func3.ll
 llc test-func3.ll > test-func3.s
 cc -o test-func3.exe test-func3.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func3-8c75be.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func3-54f133.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-func3.exe
 diff -b test-func3.out tests/test-func3.out > test-func3.diff
 ###### SUCCESS
@@ -94,7 +94,7 @@ diff -b test-func3.out tests/test-func3.out > test-func3.diff
 ./microc.native < tests/test-func4.mc > test-func4.ll
 llc test-func4.ll > test-func4.s
 cc -o test-func4.exe test-func4.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func4-aab134.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func4-55631d.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-func4.exe
 diff -b test-func4.out tests/test-func4.out > test-func4.diff
 ###### SUCCESS
@@ -103,7 +103,7 @@ diff -b test-func4.out tests/test-func4.out > test-func4.diff
 ./microc.native < tests/test-func5.mc > test-func5.ll
 llc test-func5.ll > test-func5.s
 cc -o test-func5.exe test-func5.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func5-c83b51.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func5-13e033.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-func5.exe
 diff -b test-func5.out tests/test-func5.out > test-func5.diff
 ###### SUCCESS
@@ -112,7 +112,7 @@ diff -b test-func5.out tests/test-func5.out > test-func5.diff
 ./microc.native < tests/test-func6.mc > test-func6.ll
 llc test-func6.ll > test-func6.s
 cc -o test-func6.exe test-func6.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func6-8713d5.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func6-5b51c5.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-func6.exe
 diff -b test-func6.out tests/test-func6.out > test-func6.diff
 ###### SUCCESS
@@ -121,7 +121,7 @@ diff -b test-func6.out tests/test-func6.out > test-func6.diff
 ./microc.native < tests/test-func7.mc > test-func7.ll
 llc test-func7.ll > test-func7.s
 cc -o test-func7.exe test-func7.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func7-1b970f.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func7-6cf16c.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-func7.exe
 diff -b test-func7.out tests/test-func7.out > test-func7.diff
 ###### SUCCESS
@@ -130,7 +130,7 @@ diff -b test-func7.out tests/test-func7.out > test-func7.diff
 ./microc.native < tests/test-func8.mc > test-func8.ll
 llc test-func8.ll > test-func8.s
 cc -o test-func8.exe test-func8.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func8-15c36b.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-func8-2ebbc5.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-func8.exe
 diff -b test-func8.out tests/test-func8.out > test-func8.diff
 ###### SUCCESS
@@ -139,7 +139,7 @@ diff -b test-func8.out tests/test-func8.out > test-func8.diff
 ./microc.native < tests/test-gcd.mc > test-gcd.ll
 llc test-gcd.ll > test-gcd.s
 cc -o test-gcd.exe test-gcd.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-gcd-f641b7.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-gcd-001567.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-gcd.exe
 diff -b test-gcd.out tests/test-gcd.out > test-gcd.diff
 ###### SUCCESS
@@ -148,7 +148,7 @@ diff -b test-gcd.out tests/test-gcd.out > test-gcd.diff
 ./microc.native < tests/test-gcd2.mc > test-gcd2.ll
 llc test-gcd2.ll > test-gcd2.s
 cc -o test-gcd2.exe test-gcd2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-gcd2-2129da.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-gcd2-d08928.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-gcd2.exe
 diff -b test-gcd2.out tests/test-gcd2.out > test-gcd2.diff
 ###### SUCCESS
@@ -157,7 +157,7 @@ diff -b test-gcd2.out tests/test-gcd2.out > test-gcd2.diff
 ./microc.native < tests/test-global1.mc > test-global1.ll
 llc test-global1.ll > test-global1.s
 cc -o test-global1.exe test-global1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-global1-263b1d.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-global1-52e055.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-global1.exe
 diff -b test-global1.out tests/test-global1.out > test-global1.diff
 ###### SUCCESS
@@ -166,7 +166,7 @@ diff -b test-global1.out tests/test-global1.out > test-global1.diff
 ./microc.native < tests/test-global2.mc > test-global2.ll
 llc test-global2.ll > test-global2.s
 cc -o test-global2.exe test-global2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-global2-80c5ec.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-global2-793430.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-global2.exe
 diff -b test-global2.out tests/test-global2.out > test-global2.diff
 ###### SUCCESS
@@ -175,7 +175,7 @@ diff -b test-global2.out tests/test-global2.out > test-global2.diff
 ./microc.native < tests/test-global3.mc > test-global3.ll
 llc test-global3.ll > test-global3.s
 cc -o test-global3.exe test-global3.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-global3-4756a6.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-global3-f85fd8.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-global3.exe
 diff -b test-global3.out tests/test-global3.out > test-global3.diff
 ###### SUCCESS
@@ -184,7 +184,7 @@ diff -b test-global3.out tests/test-global3.out > test-global3.diff
 ./microc.native < tests/test-hello.mc > test-hello.ll
 llc test-hello.ll > test-hello.s
 cc -o test-hello.exe test-hello.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-hello-7b8713.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-hello-50c1e6.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-hello.exe
 diff -b test-hello.out tests/test-hello.out > test-hello.diff
 ###### SUCCESS
@@ -193,7 +193,7 @@ diff -b test-hello.out tests/test-hello.out > test-hello.diff
 ./microc.native < tests/test-if1.mc > test-if1.ll
 llc test-if1.ll > test-if1.s
 cc -o test-if1.exe test-if1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if1-2d88c0.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if1-8c7dc8.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-if1.exe
 diff -b test-if1.out tests/test-if1.out > test-if1.diff
 ###### SUCCESS
@@ -202,7 +202,7 @@ diff -b test-if1.out tests/test-if1.out > test-if1.diff
 ./microc.native < tests/test-if2.mc > test-if2.ll
 llc test-if2.ll > test-if2.s
 cc -o test-if2.exe test-if2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if2-43476c.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if2-270698.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-if2.exe
 diff -b test-if2.out tests/test-if2.out > test-if2.diff
 ###### SUCCESS
@@ -211,7 +211,7 @@ diff -b test-if2.out tests/test-if2.out > test-if2.diff
 ./microc.native < tests/test-if3.mc > test-if3.ll
 llc test-if3.ll > test-if3.s
 cc -o test-if3.exe test-if3.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if3-c77885.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if3-5bdc3d.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-if3.exe
 diff -b test-if3.out tests/test-if3.out > test-if3.diff
 ###### SUCCESS
@@ -220,7 +220,7 @@ diff -b test-if3.out tests/test-if3.out > test-if3.diff
 ./microc.native < tests/test-if4.mc > test-if4.ll
 llc test-if4.ll > test-if4.s
 cc -o test-if4.exe test-if4.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if4-3f1770.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if4-a888e7.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-if4.exe
 diff -b test-if4.out tests/test-if4.out > test-if4.diff
 ###### SUCCESS
@@ -229,7 +229,7 @@ diff -b test-if4.out tests/test-if4.out > test-if4.diff
 ./microc.native < tests/test-if5.mc > test-if5.ll
 llc test-if5.ll > test-if5.s
 cc -o test-if5.exe test-if5.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if5-fe0ecb.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-if5-2aa01f.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-if5.exe
 diff -b test-if5.out tests/test-if5.out > test-if5.diff
 ###### SUCCESS
@@ -238,7 +238,7 @@ diff -b test-if5.out tests/test-if5.out > test-if5.diff
 ./microc.native < tests/test-local1.mc > test-local1.ll
 llc test-local1.ll > test-local1.s
 cc -o test-local1.exe test-local1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-local1-984a4d.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-local1-457ae9.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-local1.exe
 diff -b test-local1.out tests/test-local1.out > test-local1.diff
 ###### SUCCESS
@@ -247,7 +247,7 @@ diff -b test-local1.out tests/test-local1.out > test-local1.diff
 ./microc.native < tests/test-local2.mc > test-local2.ll
 llc test-local2.ll > test-local2.s
 cc -o test-local2.exe test-local2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-local2-877de0.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-local2-f0a9da.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-local2.exe
 diff -b test-local2.out tests/test-local2.out > test-local2.diff
 ###### SUCCESS
@@ -256,7 +256,7 @@ diff -b test-local2.out tests/test-local2.out > test-local2.diff
 ./microc.native < tests/test-ops1.mc > test-ops1.ll
 llc test-ops1.ll > test-ops1.s
 cc -o test-ops1.exe test-ops1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-ops1-043985.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-ops1-0c4f36.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-ops1.exe
 diff -b test-ops1.out tests/test-ops1.out > test-ops1.diff
 ###### SUCCESS
@@ -265,7 +265,7 @@ diff -b test-ops1.out tests/test-ops1.out > test-ops1.diff
 ./microc.native < tests/test-ops2.mc > test-ops2.ll
 llc test-ops2.ll > test-ops2.s
 cc -o test-ops2.exe test-ops2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-ops2-3d751d.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-ops2-f272ec.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-ops2.exe
 diff -b test-ops2.out tests/test-ops2.out > test-ops2.diff
 ###### SUCCESS
@@ -274,16 +274,26 @@ diff -b test-ops2.out tests/test-ops2.out > test-ops2.diff
 ./microc.native < tests/test-printbig.mc > test-printbig.ll
 llc test-printbig.ll > test-printbig.s
 cc -o test-printbig.exe test-printbig.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-printbig-a635cb.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-printbig-42f19c.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-printbig.exe
 diff -b test-printbig.out tests/test-printbig.out > test-printbig.diff
 ###### SUCCESS
+
+###### Testing test-stringdecl
+./microc.native < tests/test-stringdecl.mc > test-stringdecl.ll
+llc test-stringdecl.ll > test-stringdecl.s
+cc -o test-stringdecl.exe test-stringdecl.s printbig.o
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-stringdecl-21ae30.o) was built for newer OSX version (14.5) than being linked (10.10)
+./test-stringdecl.exe
+diff -b test-stringdecl.out tests/test-stringdecl.out > test-stringdecl.diff
+FAILED test-stringdecl.out differs from tests/test-stringdecl.out
+###### FAILED
 
 ###### Testing test-var1
 ./microc.native < tests/test-var1.mc > test-var1.ll
 llc test-var1.ll > test-var1.s
 cc -o test-var1.exe test-var1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-var1-0d17d6.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-var1-1ee86d.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-var1.exe
 diff -b test-var1.out tests/test-var1.out > test-var1.diff
 ###### SUCCESS
@@ -292,7 +302,7 @@ diff -b test-var1.out tests/test-var1.out > test-var1.diff
 ./microc.native < tests/test-var2.mc > test-var2.ll
 llc test-var2.ll > test-var2.s
 cc -o test-var2.exe test-var2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-var2-f4f46a.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-var2-e917ce.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-var2.exe
 diff -b test-var2.out tests/test-var2.out > test-var2.diff
 ###### SUCCESS
@@ -301,7 +311,7 @@ diff -b test-var2.out tests/test-var2.out > test-var2.diff
 ./microc.native < tests/test-while1.mc > test-while1.ll
 llc test-while1.ll > test-while1.s
 cc -o test-while1.exe test-while1.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-while1-4ec07e.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-while1-83bc37.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-while1.exe
 diff -b test-while1.out tests/test-while1.out > test-while1.diff
 ###### SUCCESS
@@ -310,7 +320,7 @@ diff -b test-while1.out tests/test-while1.out > test-while1.diff
 ./microc.native < tests/test-while2.mc > test-while2.ll
 llc test-while2.ll > test-while2.s
 cc -o test-while2.exe test-while2.s printbig.o
-ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-while2-7cc043.o) was built for newer OSX version (14.5) than being linked (10.10)
+ld: warning: object file (/var/folders/vy/s1gdxgk96mg67k05glr_bd980000gn/T/test-while2-251cae.o) was built for newer OSX version (14.5) than being linked (10.10)
 ./test-while2.exe
 diff -b test-while2.out tests/test-while2.out > test-while2.diff
 ###### SUCCESS

@@ -4,11 +4,22 @@
 open Ast
 %}
 
+/* Punctuation tokens */
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
+/* Arithmetic tokens */
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
+/* Logical tokens */
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL VOID
-%token <int> LITERAL
+/* Primitive datatype tokens */
+%token INT BOOL STRING
+/* Control flow tokens */
+%token IF ELSE FOR WHILE
+/* Function tokens */
+%token RETURN VOID 
+
+%token <int> INT_LITERAL
+%token <string> STR_LITERAL
+/* Variable names */
 %token <string> ID
 %token EOF
 
@@ -54,7 +65,8 @@ formal_list:
 
 typ:
     INT { Int }
-  | BOOL { Bool }
+  | BOOL { Bool } 
+  | STRING { String }
   | VOID { Void }
 
 vdecl_list:
@@ -84,7 +96,8 @@ expr_opt:
   | expr          { $1 }
 
 expr:
-    LITERAL          { Literal($1) }
+    INT_LITERAL      { IntLit($1) }
+  | STR_LITERAL      { StringLit($1) }
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }
   | ID               { Id($1) }

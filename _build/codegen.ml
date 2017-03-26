@@ -28,6 +28,7 @@ let translate (globals, functions) =
   let ltype_of_typ = function
       A.Int -> i32_t
     | A.Bool -> i1_t
+    | A.String -> L.pointer_type i8_t
     | A.Void -> void_t in
 
   (* Declare each global variable; remember its value in a map *)
@@ -62,6 +63,8 @@ let translate (globals, functions) =
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+    let str_format_str = L.build_global_stringptr "%s\n" "fmt" builder in
+
     
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
@@ -87,8 +90,9 @@ let translate (globals, functions) =
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
-	      A.Literal i -> L.const_int i32_t i
+	      A.IntLit i -> L.const_int i32_t i
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
+      | A.StringLit s -> L.build_alloca (L.array_type i8_t (String.length s)) "str" builder
       | A.Noexpr -> L.const_int i32_t 0
       | A.Id s -> L.build_load (lookup s) s builder
       | A.Binop (e1, op, e2) ->
@@ -116,9 +120,9 @@ let translate (globals, functions) =
       | A.Assign (s, e) -> let e' = expr builder e in
 	                   ignore (L.build_store e' (lookup s) builder); e'
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
-	       L.build_call printf_func 
-            [| int_format_str ; (expr builder e) |]
-	           "printf" builder
+	       L.build_call printf_func [| int_format_str ; (expr builder e) |] "printf" builder
+      | A.Call ("prints", [e]) -> 
+         L.build_call printf_func [| str_format_str ; (expr builder e) |] "printf" builder
       | A.Call ("printbig", [e]) ->
 	       L.build_call printbig_func 
             [| (expr builder e) |] 
