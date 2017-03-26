@@ -13,8 +13,8 @@ type gop = AddNode | RemoveNode | AddEdge | RemoveEdge
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Void
-           (* String | Float | 
+type typ = Int | Bool | Void|  String
+          (* | Float | 
            Node | Graph | 
            ListOfInt | ListOfBool | ListOfString | ListOfFloat | 
            QueueOfInt | QueueOfBool | QueueOfString | QueueOfFloat |
@@ -28,8 +28,8 @@ type expr =
     Literal of int 
   (* | FloatLit of float *)
   | BoolLit of bool 
-  (* | StringLit of string 
-  | ListLit of expr list *)
+  | StringLit of string 
+  (*| ListLit of expr list *)
   | Id of string
   | Binop of expr * op * expr 
   | Unop of uop * expr
