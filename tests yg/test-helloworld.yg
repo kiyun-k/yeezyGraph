@@ -1,5 +1,0 @@
-int main() {
-    string s; 
-    s = "helloworld";
-    print(s);
-}
