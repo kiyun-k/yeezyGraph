@@ -56,7 +56,7 @@
 %right NOT NEG
 %left DOT
 %left TILDE
-%nonassoc AT
+%nonassoc AT LBRACKET RBRACKET
 %left ADD_EDGE REMOVE_EDGE
 %nonassoc UNDERSCORE
 %left ADD_NODE REMOVE_NODE
@@ -179,13 +179,13 @@ expr:
   | expr GEQ    expr              { Binop($1, Geq,   $3) }
   | expr AND    expr              { Binop($1, And,   $3) }
   | expr OR     expr              { Binop($1, Or,    $3) }
-  | expr TILDE    expr              { Binop($1, AccessStructField, $3) }
+  | expr TILDE    expr            { Binop($1, AccessStructField, $3) }
   | expr UNDERSCORE ID            { NodeOp($1, AccessNode, $3) } 
   | expr AT ID                    { NodeOp($1, AccessNodeField, $3) } 
   | ID ADD_NODE ID                { GraphOp($1, AddNode, $3) }
   | ID REMOVE_NODE ID             { GraphOp($1, RemoveNode, $3) }
-  /* | expr LBRACE INT_LITERAL RBRACE ADD_EDGE expr    { GraphOpAddEdgeInt($1, $3, AddEdge, $6) } */
-  /* | expr LPAREN FLOAT_LITERAL RPAREN ADD_EDGE expr  { GraphOpAddEdgeFloat($1, $3, AddEdge, $6) } */
+  | expr LBRACKET INT_LITERAL RBRACKET ADD_EDGE expr    { GraphOpAddEdgeInt($1, $3, AddEdge, $6) } 
+  | expr LBRACKET FLOAT_LITERAL RBRACKET ADD_EDGE expr  { GraphOpAddEdgeFloat($1, $3, AddEdge, $6) }
   | ID REMOVE_EDGE ID             { GraphOp($1, RemoveEdge, $3) }
   | MINUS expr %prec NEG          { Unop(Neg, $2) }
   | NOT expr                      { Unop(Not, $2) }
