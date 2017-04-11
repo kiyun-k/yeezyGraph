@@ -31,6 +31,12 @@ let translate (globals, functions) =
     | A.String -> L.pointer_type i8_t
     | A.Void -> void_t in
 
+  let str_of_typ = function 
+    | i32_t -> "\n~~~INT~~~\n"
+    | i1_t -> "\n~~~BOOL~~~\n"
+    | void_t -> "\n~~~VOID~~~\n" 
+    | _ -> "\n~~~STRING~~~\n" in
+
   (* Declare and initialize each global variable; remember its value in a map *)
   let global_vars =
     let global_var m (t, n) =
@@ -53,7 +59,10 @@ let translate (globals, functions) =
       and formal_types = Array.of_list 
           (List.map (fun (t,_) -> ltype_of_typ t) fdecl.A.formals)
       in let ftype = 
-          L.function_type (ltype_of_typ fdecl.A.typ) formal_types in
+          let foo = ltype_of_typ fdecl.A.typ in
+          let _ = print_string (str_of_typ foo) in
+
+          L.function_type foo formal_types in
       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
     List.fold_left function_decl StringMap.empty functions in
   
