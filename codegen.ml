@@ -31,12 +31,6 @@ let translate (globals, functions) =
     | A.String -> L.pointer_type i8_t
     | A.Void -> void_t in
 
-  let str_of_typ = function 
-    | i32_t -> "\n~~~INT~~~\n"
-    | i1_t -> "\n~~~BOOL~~~\n"
-    | void_t -> "\n~~~VOID~~~\n" 
-    | _ -> "\n~~~STRING~~~\n" in
-
   (* Declare and initialize each global variable; remember its value in a map *)
   let global_vars =
     let global_var m (t, n) =
