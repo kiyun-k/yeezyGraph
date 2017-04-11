@@ -7,5 +7,8 @@ string foo()
 
 int main()
 {
+  string s;
+  s = foo();
+  prints(s);
   return 0;
 }
