@@ -17,7 +17,7 @@ module A = Ast
 
 module StringMap = Map.Make(String)
 
-let translate (globals, functions) =
+let translate (globals, functions, structs) =
   let context = L.global_context () in (* global data container *)
   let the_module = L.create_module context "MicroC" (* container *)
   and i32_t  = L.i32_type  context
@@ -30,6 +30,7 @@ let translate (globals, functions) =
     | A.Bool -> i1_t
     | A.String -> L.pointer_type i8_t
     | A.Void -> void_t in
+    | A.StructType s -> Hashtbl.find struct_types s in
 
   (* Declare and initialize each global variable; remember its value in a map *)
   let global_vars =
@@ -37,6 +38,22 @@ let translate (globals, functions) =
       let init = L.const_int (ltype_of_typ t) 0
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
+
+  (* Declare each struct; remember in a hashtable*)
+  let struct_types:(string, L.lltype) Hashtbl.t = Hashtbl.create 50 in
+    let add_struct sdecl = 
+      let struct_t = L.named_struct_type context sdecl.A.sname in
+      Hashtbl.add struct_types sdecl.A.sname struct_t in
+    ignore(List.map add_struct structs);
+
+  (* Build struct body*)
+  let build_struct_body sdecl = 
+    let struct_t = Hashtbl.find struct_types sdecl.A.sname in
+    let element_list = List.map (fun (t, _) -> ltype_of_typ t) sdecl.A.sformals in
+    L.struct_set_body struct_t element_list true in
+    ignore(List.map build_struct_body structs);
+
+
 
   (* Declare printf(), which the print built-in function will call *)
   let printf_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in (* Declare a function type *)
@@ -115,6 +132,12 @@ let translate (globals, functions) =
 	       (match op with
 	         A.Neg     -> L.build_neg
          | A.Not     -> L.build_not) e' "tmp" builder
+      | A.AccessStructField ()
+
+
+
+
+
       | A.Assign (s, e) -> let e' = expr builder e in
 	                   ignore (L.build_store e' (lookup s) builder); e'
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->

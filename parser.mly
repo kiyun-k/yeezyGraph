@@ -133,9 +133,9 @@ expr:
   | expr GEQ    expr      { Binop($1, Geq,   $3) }
   | expr AND    expr      { Binop($1, And,   $3) }
   | expr OR     expr      { Binop($1, Or,    $3) }
-  | expr TILDE    expr    { Binop($1, AccessStructField, $3) }
   | MINUS expr %prec NEG  { Unop(Neg, $2) }
   | NOT expr              { Unop(Not, $2) }
+  | expr TILDE  expr      { AccessStructField($1, $3) }
   | ID ASSIGN expr        { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN    { $2 }
