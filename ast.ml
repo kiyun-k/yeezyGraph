@@ -1,12 +1,13 @@
-(* Abstract Syntax Tree and functions for printing it *)
+(* Abstract Syntax Tree for yeezyGraph *)
 
 type op = Add | Sub | Mult | Div | 
           Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or
+          And | Or | 
+          AccessStructField
 
 type uop = Neg | Not
 
-type typ = Int | Bool | String | Void
+type typ = Int | Bool | String | Void | Struct of string
 
 type bind = typ * string
 
@@ -37,7 +38,12 @@ type func_decl = {
     body : stmt list;
   }
 
-type program = bind list * func_decl list
+type struct_type_decl = { 
+  sname : string;
+  sformals : bind list; 
+}
+
+type program = bind list * func_decl list * struct_type_decl list
 
 (* Pretty-printing functions *)
 
@@ -91,17 +97,23 @@ let string_of_typ = function
   | Bool -> "bool"
   | String -> "string"
   | Void -> "void"
+  | Struct(s) -> "struct" ^ s
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
 let string_of_fdecl fdecl =
   string_of_typ fdecl.typ ^ " " ^
-  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
-  ")\n{\n" ^
+  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^ ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.locals) ^
   String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
-let string_of_program (vars, funcs) =
+let string_of_sdecl sdecl = 
+  "struct " ^ sdecl.sname ^ " \n{\n" ^
+  String.concat "; " (List.map snd sdecl.sformals) ^
+  "}\n"
+
+let string_of_program (vars, funcs, structs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
+  String.concat "\n" (List.map string_of_sdecl structs) ^ "\n" ^
+  String.concat "\n" (List.map string_of_fdecl funcs) 
