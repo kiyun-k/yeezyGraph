@@ -19,7 +19,6 @@ open Ast
 
 %token <int> INT_LITERAL
 %token <string> STR_LITERAL
-/* Variable names */
 %token <string> ID
 %token EOF
 
