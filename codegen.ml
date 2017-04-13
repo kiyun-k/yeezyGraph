@@ -17,16 +17,22 @@ module A = Ast
 
 module StringMap = Map.Make(String)
 
+
+
+
 let translate (globals, functions) =
   let context = L.global_context () in (* global data container *)
   let the_module = L.create_module context "MicroC" (* container *)
   and i32_t  = L.i32_type  context
   and i8_t   = L.i8_type   context (* for printf format string *)
+  and float_t  = L.double_type context
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context in
 
+
   let ltype_of_typ = function (* LLVM type for a given AST type *)
       A.Int -> i32_t
+    | A.Float -> float_t
     | A.Bool -> i1_t
     | A.String -> L.pointer_type i8_t
     | A.Void -> void_t in
@@ -34,7 +40,7 @@ let translate (globals, functions) =
   (* Declare and initialize each global variable; remember its value in a map *)
   let global_vars =
     let global_var m (t, n) =
-      let init = L.const_int (ltype_of_typ t) 0
+      let init = L.const_null (ltype_of_typ t) 
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
 
@@ -62,7 +68,8 @@ let translate (globals, functions) =
     let (the_function, _) = StringMap.find fdecl.A.fname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in 
+    let float_format_str = L.build_global_stringptr "%f\n" "fmt" builder in
     
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
@@ -86,30 +93,46 @@ let translate (globals, functions) =
                    with Not_found -> StringMap.find n global_vars
     in
 
+(*
+    let get_type_from_expr expr = match expr with 
+    A.IntLit(_) -> ltype_of_typ A.Int
+    | A.BoolLit(_) -> ltype_of_typ A.Bool
+    | A.StringLit(_) -> ltype_of_typ A.String
+    | A.FloatLit(_) -> ltype_of_typ A.Float
+    | A.Noexpr -> ltype_of_typ A.Void 
+    | A.Id(s) -> ltype_of_typ A.Void
+    | A.Binop(_, _, _) -> ltype_of_typ A.Void
+    | A.Unop(_, _) -> ltype_of_typ A.Void 
+    | A.Assign(_,_) -> ltype_of_typ A.Void 
+    | A.Call(_,_) -> ltype_of_typ A.Void in 
+
+*)
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
 	      A.IntLit i -> L.const_int i32_t i
       | A.BoolLit b -> L.const_int i1_t (if b then 1 else 0)
       | A.StringLit s -> L.build_global_stringptr s "str" builder
+      | A.FloatLit f -> L.const_float float_t f
       | A.Noexpr -> L.const_int i32_t 0
       | A.Id s -> L.build_load (lookup s) s builder
       | A.Binop (e1, op, e2) ->
-	       let e1' = expr builder e1
-	       and e2' = expr builder e2 in
+         let e1' = expr builder e1
+	       and e2' = expr builder e2 
+         in
+         let t1 = L.type_of e1' in 
 	       (match op with
-	         A.Add     -> L.build_add
-	       | A.Sub     -> L.build_sub
-	       | A.Mult    -> L.build_mul
-         | A.Div     -> L.build_sdiv
+	         A.Add     -> if t1 = float_t then L.build_fadd else L.build_add
+	       | A.Sub     -> if t1 = float_t then L.build_fsub else L.build_sub
+	       | A.Mult    -> if t1 = float_t then L.build_fmul else L.build_mul
+         | A.Div     -> if t1 = float_t then L.build_fdiv else L.build_sdiv
 	       | A.And     -> L.build_and
 	       | A.Or      -> L.build_or
-	       | A.Equal   -> L.build_icmp L.Icmp.Eq
-	       | A.Neq     -> L.build_icmp L.Icmp.Ne
-	       | A.Less    -> L.build_icmp L.Icmp.Slt
-	       | A.Leq     -> L.build_icmp L.Icmp.Sle
-	       | A.Greater -> L.build_icmp L.Icmp.Sgt
-	       | A.Geq     -> L.build_icmp L.Icmp.Sge
-	       ) e1' e2' "tmp" builder
+	       | A.Equal   -> if t1 = float_t then L.build_fcmp L.Fcmp.Oeq else L.build_icmp L.Icmp.Eq
+	       | A.Neq     -> if t1 = float_t then L.build_fcmp L.Fcmp.One else L.build_icmp L.Icmp.Ne
+	       | A.Less    -> if t1 = float_t then L.build_fcmp L.Fcmp.Olt else L.build_icmp L.Icmp.Slt
+	       | A.Leq     -> if t1 = float_t then L.build_fcmp L.Fcmp.Ole else L.build_icmp L.Icmp.Sle
+	       | A.Greater -> if t1 = float_t then L.build_fcmp L.Fcmp.Ogt else L.build_icmp L.Icmp.Sgt
+	       | A.Geq     -> if t1 = float_t then L.build_fcmp L.Fcmp.Oge else L.build_icmp L.Icmp.Sge ) e1' e2' "tmp" builder
       | A.Unop(op, e) ->
 	       let e' = expr builder e in
 	       (match op with
@@ -119,6 +142,7 @@ let translate (globals, functions) =
 	                   ignore (L.build_store e' (lookup s) builder); e'
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
 	       L.build_call printf_func [| int_format_str ; (expr builder e) |] "printf" builder
+      | A.Call ("printfloat", [e]) -> L.build_call printf_func [| float_format_str; (expr builder e) |] "printf" builder
       | A.Call ("prints", [e]) -> 
          L.build_call printf_func [| expr builder e |] "printf" builder
       | A.Call ("printbig", [e]) ->

@@ -11,13 +11,14 @@ open Ast
 /* Logical tokens */
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 /* Primitive datatype tokens */
-%token INT BOOL STRING
+%token INT BOOL FLOAT STRING
 /* Control flow tokens */
 %token IF ELSE FOR WHILE
 /* Function tokens */
 %token RETURN VOID 
 
 %token <int> INT_LITERAL
+%token <float> FLOAT_LITERAL
 %token <string> STR_LITERAL
 /* Variable names */
 %token <string> ID
@@ -65,6 +66,7 @@ formal_list:
 
 typ:
     INT { Int }
+  | FLOAT { Float }
   | BOOL { Bool } 
   | STRING { String }
   | VOID { Void }
@@ -97,6 +99,7 @@ expr_opt:
 
 expr:
     INT_LITERAL      { IntLit($1) }
+  | FLOAT_LITERAL    { FloatLit($1) } 
   | STR_LITERAL      { StringLit($1) }
   | TRUE             { BoolLit(true) }
   | FALSE            { BoolLit(false) }

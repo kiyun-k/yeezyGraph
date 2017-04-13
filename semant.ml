@@ -51,6 +51,10 @@ let check (globals, functions) =
      { typ = Void; fname = "print"; formals = [(Int, "x")];
        locals = []; body = [] } 
 
+       (StringMap.add "printfloat"
+     { typ = Void; fname = "printfloat"; formals = [(Float, "x")];
+       locals = []; body = [] } 
+
        (StringMap.add "printb"
      { typ = Void; fname = "printb"; formals = [(Bool, "x")];
        locals = []; body = [] } 
@@ -63,7 +67,7 @@ let check (globals, functions) =
      { typ = Void; fname = "printbig"; formals = [(Int, "x")];
        locals = []; body = [] }
 
-     )))
+     ))))
    in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -105,19 +109,35 @@ let check (globals, functions) =
     let rec expr = function
 	      IntLit _ -> Int
       | BoolLit _ -> Bool
+      | FloatLit _ -> Float
       | StringLit _ -> String
       | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 
                                   and t2 = expr e2 in
 	      (match op with
-         Add | Sub | Mult | Div      when t1 = Int && t2 = Int -> Int
-	     | Equal | Neq                 when t1 = t2 -> Bool
-	     | Less | Leq | Greater | Geq  when t1 = Int && t2 = Int -> Bool
-	     | And | Or                    when t1 = Bool && t2 = Bool -> Bool
-       | _ -> raise (Failure ("illegal binary operator " ^
+            Add       when t1 = Float && t2 = Float -> Float
+          | Add       when t1 = Int && t2 = Int -> Int
+          | And       when t1 = Bool && t2 = Bool -> Bool
+          | Div       when t1 = Float && t2 = Float -> Float
+          | Div       when t1 = Int && t2 = Int -> Int
+          | Equal     when t1 = t2 -> Bool
+          | Geq       when t1 = Float && t2 = Float -> Bool
+          | Geq       when t1 = Int && t2 = Int -> Bool
+          | Greater   when t1 = Float && t2 = Float -> Bool
+          | Greater   when t1 = Int && t2 = Int -> Bool
+          | Leq       when t1 = Float && t2 = Float -> Bool
+          | Leq       when t1 = Int && t2 = Int -> Bool
+          | Less      when t1 = Float && t2 = Float -> Bool
+          | Less      when t1 = Int && t2 = Int -> Bool
+          | Mult      when t1 = Float && t2 = Float -> Float
+          | Mult      when t1 = Int && t2 = Int -> Int
+          | Neq    when t1 = t2 -> Bool
+          | Or        when t1 = Bool && t2 = Bool -> Bool
+          | Sub       when t1 = Float && t2 = Float -> Float
+          | Sub       when t1 = Int && t2 = Int -> Int
+          | _ -> raise (Failure ("illegal binary operator " ^
               string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-              string_of_typ t2 ^ " in " ^ string_of_expr e))
-        )
+              string_of_typ t2 ^ " in " ^ string_of_expr e)))
 
       | Unop(op, e) as ex -> let t = expr e in
 	      (match op with
