@@ -2,3 +2,6 @@
 parser.ml
 parser.output
 parser.mli
+testall.sh
+*.o
+microc.native
