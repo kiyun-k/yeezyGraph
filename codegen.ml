@@ -18,8 +18,6 @@ module A = Ast
 module StringMap = Map.Make(String)
 
 
-
-
 let translate (globals, functions) =
   let context = L.global_context () in (* global data container *)
   let the_module = L.create_module context "MicroC" (* container *)
@@ -28,6 +26,8 @@ let translate (globals, functions) =
   and float_t  = L.double_type context
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context in
+  (*and list_t = L.pointer_type ()*)
+  
 
 
   let ltype_of_typ = function (* LLVM type for a given AST type *)
@@ -51,6 +51,9 @@ let translate (globals, functions) =
   (* Declare the built-in printbig() function *)
   let printbig_t = L.function_type i32_t [| i32_t |] in
   let printbig_func = L.declare_function "printbig" printbig_t the_module in
+
+  (* Linked Lists *)
+
 
   (* Define each user-defined function (arguments and return type); remember in a map *)
   let function_decls =

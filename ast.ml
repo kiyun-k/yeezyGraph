@@ -7,7 +7,7 @@ type op = Add | Sub | Mult | Div |
 type uop = Neg | Not
 
 type typ = Int | Bool | Float | String | Void
-           ListTyp of typ 
+           | ListTyp of typ 
 
 type bind = typ * string
 
@@ -69,6 +69,7 @@ let rec string_of_expr = function
   | BoolLit(false) -> "false"
   | FloatLit(l) -> string_of_float l
   | StringLit(s) -> s
+  | ListLit(el) -> "[" ^ String.concat "," (List.map string_of_expr el) ^ "]"
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
@@ -97,6 +98,7 @@ let string_of_typ = function
   | Bool -> "bool"
   | String -> "string"
   | Void -> "void"
+  | ListTyp(t) -> "list " (* ^ string_of_typ t *)
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
