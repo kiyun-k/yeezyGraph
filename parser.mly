@@ -5,7 +5,7 @@ open Ast
 %}
 
 /* Punctuation tokens */
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
+%token SEMI LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE COMMA
 /* Arithmetic tokens */
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 /* Logical tokens */
@@ -16,6 +16,9 @@ open Ast
 %token IF ELSE FOR WHILE
 /* Function tokens */
 %token RETURN VOID 
+
+/* Collection tokens */
+%token LIST
 
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
@@ -33,6 +36,7 @@ open Ast
 %left PLUS MINUS
 %left TIMES DIVIDE
 %right NOT NEG
+%nonassoc LBRACKET RBRACKET
 
 %start program
 %type <Ast.program> program
@@ -69,6 +73,7 @@ typ:
   | BOOL { Bool } 
   | STRING { String }
   | VOID { Void }
+  | LIST LT typ GT { ListTyp($3) }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -120,6 +125,7 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
+  | LBRACKET actuals_opt RBRACKET { ListLit ($2) }
 
 actuals_opt:
     /* nothing */ { [] }

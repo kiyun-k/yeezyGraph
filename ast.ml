@@ -7,6 +7,7 @@ type op = Add | Sub | Mult | Div |
 type uop = Neg | Not
 
 type typ = Int | Bool | Float | String | Void
+           ListTyp of typ 
 
 type bind = typ * string
 
@@ -15,6 +16,7 @@ type expr =
   | BoolLit of bool
   | FloatLit of float
   | StringLit of string
+  | ListLit of expr list
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
