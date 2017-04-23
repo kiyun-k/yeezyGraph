@@ -6,11 +6,11 @@
 #  Compile and check the error of each expected-to-fail test
 
 # Path to the LLVM interpreter
-LLI="lli"
-#LLI="/usr/local/opt/llvm/bin/lli"
+# LLI="lli"
+LLI="/usr/local/opt/llvm@3.7/bin/lli-3.7"
 
 # Path to the LLVM compiler
-LLC="llc"
+LLC="/usr/local/opt/llvm@3.7/bin/llc-3.7"
 
 # Path to the C compiler
 CC="cc"

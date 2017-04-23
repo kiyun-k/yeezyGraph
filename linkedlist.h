@@ -10,19 +10,15 @@ struct node {
 	struct node *next;
 };
 
-void init_list(); 
+struct List* init_list(); 
 
-void addFront(struct List *list, void *data, int index);
+struct node* addFront(struct List *list, void *data);
 
-void addBack(struct List *list, void *data);
+struct node* addBack(struct List *list, void *data);
 
-node* get(struct List *list, int index);
+struct node* get(struct List *list, int index);
 
-void delete(struct List *list, int index); !
-
-void removeAll(struct List *list); ??
-
-int contains(void *data);??
+void delete(struct List *list, int index);
 
 int isEmpty(struct List *list);
 
