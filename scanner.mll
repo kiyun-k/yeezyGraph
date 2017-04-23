@@ -8,6 +8,7 @@ rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
 | "/*"     { comment lexbuf }           (* Comments *)
 | '('      { LPAREN }		| ')'      { RPAREN }
+| '['	   { LBRACKET }		| ']'	   { RBRACKET }
 | '{'      { LBRACE }		| '}'      { RBRACE }
 | ';'      { SEMI }			| ','      { COMMA }
 
@@ -30,6 +31,8 @@ rule token = parse
 | "void"   { VOID }
 
 | "true"   { TRUE }			| "false"  { FALSE }
+
+| "list" { LIST }
 
 | ['0'-'9']+ as lxm { INT_LITERAL(int_of_string lxm) }
 | digit+('.')digit+ as lxm {FLOAT_LITERAL(float_of_string lxm)}
