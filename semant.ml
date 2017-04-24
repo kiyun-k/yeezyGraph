@@ -111,7 +111,7 @@ let check (globals, functions) =
       | BoolLit _ -> Bool
       | FloatLit _ -> Float
       | StringLit _ -> String
-
+      | ListLit (t,_) -> ListTyp(t) 
       | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 
                                   and t2 = expr e2 in

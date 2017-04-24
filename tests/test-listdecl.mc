@@ -1,5 +1,5 @@
 int main() {
 	list<string> s;
-	s = ["hello","world"];
+	s = <string>["hello","world"];
 	return 0;
 }

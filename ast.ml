@@ -16,7 +16,7 @@ type expr =
   | BoolLit of bool
   | FloatLit of float
   | StringLit of string
-  | ListLit of expr list
+  | ListLit of typ * expr list
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
@@ -63,13 +63,22 @@ let string_of_uop = function
     Neg -> "-"
   | Not -> "!"
 
+let rec string_of_typ = function
+    Int -> "int"
+  | Float -> "float"
+  | Bool -> "bool"
+  | String -> "string"
+  | Void -> "void"
+  | ListTyp(t) -> "list " ^ string_of_typ t 
+
+
 let rec string_of_expr = function
     IntLit(l) -> string_of_int l
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
   | FloatLit(l) -> string_of_float l
   | StringLit(s) -> s
-  | ListLit(el) -> "[" ^ String.concat "," (List.map string_of_expr el) ^ "]"
+  | ListLit(t, el) -> "<" ^ string_of_typ t ^ ">" ^ "[" ^ String.concat "," (List.map string_of_expr el) ^ "]"
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
@@ -92,13 +101,6 @@ let rec string_of_stmt = function
       string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
 
-let rec string_of_typ = function
-    Int -> "int"
-  | Float -> "float"
-  | Bool -> "bool"
-  | String -> "string"
-  | Void -> "void"
-  | ListTyp(t) -> "list " ^ string_of_typ t 
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
