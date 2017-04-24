@@ -92,13 +92,13 @@ let rec string_of_stmt = function
       string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
 
-let string_of_typ = function
+let rec string_of_typ = function
     Int -> "int"
   | Float -> "float"
   | Bool -> "bool"
   | String -> "string"
   | Void -> "void"
-  | ListTyp(t) -> "list " (* ^ string_of_typ t *)
+  | ListTyp(t) -> "list " ^ string_of_typ t 
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
