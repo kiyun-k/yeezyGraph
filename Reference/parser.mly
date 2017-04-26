@@ -18,7 +18,7 @@
 /* Control flow tokens */
 %token IF ELSE FOR WHILE
 /* Function tokens */
-%token RETURN VOID MAIN
+%token RETURN VOID 
 %token NODE GRAPH 
 /* Node token s*/
 %token UNDERSCORE AT 
@@ -34,11 +34,14 @@
 %token DOT
 /* Infinity tokens */  
 %token INT_MAX INT_MIN FLOAT_MAX FLOAT_MIN
+
 /* Number literals */
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
+
 /* String literal */
 %token <string> STR_LITERAL
+
 /* Variable names */
 %token <string> ID
 %token EOF

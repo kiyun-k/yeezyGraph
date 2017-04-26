@@ -2,8 +2,8 @@
 
 type op = Add | Sub | Mult | Div | 
           Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or 
-          (* | AccessStructField *)
+          And | Or | 
+          AccessStructField 
 
 (*
 type nop = AccessNode (*underscore, e.g. g1_n1*) | AccessNodeField (* At, g1_n1@visited*)
@@ -13,14 +13,14 @@ type gop = AddNode | RemoveNode | AddEdge | RemoveEdge
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Void|  String
+type typ = Int | Bool | Void | String |
           (* | Float | 
            Node | Graph | 
            ListOfInt | ListOfBool | ListOfString | ListOfFloat | 
            QueueOfInt | QueueOfBool | QueueOfString | QueueOfFloat |
            PQueueOfInt | PQueueOfBool | PQueueOfString | PQueueOfFloat | 
-           MapOfStringInt | MapOfStringString |
-           Struct | *)
+           MapOfStringInt | MapOfStringString | *)
+           Struct 
            
 type bind = typ * string
 
@@ -63,12 +63,11 @@ type func_decl = {
     body : stmt list;
   }
 
-(*
 type struct_type_decl = { (*Check with TA *)
   sname : string;
-  body : bind list; 
+  sformals : bind list; 
 }
-*)
 
 
-type program = bind list * func_decl list (* * struct_type_decl list *)
+
+type program = bind list * func_decl list * struct_type_decl list
