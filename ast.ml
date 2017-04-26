@@ -16,7 +16,7 @@ type expr =
   | BoolLit of bool
   | FloatLit of float
   | StringLit of string
-  | ListLit of typ * expr list
+  | List of typ * expr list
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
@@ -69,7 +69,7 @@ let rec string_of_typ = function
   | Bool -> "bool"
   | String -> "string"
   | Void -> "void"
-  | ListTyp(t) -> "list " ^ string_of_typ t 
+  | ListTyp(typ) -> "list " ^ string_of_typ typ 
 
 
 let rec string_of_expr = function
@@ -78,7 +78,7 @@ let rec string_of_expr = function
   | BoolLit(false) -> "false"
   | FloatLit(l) -> string_of_float l
   | StringLit(s) -> s
-  | ListLit(t, el) -> "<" ^ string_of_typ t ^ ">" ^ "[" ^ String.concat "," (List.map string_of_expr el) ^ "]"
+  | List(typ, el) -> "new" ^ "list" ^ "<" ^ string_of_typ typ ^ ">" ^ "[" ^ String.concat "," (List.map string_of_expr el) ^ "]"
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2

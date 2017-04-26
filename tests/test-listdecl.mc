@@ -1,7 +1,5 @@
 int main() {
-	/*list<string> s;*/
-	/*s = <string>["hello","world"];*/
 	list<int> i;
-	i = <int>[1];
+	i = new list<int>[1,2];
 	return 0;
 }

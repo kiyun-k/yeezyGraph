@@ -24,7 +24,7 @@ rule token = parse
 
 | "if"     { IF }			| "else"   { ELSE }
 | "for"    { FOR }			| "while"  { WHILE }
-| "return" { RETURN }
+| "return" { RETURN }		| "new"	   { NEW }
 
 | "int"    { INT }			| "bool"   { BOOL }			|     "float" { FLOAT } |   "string"	{ STRING }
 

@@ -15,7 +15,9 @@ open Ast
 /* Control flow tokens */
 %token IF ELSE FOR WHILE
 /* Function tokens */
-%token RETURN VOID 
+%token RETURN VOID NEW
+/* Built-in Function tokens */
+
 
 /* Collection tokens */
 %token LIST
@@ -125,7 +127,7 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
-  | LT typ GT LBRACKET actuals_opt RBRACKET { ListLit ($2,$5) }
+  | NEW LIST LT typ GT LBRACKET actuals_opt RBRACKET { List($4,$7) }
 
 actuals_opt:
     /* nothing */ { [] }

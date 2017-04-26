@@ -12,13 +12,11 @@ struct node {
 
 struct List* init_list(); 
 
-struct node* addFront(struct List *list, void *data);
-
-struct node* addBack(struct List *list, void *data);
-
-struct node* get(struct List *list, int index);
+void add(struct List *list, void *data);
 
 void delete(struct List *list, int index);
+
+struct node* get(struct List *list, int index);
 
 int isEmpty(struct List *list);
 

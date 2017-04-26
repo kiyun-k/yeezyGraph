@@ -30,8 +30,7 @@ let translate (globals, functions) =
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context 
   and list_t = L.pointer_type (match L.type_by_name list_module "struct.List" with
-    None -> raise (Invalid_argument "null")
-  | Some x -> x) in 
+    None -> raise (Invalid_argument "Option.get struct.List") | Some x -> x) in 
   
 
   let ltype_of_typ = function (* LLVM type for a given AST type *)
@@ -58,7 +57,10 @@ let translate (globals, functions) =
   let printbig_func = L.declare_function "printbig" printbig_t the_module in
 
   (* Linked Lists *)
-
+  let init_list_t = L.function_type list_t [| |] in
+  let init_list_func = L.declare_function "init_list" init_list_t the_module in
+  let add_t = L.function_type void_t [| list_t; (L.pointer_type i8_t) |] in
+  let add_func = L.declare_function "add" add_t the_module in 
 
   (* Define each user-defined function (arguments and return type); remember in a map *)
   let function_decls =
@@ -146,6 +148,16 @@ let translate (globals, functions) =
 	       (match op with
 	         A.Neg     -> L.build_neg
          | A.Not     -> L.build_not) e' "tmp" builder
+
+      | A.List (_, act) -> 
+        let listptr = L.build_call init_list_func [||] "init" builder in
+          let add_elmt elmt= 
+            let d_ptr = expr builder elmt in
+            let void_d_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
+            ignore (L.build_call add_func [| listptr; void_d_ptr |] "tmp" builder) in
+          ignore (List.map add_elmt act);
+          listptr
+
       | A.Assign (s, e) -> let e' = expr builder e in
 	                   ignore (L.build_store e' (lookup s) builder); e'
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->

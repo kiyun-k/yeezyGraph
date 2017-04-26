@@ -8,20 +8,10 @@ struct List* init_list() {
 	return list;
 }
 
-struct node* addFront(struct List *list, void *data) {
+void add(struct List *list, void *data) {
 	struct node* new = (struct node*) malloc(sizeof(struct node));
 	if (new == NULL) 
-		return NULL;
-	new->data = data;
-	new->next = list->head;
-	list->head = new;
-	return new;
-}
-
-struct node* addBack(struct List *list, void *data) {
-	struct node* new = (struct node*) malloc(sizeof(struct node));
-	if (new == NULL) 
-		return NULL;
+		return;
 
 	new->data = data;
 	new->next = NULL; 
@@ -34,23 +24,11 @@ struct node* addBack(struct List *list, void *data) {
 		}
 		temp->next = new;
 	}
-	return new;
 }
-
-struct node* get(struct List *list, int index) {
-	struct node* temp = list->head;
-	while (index > 0) {
-		temp = temp->next;
-		index--;
-	}
-	return temp;
-}
-
 void delete(struct List *list, int index) {
 	if (isEmpty(list)) {
 		return;
 	}
-	
 	if (index == 0) {
 		struct node* temp = list->head;
 		list->head = list->head->next;
@@ -67,7 +45,15 @@ void delete(struct List *list, int index) {
 	temp->next = temp->next->next;
 	temp = temp->next;
 	free(temp);
-	return;
+}
+
+struct node* get(struct List *list, int index) {
+	struct node* temp = list->head;
+	while (index > 0) {
+		temp = temp->next;
+		index--;
+	}
+	return temp;
 }
 
 
