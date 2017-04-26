@@ -2,29 +2,23 @@
 
 type op = Add | Sub | Mult | Div | 
           Equal | Neq | Less | Leq | Greater | Geq |
-          And | Or | 
-          AccessStructField
+          And | Or 
 
 type uop = Neg | Not
 
-<<<<<<< HEAD
-type typ = Int | Bool | Float | String | Void
-=======
-type typ = Int | Bool | String | Void | Struct of string
->>>>>>> 1eae4510db443321aceb116645adc68e61159134
+type typ = Int | Bool | String | Void | StructType of string
 
 type bind = typ * string
 
 type expr =
     IntLit of int
   | BoolLit of bool
-  | FloatLit of float
   | StringLit of string
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
   | AccessStructField of expr * string 
-  | Assign of string * expr
+  | Assign of expr * expr
   | Call of string * expr list
   | Noexpr
 
@@ -44,13 +38,12 @@ type func_decl = {
     body : stmt list;
   }
 
-type struct_type_decl = { 
+type struct_decl = { 
   sname : string;
   sformals : bind list; 
 }
 
-type program = bind list * func_decl list * struct_type_decl list
-
+type program = bind list * func_decl list * struct_decl list
 
 (* Pretty-printing functions *)
 
@@ -76,14 +69,13 @@ let rec string_of_expr = function
     IntLit(l) -> string_of_int l
   | BoolLit(true) -> "true"
   | BoolLit(false) -> "false"
-  | FloatLit(l) -> string_of_float l
   | StringLit(s) -> s
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
   | AccessStructField(v, e) -> string_of_expr v ^ "~" ^ e
-  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | Assign(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
@@ -103,11 +95,10 @@ let rec string_of_stmt = function
 
 let string_of_typ = function
     Int -> "int"
-  | Float -> "float"
   | Bool -> "bool"
   | String -> "string"
   | Void -> "void"
-  | Struct(s) -> "struct" ^ s
+  | StructType(s) -> "struct" ^ s
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
