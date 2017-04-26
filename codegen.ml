@@ -20,22 +20,27 @@ module StringMap = Map.Make(String)
 
 let translate (globals, functions) =
   let context = L.global_context () in (* global data container *)
-  let the_module = L.create_module context "MicroC" (* container *)
-  and i32_t  = L.i32_type  context
+  let listcontext = L.global_context () in 
+  let the_module = L.create_module context "MicroC" in (* container *)
+  let listm = L.MemoryBuffer.of_file "linkedlist.bc" in
+  let list_module = Llvm_bitreader.parse_bitcode listcontext listm in
+  let i32_t  = L.i32_type  context
   and i8_t   = L.i8_type   context (* for printf format string *)
   and float_t  = L.double_type context
   and i1_t   = L.i1_type   context
-  and void_t = L.void_type context in
-  (*and list_t = L.pointer_type ()*)
+  and void_t = L.void_type context 
+  and list_t = L.pointer_type (match L.type_by_name list_module "struct.List" with
+    None -> raise (Invalid_argument "null")
+  | Some x -> x) in 
   
-
 
   let ltype_of_typ = function (* LLVM type for a given AST type *)
       A.Int -> i32_t
     | A.Float -> float_t
     | A.Bool -> i1_t
     | A.String -> L.pointer_type i8_t
-    | A.Void -> void_t in
+    | A.Void -> void_t
+    | A.ListTyp _ -> list_t in
 
   (* Declare and initialize each global variable; remember its value in a map *)
   let global_vars =
@@ -218,4 +223,4 @@ let translate (globals, functions) =
   in
 
   List.iter build_function_body functions;
-  the_module
+the_module
