@@ -149,12 +149,20 @@ let translate (globals, functions) =
 	         A.Neg     -> L.build_neg
          | A.Not     -> L.build_not) e' "tmp" builder
 
-      | A.List (_, act) -> 
+      | A.List (typ, act) -> 
+        let d_ltyp = ltype_of_typ typ in
         let listptr = L.build_call init_list_func [||] "init" builder in
-          let add_elmt elmt= 
-            let d_ptr = expr builder elmt in
+          let add_elmt elmt = 
+            let d_ptr = match typ with
+            A.ListTyp _ -> expr builder elmt
+          | _ ->
+            let d_val = expr builder elmt in
+            let d_ptr = L.build_malloc d_ltyp "tmp" builder in
+            ignore (L.build_store d_val d_ptr builder);
+            d_ptr in
+
             let void_d_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
-            ignore (L.build_call add_func [| listptr; void_d_ptr |] "tmp" builder) in
+            ignore (L.build_call add_func [| listptr; void_d_ptr |] "" builder) in
           ignore (List.map add_elmt act);
         listptr
 
