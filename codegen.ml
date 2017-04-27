@@ -156,7 +156,7 @@ let translate (globals, functions) =
             let void_d_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
             ignore (L.build_call add_func [| listptr; void_d_ptr |] "tmp" builder) in
           ignore (List.map add_elmt act);
-          listptr
+        listptr
 
       | A.Assign (s, e) -> let e' = expr builder e in
 	                   ignore (L.build_store e' (lookup s) builder); e'
