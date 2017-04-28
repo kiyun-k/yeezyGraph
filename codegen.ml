@@ -39,7 +39,7 @@ let struct_types =
     | A.Bool -> i1_t
     | A.String -> L.pointer_type i8_t
     | A.Void -> void_t 
-    | A.StructType s -> (try StringMap.find s struct_types with Not_found -> raise (Failure("unrecognized struct type " ^ s) )) in
+    | A.StructType s -> (try StringMap.find s struct_types with Not_found -> raise (Failure("struct type " ^ s ^ " is undefined") )) in
 
 
   (* Build struct body*)
@@ -151,11 +151,11 @@ let struct_types =
          (match op with
            A.Neg     -> L.build_neg
          | A.Not     -> L.build_not) e' "tmp" builder
+
       | A.AccessStructField(e, field_name) -> 
         (match e with 
-           A.Id s -> let etype = fst(try List.find (fun local -> snd(local) = s) fdecl.A.locals
-                                     with Not_found -> raise (Failure("Variable " ^ s ^ " is not declared or out of scope"))) in
-              (try match etype with
+           A.Id s -> let etype = fst(List.find (fun local -> snd(local) = s) fdecl.A.locals) in
+              (match etype with
                   A.StructType struct_type ->
                     let field_indexing_map = StringMap.find struct_type struct_indexing_map in
                     let index = StringMap.find field_name field_indexing_map in
@@ -165,38 +165,27 @@ let struct_types =
                     (* %struct_field_value = load %struct_field_pointer*)
                     let struct_field_value = L.build_load struct_field_pointer "struct_field_value" builder in
                     struct_field_value
-                | _ -> raise (Failure(s ^ "Variable " ^ s ^"'s struct type is not defined"))
+                | _ -> raise (Failure("AccessStructField failed: " ^ s ^ "is not a struct type")))
+         | _ -> raise (Failure("AccessStructField failed")))
 
-              with Not_found -> raise (Failure((s ^ "Variable " ^ s ^"'s struct type is not defined"))
-            )
-         | _ -> raise (Failure("Variable " ^ s ^ " is not declared or out of scope")))
-        )
-
-
-      | A.Assign (lhs, e) -> let e' = expr builder e in
-        (match lhs with
-          A.Id s -> ignore (L.build_store e' (lookup s) builder); e'
-        | A.AccessStructField(e1, field) ->
-          (match e1 with 
-            A.Id s -> let etype = fst( 
-              try List.find (fun t -> snd(t) = s) fdecl.A.locals
-              with Not_found -> raise (Failure("Unable to find" ^ s ^ "in dotop")))
-              in
+      | A.Assign (e1, e2) -> let e2' = expr builder e2 in
+        (match e1 with
+          A.Id s -> ignore (L.build_store e2' (lookup s) builder); e2'
+        | A.AccessStructField(e, field_name) ->
+          (match e with 
+            A.Id s -> let etype = fst(List.find (fun local -> snd(local) = s) fdecl.A.locals) in
               (match etype with
-                 A.StructType t -> (try
-                  let index_number_list = StringMap.find t struct_indexing_map in
-                  let index_number = StringMap.find field index_number_list in
+                 A.StructType struct_type ->
+                  let field_indexing_map = StringMap.find struct_type struct_indexing_map in
+                  let index = StringMap.find field_name field_indexing_map in
                   let struct_llvalue = lookup s in
-                  let access_llvalue = L.build_struct_gep struct_llvalue index_number field builder in
-                  (try (ignore(L.build_store e' access_llvalue builder); e')
-                    with Not_found -> raise (Failure("unable to store " ^ t )) )
-                 with Not_found -> raise (Failure("unable to find" ^ s)) )
-            | _ -> raise (Failure("StructType not found.")))
-          |_ -> raise (Failure("This variable is not defined"))))
+                  let struct_field_pointer = L.build_struct_gep struct_llvalue index "struct_field_pointer" builder in
+                  ignore(L.build_store e2' struct_field_pointer builder); e2'
+                | _ -> raise (Failure("AccessStructField failed: " ^ s ^ "is not a struct type")))
+          | _ -> raise (Failure("AccessStructField failed")))
+        | _ -> raise (Failure("Assign failed")))
       
 
-
-               
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
          L.build_call printf_func [| int_format_str ; (expr builder e) |] "printf" builder
       | A.Call ("prints", [e]) -> 

@@ -45,20 +45,8 @@ let check (globals, functions, structs) =
   report_duplicate (fun n -> "duplicate struct type " ^ n)
     (List.map (fun sd -> sd.sname) structs);
 
-
-  let match_struct_to_accessor structType fieldName = 
-    let  s1 = try List.find (fun s -> s.sname = structType) structs 
-      with Not_found -> raise (Failure("Struct of name " ^ structType ^ "not found.")) in
-    try fst( List.find (fun s -> snd(s) = fieldName) s1.sformals) with
-  Not_found -> raise (Failure("Struct " ^ structType ^ " does not have field " ^ fieldName))
-  in
-
-  let check_access structName fieldName =
-     match structName with
-       StructType structType -> match_struct_to_accessor structType fieldName
-     | _ -> raise (Failure(string_of_typ structName ^ " is not a struct"))
-  in
-
+  
+  
 
 
   (**** Checking Functions ****)
@@ -103,6 +91,18 @@ let check (globals, functions, structs) =
   in
 
   let _ = function_decl "main" in (* Ensure "main" is defined *)
+
+
+  let check_AccessStructField struct_name field_name = 
+    match struct_name with
+        StructType struct_type -> 
+          (let the_struct_type = try List.find (fun s -> s.sname = struct_type) structs 
+                                 with Not_found -> raise (Failure("struct type " ^ struct_type ^ " is undefined")) in
+          try fst( List.find (fun s -> snd(s) = field_name) the_struct_type.sformals) 
+          with Not_found -> raise (Failure("struct " ^ struct_type ^ " does not contain field " ^ field_name)))       
+      | _ -> raise (Failure(string_of_typ struct_name ^ " is not a struct type"))
+  in
+
 
   let check_function func =
 
@@ -154,8 +154,8 @@ let check (globals, functions, structs) =
        | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
                string_of_typ t ^ " in " ^ string_of_expr ex)))
 
-      | AccessStructField(e1, field) -> let lt = expr e1 in
-         check_access (lt) (field)
+      | AccessStructField(e, field_name) -> let lt = expr e in
+         check_AccessStructField lt field_name
 
 
 
@@ -164,10 +164,9 @@ let check (globals, functions, structs) =
         (match e1 with 
           Id s -> let lt = type_of_identifier s and rt = expr e2 in
             check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
-                                     " = " ^ string_of_typ rt ^ " in " ^ 
-                                     string_of_expr ex))
+                                     " = " ^ string_of_typ rt ^ " in " ^ string_of_expr ex))
         | AccessStructField(_, _) -> expr e2
-        | _ -> raise (Failure("whatever")))
+        | _ -> raise (Failure("illegal assignment")))
 
 
 

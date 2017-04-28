@@ -1,1 +1,1 @@
-Fatal error: exception Failure("unrecognized struct type Circle")
+Fatal error: exception Failure("struct type Circle is undefined")

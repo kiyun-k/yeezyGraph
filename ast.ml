@@ -98,7 +98,7 @@ let string_of_typ = function
   | Bool -> "bool"
   | String -> "string"
   | Void -> "void"
-  | StructType(s) -> "struct" ^ s
+  | StructType(s) -> s
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
