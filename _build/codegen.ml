@@ -166,9 +166,8 @@ let struct_types =
                     let struct_field_value = L.build_load struct_field_pointer "struct_field_value" builder in
                     struct_field_value
                 | _ -> raise (Failure(s ^ "Variable " ^ s ^"'s struct type is not defined"))
-
-              with Not_found -> raise (Failure((s ^ "Variable " ^ s ^"'s struct type is not defined"))
-            )
+                
+              with Not_found -> raise (Failure((s ^ "Variable " ^ s ^"'s struct type is not defined")))
          | _ -> raise (Failure("Variable " ^ s ^ " is not declared or out of scope")))
         )
 
