@@ -17,10 +17,7 @@ module A = Ast
 
 module StringMap = Map.Make(String)
 
-
-
-
-let translate (globals, functions) =
+let translate (globals, functions, structs) =
   let context = L.global_context () in (* global data container *)
   let the_module = L.create_module context "MicroC" (* container *)
   and i32_t  = L.i32_type  context
@@ -30,12 +27,44 @@ let translate (globals, functions) =
   and void_t = L.void_type context in
 
 
+let struct_types = 
+  let add_struct m sdecl = 
+    let struct_t = L.named_struct_type context sdecl.A.sname 
+    in StringMap.add sdecl.A.sname struct_t m in
+  List.fold_left add_struct StringMap.empty structs in
+
+
   let ltype_of_typ = function (* LLVM type for a given AST type *)
       A.Int -> i32_t
     | A.Float -> float_t
     | A.Bool -> i1_t
     | A.String -> L.pointer_type i8_t
-    | A.Void -> void_t in
+    | A.Void -> void_t 
+    | A.StructType s -> (try StringMap.find s struct_types with Not_found -> raise (Failure("struct type " ^ s ^ " is undefined") )) in
+
+
+  (* Build struct body*)
+  let build_struct_body sdecl = 
+    let struct_t = StringMap.find sdecl.A.sname struct_types in
+    let element_list = Array.of_list(List.map (fun (t, _) -> ltype_of_typ t) sdecl.A.sformals) in
+    L.struct_set_body struct_t element_list true in
+    ignore(List.map build_struct_body structs);
+
+
+  (* struct_indexing_map(struct_type -> field_indexing_map *)
+  (* field_indexing_map(field_name -> index) *)
+  let struct_indexing_map =
+    let fill_struct_indexing_map m this_struct = 
+      let field_name_list = List.map snd this_struct.A.sformals in
+      let add_one i = i + 1 in
+      let fill_field_indexing_map (m, i) field_name = StringMap.add field_name (add_one i) m, add_one i in
+      let field_indexing_map = List.fold_left fill_field_indexing_map (StringMap.empty, -1) field_name_list in
+      StringMap.add this_struct.A.sname (fst field_indexing_map) m  
+    in
+    List.fold_left fill_struct_indexing_map StringMap.empty structs  
+  in
+
+
 
   (* Declare and initialize each global variable; remember its value in a map *)
   let global_vars =
@@ -138,8 +167,41 @@ let translate (globals, functions) =
 	       (match op with
 	         A.Neg     -> L.build_neg
          | A.Not     -> L.build_not) e' "tmp" builder
-      | A.Assign (s, e) -> let e' = expr builder e in
-	                   ignore (L.build_store e' (lookup s) builder); e'
+
+      | A.AccessStructField(e, field_name) -> 
+        (match e with 
+           A.Id s -> let etype = fst(List.find (fun local -> snd(local) = s) fdecl.A.locals) in
+              (match etype with
+                  A.StructType struct_type ->
+                    let field_indexing_map = StringMap.find struct_type struct_indexing_map in
+                    let index = StringMap.find field_name field_indexing_map in
+                    let struct_llvalue = lookup s in
+                    (* %struct_field_pointer = getelementptr %struct_llvalue, 0, index_number*)
+                    let struct_field_pointer = L.build_struct_gep struct_llvalue index "struct_field_pointer" builder in
+                    (* %struct_field_value = load %struct_field_pointer*)
+                    let struct_field_value = L.build_load struct_field_pointer "struct_field_value" builder in
+                    struct_field_value
+                | _ -> raise (Failure("AccessStructField failed: " ^ s ^ "is not a struct type")))
+         | _ -> raise (Failure("AccessStructField failed")))
+
+
+      | A.Assign (e1, e2) -> let e2' = expr builder e2 in
+        (match e1 with
+          A.Id s -> ignore (L.build_store e2' (lookup s) builder); e2'
+        | A.AccessStructField(e, field_name) ->
+          (match e with 
+            A.Id s -> let etype = fst(List.find (fun local -> snd(local) = s) fdecl.A.locals) in
+              (match etype with
+                 A.StructType struct_type ->
+                  let field_indexing_map = StringMap.find struct_type struct_indexing_map in
+                  let index = StringMap.find field_name field_indexing_map in
+                  let struct_llvalue = lookup s in
+                  let struct_field_pointer = L.build_struct_gep struct_llvalue index "struct_field_pointer" builder in
+                  ignore(L.build_store e2' struct_field_pointer builder); e2'
+                | _ -> raise (Failure("AccessStructField failed: " ^ s ^ "is not a struct type")))
+          | _ -> raise (Failure("AccessStructField failed")))
+        | _ -> raise (Failure("Assign failed")))
+
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
 	       L.build_call printf_func [| int_format_str ; (expr builder e) |] "printf" builder
       | A.Call ("printfloat", [e]) -> L.build_call printf_func [| float_format_str; (expr builder e) |] "printf" builder

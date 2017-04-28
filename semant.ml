@@ -9,7 +9,7 @@ module StringMap = Map.Make(String)
 
    Check each global variable, then check each function *)
 
-let check (globals, functions) =
+let check (globals, functions, structs) =
 
   (* Raise an exception if the given list has a duplicate *)
   let report_duplicate exceptf list =
@@ -32,16 +32,36 @@ let check (globals, functions) =
      if lvaluet == rvaluet then lvaluet else raise err
   in
    
+
+
+
   (**** Checking Global Variables ****)
 
   List.iter (check_not_void (fun n -> "illegal void global " ^ n)) globals;
    
   report_duplicate (fun n -> "duplicate global " ^ n) (List.map snd globals);
 
+
+
+
+  (**** Checking Structs ****)
+  report_duplicate (fun n -> "duplicate struct type " ^ n)
+    (List.map (fun sd -> sd.sname) structs);
+
+
+
+
   (**** Checking Functions ****)
 
   if List.mem "print" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function print may not be defined")) else ();
+
+  if List.mem "prints" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function prints may not be defined")) else ();
+
+  if List.mem "printfloat" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function printfloat may not be defined")) else ();
+
 
   report_duplicate (fun n -> "duplicate function " ^ n)
     (List.map (fun fd -> fd.fname) functions);
@@ -79,6 +99,21 @@ let check (globals, functions) =
   in
 
   let _ = function_decl "main" in (* Ensure "main" is defined *)
+
+
+  
+  let check_AccessStructField struct_name field_name = 
+    match struct_name with
+        StructType struct_type -> 
+          (let the_struct_type = try List.find (fun s -> s.sname = struct_type) structs 
+                                 with Not_found -> raise (Failure("struct type " ^ struct_type ^ " is undefined")) in
+          try fst( List.find (fun s -> snd(s) = field_name) the_struct_type.sformals) 
+          with Not_found -> raise (Failure("struct " ^ struct_type ^ " does not contain field " ^ field_name)))       
+      | _ -> raise (Failure(string_of_typ struct_name ^ " is not a struct type"))
+  in
+
+
+
 
   let check_function func =
 
@@ -146,12 +181,20 @@ let check (globals, functions) =
        | _ -> raise (Failure ("illegal unary operator " ^ string_of_uop op ^
 	  		       string_of_typ t ^ " in " ^ string_of_expr ex)))
 
+      | AccessStructField(e, field_name) -> let lt = expr e in
+         check_AccessStructField lt field_name
+
       | Noexpr -> Void
-      | Assign(var, e) as ex -> let lt = type_of_identifier var
-                                and rt = expr e in
-        check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
-				                             " = " ^ string_of_typ rt ^ " in " ^ 
-				                             string_of_expr ex))
+
+      | Assign(e1, e2) as ex ->
+        (match e1 with 
+          Id s -> let lt = type_of_identifier s and rt = expr e2 in
+            check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
+                                     " = " ^ string_of_typ rt ^ " in " ^ string_of_expr ex))
+        | AccessStructField(_, _) -> expr e2
+        | _ -> raise (Failure("illegal assignment")))
+
+
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
            raise (Failure ("expecting " ^ string_of_int

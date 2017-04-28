@@ -1,21 +1,35 @@
 /* Ocamlyacc parser for MicroC */
 
 %{
-open Ast
+  open Ast
+
+  let get_1_3 (a,_,_) = a
+  let get_2_3 (_,a,_) = a
+  let get_3_3 (_,_,a) = a
 %}
+
 
 /* Punctuation tokens */
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
-/* Arithmetic tokens */
-%token PLUS MINUS TIMES DIVIDE ASSIGN NOT
-/* Logical tokens */
-%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
+
 /* Primitive datatype tokens */
 %token INT BOOL FLOAT STRING
+
+/* Struct datatype tokens */
+%token STRUCT TILDE
+
+/* Arithmetic tokens */
+%token PLUS MINUS TIMES DIVIDE ASSIGN NOT
+
+/* Logical tokens */
+%token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
+
 /* Control flow tokens */
 %token IF ELSE FOR WHILE
+
 /* Function tokens */
 %token RETURN VOID 
+
 
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
@@ -33,6 +47,8 @@ open Ast
 %left PLUS MINUS
 %left TIMES DIVIDE
 %right NOT NEG
+%left TILDE
+
 
 %start program
 %type <Ast.program> program
@@ -43,17 +59,19 @@ program:
   decls EOF { $1 }
 
 decls:
-   /* nothing */ { [], [] }
- | decls vdecl { ($2 :: fst $1), snd $1 }
- | decls fdecl { fst $1, ($2 :: snd $1) }
+   /* nothing */ { [], [], [] }
+ | decls vdecl { ($2 :: get_1_3($1)), get_2_3($1), get_3_3($1) }
+ | decls fdecl { get_1_3($1), ($2 :: get_2_3($1)), get_3_3($1) }
+ | decls sdecl { get_1_3($1), get_2_3($1), $2 :: get_3_3($1) }
+
 
 fdecl:
    typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
      { { typ = $1;
-	 fname = $2;
-	 formals = $4;
-	 locals = List.rev $7;
-	 body = List.rev $8 } }
+	       fname = $2;
+	       formals = $4;
+	       locals = List.rev $7;
+	       body = List.rev $8 } }
 
 formals_opt:
     /* nothing */ { [] }
@@ -63,12 +81,15 @@ formal_list:
     typ ID                   { [($1,$2)] }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
+
 typ:
     INT { Int }
   | FLOAT { Float }
   | BOOL { Bool } 
   | STRING { String }
   | VOID { Void }
+  | STRUCT ID { StructType ($2) } 
+
 
 vdecl_list:
     /* nothing */    { [] }
@@ -76,6 +97,14 @@ vdecl_list:
 
 vdecl:
    typ ID SEMI { ($1, $2) }
+
+
+sdecl: 
+   STRUCT ID LBRACE vdecl_list RBRACE
+      { {
+        sname = $2;
+        sformals = $4; } } 
+
 
 stmt_list:
     /* nothing */  { [] }
@@ -97,29 +126,30 @@ expr_opt:
   | expr          { $1 }
 
 expr:
-    INT_LITERAL      { IntLit($1) }
-  | FLOAT_LITERAL    { FloatLit($1) } 
-  | STR_LITERAL      { StringLit($1) }
-  | TRUE             { BoolLit(true) }
-  | FALSE            { BoolLit(false) }
-  | ID               { Id($1) }
-  | expr PLUS   expr { Binop($1, Add,   $3) }
-  | expr MINUS  expr { Binop($1, Sub,   $3) }
-  | expr TIMES  expr { Binop($1, Mult,  $3) }
-  | expr DIVIDE expr { Binop($1, Div,   $3) }
-  | expr EQ     expr { Binop($1, Equal, $3) }
-  | expr NEQ    expr { Binop($1, Neq,   $3) }
-  | expr LT     expr { Binop($1, Less,  $3) }
-  | expr LEQ    expr { Binop($1, Leq,   $3) }
-  | expr GT     expr { Binop($1, Greater, $3) }
-  | expr GEQ    expr { Binop($1, Geq,   $3) }
-  | expr AND    expr { Binop($1, And,   $3) }
-  | expr OR     expr { Binop($1, Or,    $3) }
-  | MINUS expr %prec NEG { Unop(Neg, $2) }
-  | NOT expr         { Unop(Not, $2) }
-  | ID ASSIGN expr   { Assign($1, $3) }
+    INT_LITERAL           { IntLit($1) }
+  | FLOAT_LITERAL         { FloatLit($1) } 
+  | STR_LITERAL           { StringLit($1) }
+  | TRUE                  { BoolLit(true) }
+  | FALSE                 { BoolLit(false) }
+  | ID                    { Id($1) }
+  | expr PLUS   expr      { Binop($1, Add,   $3) }
+  | expr MINUS  expr      { Binop($1, Sub,   $3) }
+  | expr TIMES  expr      { Binop($1, Mult,  $3) }
+  | expr DIVIDE expr      { Binop($1, Div,   $3) }
+  | expr EQ     expr      { Binop($1, Equal, $3) }
+  | expr NEQ    expr      { Binop($1, Neq,   $3) }
+  | expr LT     expr      { Binop($1, Less,  $3) }
+  | expr LEQ    expr      { Binop($1, Leq,   $3) }
+  | expr GT     expr      { Binop($1, Greater, $3) }
+  | expr GEQ    expr      { Binop($1, Geq,   $3) }
+  | expr AND    expr      { Binop($1, And,   $3) }
+  | expr OR     expr      { Binop($1, Or,    $3) }
+  | MINUS expr %prec NEG  { Unop(Neg, $2) }
+  | NOT expr              { Unop(Not, $2) }
+  | expr TILDE  ID        { AccessStructField($1, $3) }
+  | expr ASSIGN expr      { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
-  | LPAREN expr RPAREN { $2 }
+  | LPAREN expr RPAREN    { $2 }
 
 actuals_opt:
     /* nothing */ { [] }

@@ -7,6 +7,7 @@ let digit = ['0'-'9']
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
 | "/*"     { comment lexbuf }           (* Comments *)
+
 | '('      { LPAREN }		| ')'      { RPAREN }
 | '{'      { LBRACE }		| '}'      { RBRACE }
 | ';'      { SEMI }			| ','      { COMMA }
@@ -25,11 +26,15 @@ rule token = parse
 | "for"    { FOR }			| "while"  { WHILE }
 | "return" { RETURN }
 
-| "int"    { INT }			| "bool"   { BOOL }			|     "float" { FLOAT } |   "string"	{ STRING }
+| "int"    { INT }			
+| "bool"   { BOOL }			| "true"   { TRUE }			| "false"  { FALSE }
+| "float"  { FLOAT } 
+| "string" { STRING }
+
+| "struct" { STRUCT }		| "~"	   { TILDE }
 
 | "void"   { VOID }
 
-| "true"   { TRUE }			| "false"  { FALSE }
 
 | ['0'-'9']+ as lxm { INT_LITERAL(int_of_string lxm) }
 | digit+('.')digit+ as lxm {FLOAT_LITERAL(float_of_string lxm)}

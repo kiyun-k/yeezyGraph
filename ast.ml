@@ -6,7 +6,7 @@ type op = Add | Sub | Mult | Div |
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | String | Void
+type typ = Int | Bool | Float | String | Void | StructType of string
 
 type bind = typ * string
 
@@ -18,7 +18,8 @@ type expr =
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
-  | Assign of string * expr
+  | AccessStructField of expr * string 
+  | Assign of expr * expr
   | Call of string * expr list
   | Noexpr
 
@@ -36,9 +37,14 @@ type func_decl = {
     formals : bind list;
     locals : bind list;
     body : stmt list;
-  }
+}
 
-type program = bind list * func_decl list
+type struct_decl = { 
+  sname : string;
+  sformals : bind list; 
+}
+
+type program = bind list * func_decl list * struct_decl list
 
 
 (* Pretty-printing functions *)
@@ -71,7 +77,8 @@ let rec string_of_expr = function
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
-  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | AccessStructField(v, e) -> string_of_expr v ^ "~" ^ e
+  | Assign(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
@@ -95,6 +102,7 @@ let string_of_typ = function
   | Bool -> "bool"
   | String -> "string"
   | Void -> "void"
+  | StructType(s) -> s
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
@@ -106,6 +114,12 @@ let string_of_fdecl fdecl =
   String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
 
-let string_of_program (vars, funcs) =
+let string_of_sdecl sdecl = 
+  "struct " ^ sdecl.sname ^ " \n{\n" ^
+  String.concat "; " (List.map snd sdecl.sformals) ^
+  "}\n"
+
+let string_of_program (vars, funcs, structs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
+  String.concat "\n" (List.map string_of_sdecl structs) ^ "\n" ^
+  String.concat "\n" (List.map string_of_fdecl funcs) 

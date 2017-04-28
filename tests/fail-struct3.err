@@ -1,0 +1,1 @@
+Fatal error: exception Failure("struct Point does not contain field z")
