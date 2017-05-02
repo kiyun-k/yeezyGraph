@@ -69,7 +69,7 @@ let check (globals, functions) =
        locals = []; body = [] }
 
         (StringMap.add "qremove"
-     { typ = QueueType(AnyType); fname = "qremove"; formals = [];
+     { typ = Void; fname = "qremove"; formals = [];
        locals = []; body = [] }
 
        (StringMap.add "qadd"
@@ -121,10 +121,6 @@ let check (globals, functions) =
        QueueType(typ) -> typ
       | _ -> String in 
 
-    let getTypeFromQueue = function
-       Queue(typ, _) -> typ
-      | _ -> String in 
-
     (* Return the type of an expression or throw an exception *)
     let rec expr_typ = function
 	      IntLit _ -> Int
@@ -170,11 +166,10 @@ let check (globals, functions) =
       | Noexpr -> Void
       | Assign(e1, e2) as ex ->
         let lt = type_of_identifier e1 and rt = expr_typ e2 in
-        if rt = AnyType then let rt = getTypeFromQueue e2 in 
-        check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
-				                             " = " ^ string_of_typ rt ^ " in " ^ 
-				                             string_of_expr ex))
-        else check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
+        if rt <> AnyType then check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
+                                     " = " ^ string_of_typ rt ^ " in " ^ 
+                                     string_of_expr ex))
+      else  check_assign rt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
                                      " = " ^ string_of_typ rt ^ " in " ^ 
                                      string_of_expr ex))
       | Call(fname, actuals) as call -> let fd = function_decl fname in
@@ -188,25 +183,25 @@ let check (globals, functions) =
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
              fd.formals actuals;
            fd.typ
+
       | ObjectCall(oname, fname, actuals) as objectcall -> let fd = function_decl fname in
+      let returntype = ref (fd.typ) in 
       if List.length actuals != List.length fd.formals then
       raise (Failure ("expecting " ^ string_of_int
              (List.length fd.formals) ^ " arguments in " ^ string_of_expr objectcall))
 
       else
            List.iter2 (fun (ft, _) e -> let et = expr_typ e in
-            if fname = "qfront" then 
-            let _ = print_endline "fuckity fuck" in ignore(check_assign (getQueueType ft) et (Failure ("illegal actual queue argument found " ^ string_of_typ et ^
-                " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e)))
+            let acttype = expr_typ oname in 
+            let actqtype = getQueueType acttype in 
+            if fname = "qfront" then let _ = print_endline (string_of_typ actqtype) in returntype := actqtype
             else 
-                if fname = "qadd" then let acttype = type_of_identifier oname in 
-                let actqtype = getQueueType acttype in 
-                let _ = print_endline string_of_typ actqtype in 
+                if fname = "qadd" then
                 ignore(check_assign actqtype et (Failure ("illegal actual queue argument found " ^ string_of_typ et ^
-                " expected " ^ string_of_typ actqtype ^ " in " ^ string_of_expr e)))
+                " expected " ^ string_of_typ actqtype ^ " in " ^ string_of_expr e))) 
                 else ignore (check_assign ft et (Failure ("illegal actual argument found 2 " ^ string_of_typ et ^
-                " expected " ^ string_of_type ft + "in" ^ string_of_expr e)))) fd.formals actuals;
-           fd.typ
+                " expected " ^ "in" ^ string_of_expr e)))) fd.formals actuals;
+           !returntype
 
     in
 

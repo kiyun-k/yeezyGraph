@@ -194,13 +194,11 @@ let translate (globals, functions) =
         let void_e_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in 
         ignore (L.build_call enqueue_f [| q_val; void_e_ptr|] "" builder); q_val
 
-      | A.ObjectCall (q, "qremove", [e]) -> 
-        ignore(e);
+      | A.ObjectCall (q, "qremove", []) -> 
         let q_val = expr builder q in
         ignore (L.build_call dequeue_f [| q_val|] "" builder); q_val
 
-      | A.ObjectCall (q, "qfront", [e]) -> 
-        ignore(e);
+      | A.ObjectCall (q, "qfront", []) -> 
         let q_val = expr builder q
         and q_type = getQueueType q in 
         let val_ptr = L.build_call front_f [| q_val|] "val_ptr" builder in
@@ -212,7 +210,7 @@ let translate (globals, functions) =
           | _ -> 
             let l_dtyp = ltype_of_typ q_type in 
             let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
-            (L.build_load d_ptr "d_ptr" builder))
+            (L.build_load d_ptr "d_ptr" builder)) 
 
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
@@ -222,6 +220,7 @@ let translate (globals, functions) =
                                               | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
 
+         
       |  A.ObjectCall(_, f, act) -> 
          let (fdef, fdecl) = StringMap.find f function_decls in
          let actuals = 
@@ -229,6 +228,9 @@ let translate (globals, functions) =
          let result = (match fdecl.A.typ with A.Void -> ""
                                               | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder 
+
+       
+       
        
     in
 

@@ -8,11 +8,12 @@ int main() {
   c = 5;
   q = new Queue<int>();
   q.qadd(a);
-  q.qremove();
-  q.qadd(c);
-  q.qadd(4);
-  /*b = q.qfront();*/
-  /*print(b);*/
+  b = q.qfront();
+  q.qremove(); 
+  /* q.qadd(c); */
+  /* q.qadd(4); */
+  /* q.qfront(); */
+  print(b);
   
   return 0;
 }
