@@ -214,6 +214,21 @@ let translate (globals, functions) =
             let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
             (L.build_load d_ptr "d_ptr" builder))
 
+  
+       (* let val_data_ptr =  L.build_struct_gep val_ptr 0 "l_val_ptr" builder *)(*in 
+
+        (match q_type with
+          A.QueueType _ ->
+            let l_dtyp = ltype_of_typ q_type in 
+            let void_d_ptr = L.build_load val_data_ptr "void_d_ptr" builder in
+            (L.build_bitcast void_d_ptr l_dtyp "data" builder)
+        | _ -> 
+          let l_dtyp = ltype_of_typ q_type in 
+          let void_d_ptr = L.build_load val_data_ptr "void_d_ptr" builder in 
+          let d_ptr = L.build_bitcast void_d_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
+          (L.build_load d_ptr "d_ptr" builder)) *)
+     
+
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	       let actuals = 

@@ -14,7 +14,8 @@ type gop = AddNode | RemoveNode | AddEdge | RemoveEdge
 type uop = Neg | Not
 
 type typ = Int | Bool | Void|  String
-          (* | Float | 
+          | Float | 
+          (*
            Node | Graph | 
            ListOfInt | ListOfBool | ListOfString | ListOfFloat | 
            QueueOfInt | QueueOfBool | QueueOfString | QueueOfFloat |
@@ -26,7 +27,8 @@ type bind = typ * string
 
 type expr = 
     Literal of int 
-  (* | FloatLit of float *)
+  | FloatLit of float 
+
   | BoolLit of bool 
   | StringLit of string 
   (*| ListLit of expr list *)
