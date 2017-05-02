@@ -5,17 +5,19 @@ open Ast
 %}
 
 /* Punctuation tokens */
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA
 /* Arithmetic tokens */
-%token PLUS MINUS TIMES DIVIDE ASSIGN NOT
+%token PLUS MINUS TIMES DIVIDE ASSIGN NOT 
 /* Logical tokens */
 %token EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 /* Primitive datatype tokens */
-%token INT BOOL FLOAT STRING
+%token INT BOOL FLOAT STRING QUEUE
 /* Control flow tokens */
 %token IF ELSE FOR WHILE
 /* Function tokens */
-%token RETURN VOID 
+%token RETURN VOID NEW 
+/* BUILT-IN FUNCTION tokens */
+%token DOT
 
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
@@ -34,6 +36,7 @@ open Ast
 %left PLUS MINUS
 %left TIMES DIVIDE
 %right NOT NEG
+%left DOT
 
 %start program
 %type <Ast.program> program
@@ -70,6 +73,7 @@ typ:
   | BOOL { Bool } 
   | STRING { String }
   | VOID { Void }
+  | QUEUE LT typ GT { QueueType($3)}
 
 vdecl_list:
     /* nothing */    { [] }
@@ -120,6 +124,8 @@ expr:
   | NOT expr         { Unop(Not, $2) }
   | ID ASSIGN expr   { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
+  | expr DOT ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }  
+  | NEW QUEUE LT typ GT LPAREN actuals_opt RPAREN { Queue($4, $7) }
   | LPAREN expr RPAREN { $2 }
 
 actuals_opt:

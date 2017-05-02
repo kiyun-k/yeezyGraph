@@ -14,28 +14,31 @@ http://llvm.moe/ocaml/
 
 module L = Llvm
 module A = Ast
-
 module StringMap = Map.Make(String)
-
-
-
 
 let translate (globals, functions) =
   let context = L.global_context () in (* global data container *)
-  let the_module = L.create_module context "MicroC" (* container *)
-  and i32_t  = L.i32_type  context
-  and i8_t   = L.i8_type   context (* for printf format string *)
-  and float_t  = L.double_type context
-  and i1_t   = L.i1_type   context
-  and void_t = L.void_type context in
-
+  let llctx = L.global_context () in 
+  let the_module = L.create_module context "MicroC" in (* container *)
+  let queuem = L.MemoryBuffer.of_file "queue.bc" in
+  let qqm = Llvm_bitreader.parse_bitcode llctx queuem in
+  let i32_t  = L.i32_type context 
+  and i8_t   = L.i8_type context (* for printf format string *)
+  and float_t  = L.double_type context 
+  and i1_t   = L.i1_type context 
+  and void_t = L.void_type context   
+  and queueid_t = L.pointer_type (match L.type_by_name qqm "struct.QueueId" with 
+    None -> raise (Invalid_argument "Option.get queueid") | Some x -> x) in 
+  
 
   let ltype_of_typ = function (* LLVM type for a given AST type *)
       A.Int -> i32_t
     | A.Float -> float_t
     | A.Bool -> i1_t
     | A.String -> L.pointer_type i8_t
-    | A.Void -> void_t in
+    | A.Void -> void_t 
+    | A.QueueType _ -> queueid_t
+    | A.AnyType -> L.pointer_type i8_t in 
 
   (* Declare and initialize each global variable; remember its value in a map *)
   let global_vars =
@@ -51,6 +54,18 @@ let translate (globals, functions) =
   (* Declare the built-in printbig() function *)
   let printbig_t = L.function_type i32_t [| i32_t |] in
   let printbig_func = L.declare_function "printbig" printbig_t the_module in
+
+  (*Declare queue functions *)
+  let initQueueId_t = L.function_type queueid_t [| |] in 
+  let initQueueId_f = L.declare_function "initQueueId" initQueueId_t the_module in
+  let enqueue_t = L.function_type void_t [| queueid_t; L.pointer_type i8_t|] in 
+  let enqueue_f = L.declare_function "enqueue" enqueue_t the_module in
+  let dequeue_t = L.function_type void_t [| queueid_t |] in 
+  let dequeue_f = L.declare_function "dequeue" dequeue_t the_module in
+  let front_t = L.function_type (L.pointer_type i8_t) [| queueid_t |] in
+  let front_f = L.declare_function "front" front_t the_module in
+
+  
 
   (* Define each user-defined function (arguments and return type); remember in a map *)
   let function_decls =
@@ -107,6 +122,12 @@ let translate (globals, functions) =
     | A.Call(_,_) -> ltype_of_typ A.Void in 
 
 *)
+    let getQueueType = function
+       A.Queue (typ, act) -> ignore(act); typ
+      | _ -> A.Int
+
+    in 
+
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
 	      A.IntLit i -> L.const_int i32_t i
@@ -138,6 +159,21 @@ let translate (globals, functions) =
 	       (match op with
 	         A.Neg     -> L.build_neg
          | A.Not     -> L.build_not) e' "tmp" builder
+      | A.Queue (typ, act) ->
+        let d_ltyp = ltype_of_typ typ in
+        let queue_ptr = L.build_call initQueueId_f [| |] "init" builder in 
+        let add_element elem = 
+          let d_ptr = match typ with 
+          | A.QueueType _ -> expr builder elem 
+          | _ -> 
+            let element = expr builder elem in 
+            let d_ptr = L.build_malloc d_ltyp "tmp" builder in 
+            ignore (L.build_store element d_ptr builder); d_ptr in 
+          let void_d_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
+          ignore (L.build_call enqueue_f [| queue_ptr; void_d_ptr |] "" builder)
+        in ignore (List.map add_element act);
+        queue_ptr
+
       | A.Assign (s, e) -> let e' = expr builder e in
 	                   ignore (L.build_store e' (lookup s) builder); e'
       | A.Call ("print", [e]) | A.Call ("printb", [e]) ->
@@ -149,6 +185,50 @@ let translate (globals, functions) =
 	       L.build_call printbig_func 
             [| (expr builder e) |] 
             "printbig" builder
+      | A.ObjectCall (q, "qadd", [e]) -> 
+        let q_val = expr builder q in
+        let e_val = expr builder e in 
+        let d_ltyp = L.type_of e_val in 
+        let d_ptr = L.build_malloc d_ltyp "tmp" builder in 
+        ignore(L.build_store e_val d_ptr builder);
+        let void_e_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in 
+        ignore (L.build_call enqueue_f [| q_val; void_e_ptr|] "" builder); q_val
+
+      | A.ObjectCall (q, "qremove", [e]) -> 
+        ignore(e);
+        let q_val = expr builder q in
+        ignore (L.build_call dequeue_f [| q_val|] "" builder); q_val
+
+      | A.ObjectCall (q, "qfront", [e]) -> 
+        ignore(e);
+        let q_val = expr builder q
+        and q_type = getQueueType q in 
+        let val_ptr = L.build_call front_f [| q_val|] "val_ptr" builder in
+        (match q_type with 
+          A.QueueType _ ->
+            let l_dtyp = ltype_of_typ q_type in 
+            let void_d_ptr = L.build_load val_ptr "void_d_ptr" builder in
+            (L.build_bitcast void_d_ptr l_dtyp "data" builder)
+          | _ -> 
+            let l_dtyp = ltype_of_typ q_type in 
+            let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
+            (L.build_load d_ptr "d_ptr" builder))
+
+  
+       (* let val_data_ptr =  L.build_struct_gep val_ptr 0 "l_val_ptr" builder *)(*in 
+
+        (match q_type with
+          A.QueueType _ ->
+            let l_dtyp = ltype_of_typ q_type in 
+            let void_d_ptr = L.build_load val_data_ptr "void_d_ptr" builder in
+            (L.build_bitcast void_d_ptr l_dtyp "data" builder)
+        | _ -> 
+          let l_dtyp = ltype_of_typ q_type in 
+          let void_d_ptr = L.build_load val_data_ptr "void_d_ptr" builder in 
+          let d_ptr = L.build_bitcast void_d_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
+          (L.build_load d_ptr "d_ptr" builder)) *)
+     
+
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	       let actuals = 
@@ -156,6 +236,15 @@ let translate (globals, functions) =
 	       let result = (match fdecl.A.typ with A.Void -> ""
                                               | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
+
+      |  A.ObjectCall(_, f, act) -> 
+         let (fdef, fdecl) = StringMap.find f function_decls in
+         let actuals = 
+            List.rev (List.map (expr builder) (List.rev act)) in
+         let result = (match fdecl.A.typ with A.Void -> ""
+                                              | _ -> f ^ "_result") in
+         L.build_call fdef (Array.of_list actuals) result builder 
+       
     in
 
     (* Invoke "f builder" if the current block doesn't already

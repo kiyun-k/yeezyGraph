@@ -9,6 +9,7 @@ rule token = parse
 | "/*"     { comment lexbuf }           (* Comments *)
 | '('      { LPAREN }		| ')'      { RPAREN }
 | '{'      { LBRACE }		| '}'      { RBRACE }
+| '['      { LBRACKET }     | ']'      { RBRACKET } 
 | ';'      { SEMI }			| ','      { COMMA }
 
 | '+'      { PLUS }			| '-'      { MINUS }
@@ -16,20 +17,24 @@ rule token = parse
 | '='      { ASSIGN }
 
 | "=="     { EQ }			| "!="     { NEQ }
-| '<'      { LT }			| "<="     { LEQ }
+| "<"      { LT }			| "<="     { LEQ }
 | ">"      { GT }			| ">="     { GEQ }
 | "&&"     { AND }			| "||"     { OR }
 | "!"      { NOT }
 
 | "if"     { IF }			| "else"   { ELSE }
 | "for"    { FOR }			| "while"  { WHILE }
-| "return" { RETURN }
+| "return" { RETURN }		| "new"    { NEW }
 
 | "int"    { INT }			| "bool"   { BOOL }			|     "float" { FLOAT } |   "string"	{ STRING }
 
 | "void"   { VOID }
 
 | "true"   { TRUE }			| "false"  { FALSE }
+
+| "Queue"  { QUEUE }
+
+| '.' { DOT }   
 
 | ['0'-'9']+ as lxm { INT_LITERAL(int_of_string lxm) }
 | digit+('.')digit+ as lxm {FLOAT_LITERAL(float_of_string lxm)}
