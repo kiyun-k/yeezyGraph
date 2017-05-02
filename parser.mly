@@ -16,7 +16,10 @@
 %token INT BOOL FLOAT STRING
 
 /* Struct datatype tokens */
-%token STRUCT TILDE
+%token STRUCT TILDE 
+
+/* Graph tokens */
+%token ADD_NODE REMOVE_NODE ADD_EDGE REMOVE_EDGE GRAPH NODE
 
 /* Arithmetic tokens */
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
@@ -28,8 +31,7 @@
 %token IF ELSE FOR WHILE
 
 /* Function tokens */
-%token RETURN VOID 
-
+%token RETURN VOID NEW
 
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
@@ -48,6 +50,7 @@
 %left TIMES DIVIDE
 %right NOT NEG
 %left TILDE
+%left ADD_NODE REMOVE_NODE
 
 
 %start program
@@ -89,6 +92,8 @@ typ:
   | STRING { String }
   | VOID { Void }
   | STRUCT ID { StructType ($2) } 
+  | GRAPH { GraphTyp }
+  | NODE { Node }
 
 
 vdecl_list:
@@ -150,6 +155,11 @@ expr:
   | expr ASSIGN expr      { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN    { $2 }
+  | ID ADD_NODE ID       { GraphOp($1, AddNode, $3) }
+  | ID REMOVE_NODE ID    { GraphOp($1, RemoveNode, $3) }
+  | ID ADD_EDGE ID       { GraphOp($1, AddEdge, $3) }
+  | ID REMOVE_NODE ID    { GraphOp($1, RemoveEdge, $3) }
+  | NEW GRAPH LPAREN RPAREN { Graph }
 
 actuals_opt:
     /* nothing */ { [] }

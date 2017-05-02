@@ -4,9 +4,11 @@ type op = Add | Sub | Mult | Div |
           Equal | Neq | Less | Leq | Greater | Geq |
           And | Or
 
+type gop = AddNode | RemoveNode | AddEdge | RemoveEdge
+
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | String | Void | StructType of string
+type typ = Int | Bool | Float | String | Void | StructType of string | GraphTyp | Node
 
 type bind = typ * string
 
@@ -22,6 +24,8 @@ type expr =
   | Assign of expr * expr
   | Call of string * expr list
   | Noexpr
+  | GraphOp of expr * gop * string
+  | Graph
 
 type stmt =
     Block of stmt list
@@ -63,6 +67,12 @@ let string_of_op = function
   | And -> "&&"
   | Or -> "||"
 
+let string_of_gop = function
+    AddNode -> "~+"
+  | RemoveNode -> "~-"
+  | AddEdge -> "->"
+  | RemoveEdge -> "!->"
+
 let string_of_uop = function
     Neg -> "-"
   | Not -> "!"
@@ -82,6 +92,8 @@ let rec string_of_expr = function
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
+  | Graph -> "new graph"
+  | GraphOp(s1, o, s2) -> string_of_expr s1 ^ string_of_gop o ^ s2
 
 let rec string_of_stmt = function
     Block(stmts) ->
@@ -103,6 +115,8 @@ let string_of_typ = function
   | String -> "string"
   | Void -> "void"
   | StructType(s) -> s
+  | GraphTyp -> "graph"
+  | Node -> "node"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 

@@ -19,13 +19,23 @@ module StringMap = Map.Make(String)
 
 let translate (globals, functions, structs) =
   let context = L.global_context () in (* global data container *)
-  let the_module = L.create_module context "MicroC" (* container *)
-  and i32_t  = L.i32_type  context
+  let nodecontext = L.global_context () in
+  let graphcontext = L.global_context () in
+  let the_module = L.create_module context "MicroC" in(* container *)
+  let nodem = L.MemoryBuffer.of_file "node.bc" in
+  let node_module = Llvm_bitreader.parse_bitcode nodecontext nodem in
+  let graphm = L.MemoryBuffer.of_file "graph.bc" in
+  let graph_module = Llvm_bitreader.parse_bitcode graphcontext graphm in
+
+  let i32_t  = L.i32_type  context
   and i8_t   = L.i8_type   context (* for printf format string *)
   and float_t  = L.double_type context
   and i1_t   = L.i1_type   context
-  and void_t = L.void_type context in
-
+  and void_t = L.void_type context
+  and graph_t = L.pointer_type (match L.type_by_name graph_module "struct.graph" with
+    None -> raise (Invalid_argument "Option.get graph") | Some x -> x )
+  and node_t = L.pointer_type (match L.type_by_name graph_module "struct.node" with
+    None -> raise (Invalid_argument "Option.get graph") | Some x -> x ) in
 
 let struct_types = 
   let add_struct m sdecl = 
@@ -40,7 +50,10 @@ let struct_types =
     | A.Bool -> i1_t
     | A.String -> L.pointer_type i8_t
     | A.Void -> void_t 
-    | A.StructType s -> (try StringMap.find s struct_types with Not_found -> raise (Failure("struct type " ^ s ^ " is undefined") )) in
+    | A.StructType s -> (try StringMap.find s struct_types with Not_found -> raise (Failure("struct type " ^ s ^ " is undefined") ))
+    | A.GraphTyp -> graph_t
+    | A.Node -> node_t in
+
 
 
   (* Build struct body*)
@@ -80,6 +93,20 @@ let struct_types =
   (* Declare the built-in printbig() function *)
   let printbig_t = L.function_type i32_t [| i32_t |] in
   let printbig_func = L.declare_function "printbig" printbig_t the_module in
+
+  (* Graph functions *)
+  let initGraph_t = L.function_type graph_t [| |] in
+  let initGraph_f = L.declare_function "g_init" initGraph_t the_module in
+  let initNode_t = L.function_type node_t [| L.pointer_type i8_t |] in
+  let initNode_f = L.declare_function "n_init" initNode_t the_module in
+  let addNode_t = L.function_type void_t [| graph_t; node_t |] in
+  let addNode_f = L.declare_function "addNode" addNode_t the_module in
+  let removeNode_t = L.function_type void_t [| graph_t; node_t |] in
+  let removeNode_f = L.declare_function "removeNode" removeNode_t the_module in
+  let addEdge_t = L.function_type void_t [| graph_t; node_t; node_t; i32_t |] in
+  let addEdge_f = L.declare_function "addEdge" addEdge_t the_module in
+  let removeEdge_t = L.function_type void_t [| graph_t; node_t; node_t |] in
+  let removeEdge_f = L.declare_function "removeEdge" removeEdge_t the_module in
 
   (* Define each user-defined function (arguments and return type); remember in a map *)
   let function_decls =
@@ -136,6 +163,11 @@ let struct_types =
     | A.Call(_,_) -> ltype_of_typ A.Void in 
 
 *)
+
+    let idtostring = function 
+      A.Id s -> s
+      | _ -> "" in 
+
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
 	      A.IntLit i -> L.const_int i32_t i
@@ -167,6 +199,19 @@ let struct_types =
 	       (match op with
 	         A.Neg     -> L.build_neg
          | A.Not     -> L.build_not) e' "tmp" builder
+      | A.Graph -> 
+          let graphptr = L.build_call initGraph_f [| |] "init" builder in graphptr
+      | A.GraphOp(g, op, n) ->
+         let g_val = expr builder g in 
+         (*let string_n = idtostring n in *)
+         let d_ltype = ltype_of_typ A.String in
+         let d_ptr = L.build_malloc d_ltype "tmp" builder in
+          ignore(L.build_store n d_ptr builder);
+          let char_n_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
+          let n_ptr = L.build_call initNode_f [| char_n_ptr |] "init" builder in
+          ignore(L.build_call addNode_f [| g_val; n_ptr |] "" builder); g_val
+      
+
 
       | A.AccessStructField(e, field_name) -> 
         (match e with 
