@@ -6,8 +6,8 @@
 
 int main() {
 	struct QueueId *q = initQueueId();
-	int a = 3;
+	double a = 3.1;
 	enqueue(q, &a);
-	int *b = (int *)front(q);
-	printf("%d\n", *b);
+	double *b = (double *)front(q);
+	printf("%f\n", *b);
 };

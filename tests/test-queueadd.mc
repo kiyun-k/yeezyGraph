@@ -1,19 +1,20 @@
 int main() {
 
-  int a;
-  int b;
-  int c;
-  Queue<int> q;
-  a = 3;
-  c = 5;
-  q = new Queue<int>();
+  float a;
+  float b;
+  Queue<float> q;
+  q = new Queue<float>();
+  a = 3.1;
   q.qadd(a);
   b = q.qfront();
-  q.qremove(); 
+  printfloat(b);
+
+
+  /* b = q.qfront(); */
   /* q.qadd(c); */
   /* q.qadd(4); */
   /* q.qfront(); */
-  print(b);
+
   
   return 0;
 }

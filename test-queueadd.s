@@ -5,7 +5,7 @@
 _main:                                  ## @main
 	.cfi_startproc
 ## BB#0:                                ## %entry
-	pushq	%rbp
+	pushq	%r14
 Ltmp0:
 	.cfi_def_cfa_offset 16
 	pushq	%rbx
@@ -17,33 +17,29 @@ Ltmp2:
 Ltmp3:
 	.cfi_offset %rbx, -24
 Ltmp4:
-	.cfi_offset %rbp, -16
-	movl	$3, 20(%rsp)
-	movl	$5, 12(%rsp)
+	.cfi_offset %r14, -16
 	callq	_initQueueId
-	movq	%rax, %rbx
-	movq	%rbx, (%rsp)
-	movl	20(%rsp), %ebp
-	movl	$4, %edi
+	movq	%rax, (%rsp)
+	movabsq	$4614162998222441677, %r14 ## imm = 0x4008CCCCCCCCCCCD
+	movq	%r14, 16(%rsp)
+	movq	(%rsp), %rbx
+	movl	$8, %edi
 	callq	_malloc
-	movl	%ebp, (%rax)
+	movq	%r14, (%rax)
 	movq	%rbx, %rdi
 	movq	%rax, %rsi
 	callq	_enqueue
 	movq	(%rsp), %rdi
 	callq	_front
-	movl	(%rax), %eax
-	movl	%eax, 16(%rsp)
-	movq	(%rsp), %rdi
-	callq	_dequeue
-	movl	16(%rsp), %esi
-	leaq	L_fmt(%rip), %rdi
-	xorl	%eax, %eax
+	movsd	(%rax), %xmm0           ## xmm0 = mem[0],zero
+	movsd	%xmm0, 8(%rsp)
+	leaq	L_fmt.1(%rip), %rdi
+	movb	$1, %al
 	callq	_printf
 	xorl	%eax, %eax
 	addq	$24, %rsp
 	popq	%rbx
-	popq	%rbp
+	popq	%r14
 	retq
 	.cfi_endproc
 

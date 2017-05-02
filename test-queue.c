@@ -6,8 +6,9 @@
 
 int main() {
 	struct QueueId *q = initQueueId();
-	int a = 3;
-        int c = 5;
+	float a = 3.1;
+        float c = 5.2;
 	enqueue(q, &a);
+	float *d = (float *)front(q);
  	
 };

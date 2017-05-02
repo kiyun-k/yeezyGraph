@@ -29,7 +29,6 @@ let translate (globals, functions) =
   and void_t = L.void_type context   
   and queueid_t = L.pointer_type (match L.type_by_name qqm "struct.QueueId" with 
     None -> raise (Invalid_argument "Option.get queueid") | Some x -> x) in 
-  
 
   let ltype_of_typ = function (* LLVM type for a given AST type *)
       A.Int -> i32_t
@@ -40,7 +39,12 @@ let translate (globals, functions) =
     | A.QueueType _ -> queueid_t
     | A.AnyType -> L.pointer_type i8_t in 
 
+
   (* Declare and initialize each global variable; remember its value in a map *)
+  let global_types = 
+    let global_type m (t, n) = StringMap.add n t m in 
+    List.fold_left global_type StringMap.empty globals in
+
   let global_vars =
     let global_var m (t, n) =
       let init = L.const_null (ltype_of_typ t) 
@@ -89,6 +93,9 @@ let translate (globals, functions) =
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
+
+    
+
     let local_vars =
       let add_formal m (t, n) p = L.set_value_name n p;
 	       let local = L.build_alloca (ltype_of_typ t) n builder in
@@ -103,10 +110,19 @@ let translate (globals, functions) =
           (Array.to_list (L.params the_function)) in
           List.fold_left add_local formals fdecl.A.locals in
 
+    let local_types = 
+      let add_type m (t, n) = StringMap.add n t m in 
+      let formal_types = List.fold_left add_type StringMap.empty fdecl.A.formals in
+          List.fold_left add_type formal_types fdecl.A.locals in
+     
+
     (* Return the value for a variable or formal argument *)
     let lookup n = try StringMap.find n local_vars
-                   with Not_found -> StringMap.find n global_vars
-    in
+                   with Not_found -> StringMap.find n global_vars in 
+
+    let lookup_types n = try StringMap.find n local_types
+                   with Not_found -> StringMap.find n global_types in 
+
 
 (*
     let get_type_from_expr expr = match expr with 
@@ -123,10 +139,13 @@ let translate (globals, functions) =
 
 *)
     let getQueueType = function
-       A.Queue (typ, act) -> ignore(act); typ
-      | _ -> A.Int
+       A.QueueType(typ) -> typ
+      | _ -> A.String in 
 
-    in 
+    let idtostring = function 
+        A.Id s -> s 
+      | _ -> "" in 
+
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
@@ -190,7 +209,7 @@ let translate (globals, functions) =
         let e_val = expr builder e in 
         let d_ltyp = L.type_of e_val in 
         let d_ptr = L.build_malloc d_ltyp "tmp" builder in 
-        ignore(L.build_store e_val d_ptr builder);
+        ignore(L.build_store e_val d_ptr builder); 
         let void_e_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in 
         ignore (L.build_call enqueue_f [| q_val; void_e_ptr|] "" builder); q_val
 
@@ -199,8 +218,9 @@ let translate (globals, functions) =
         ignore (L.build_call dequeue_f [| q_val|] "" builder); q_val
 
       | A.ObjectCall (q, "qfront", []) -> 
-        let q_val = expr builder q
-        and q_type = getQueueType q in 
+        let q_val = expr builder q in 
+        let n = idtostring q in
+        let q_type = getQueueType (lookup_types n) in 
         let val_ptr = L.build_call front_f [| q_val|] "val_ptr" builder in
         (match q_type with 
           A.QueueType _ ->
@@ -208,7 +228,7 @@ let translate (globals, functions) =
             let void_d_ptr = L.build_load val_ptr "void_d_ptr" builder in
             (L.build_bitcast void_d_ptr l_dtyp "data" builder)
           | _ -> 
-            let l_dtyp = ltype_of_typ q_type in 
+            let l_dtyp = ltype_of_typ q_type in
             let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
             (L.build_load d_ptr "d_ptr" builder)) 
 
@@ -292,3 +312,5 @@ let translate (globals, functions) =
 
   List.iter build_function_body functions;
   the_module
+
+  

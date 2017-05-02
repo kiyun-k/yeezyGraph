@@ -194,8 +194,7 @@ let check (globals, functions) =
            List.iter2 (fun (ft, _) e -> let et = expr_typ e in
             let acttype = expr_typ oname in 
             let actqtype = getQueueType acttype in 
-            if fname = "qfront" then let _ = print_endline (string_of_typ actqtype) in returntype := actqtype
-            else 
+            (* if fname = "qfront" then let _ = print_endline (string_of_typ actqtype) in returntype := actqtype *)
                 if fname = "qadd" then
                 ignore(check_assign actqtype et (Failure ("illegal actual queue argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ actqtype ^ " in " ^ string_of_expr e))) 
