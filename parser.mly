@@ -10,13 +10,16 @@
 
 
 /* Punctuation tokens */
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA
 
 /* Primitive datatype tokens */
 %token INT BOOL FLOAT STRING
 
 /* Struct datatype tokens */
 %token STRUCT TILDE
+
+/* Queue datatype tokens */
+%token QUEUE
 
 /* Arithmetic tokens */
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
@@ -28,7 +31,7 @@
 %token IF ELSE FOR WHILE
 
 /* Function tokens */
-%token RETURN VOID 
+%token RETURN VOID NEW DOT
 
 
 %token <int> INT_LITERAL
@@ -48,6 +51,7 @@
 %left TIMES DIVIDE
 %right NOT NEG
 %left TILDE
+%left DOT
 
 
 %start program
@@ -88,8 +92,9 @@ typ:
   | BOOL { Bool } 
   | STRING { String }
   | VOID { Void }
-  | STRUCT ID { StructType ($2) } 
-
+  | STRUCT ID { StructType ($2) }
+  | QUEUE LT typ GT { QueueType($3)}
+ 
 
 vdecl_list:
     /* nothing */    { [] }
@@ -131,6 +136,7 @@ expr:
   | STR_LITERAL           { StringLit($1) }
   | TRUE                  { BoolLit(true) }
   | FALSE                 { BoolLit(false) }
+  | NEW QUEUE LT typ GT LPAREN actuals_opt RPAREN { Queue($4, $7) }
   | ID                    { Id($1) }
   | expr PLUS   expr      { Binop($1, Add,   $3) }
   | expr MINUS  expr      { Binop($1, Sub,   $3) }
@@ -149,6 +155,7 @@ expr:
   | expr TILDE  ID        { AccessStructField($1, $3) }
   | expr ASSIGN expr      { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
+  | expr DOT ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }  
   | LPAREN expr RPAREN    { $2 }
 
 actuals_opt:

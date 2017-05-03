@@ -10,6 +10,7 @@ rule token = parse
 
 | '('      { LPAREN }		| ')'      { RPAREN }
 | '{'      { LBRACE }		| '}'      { RBRACE }
+| '['      { LBRACKET }     | ']'      { RBRACKET } 
 | ';'      { SEMI }			| ','      { COMMA }
 
 | '+'      { PLUS }			| '-'      { MINUS }
@@ -24,7 +25,8 @@ rule token = parse
 
 | "if"     { IF }			| "else"   { ELSE }
 | "for"    { FOR }			| "while"  { WHILE }
-| "return" { RETURN }
+| "return" { RETURN }		| "new"    { NEW }
+| '.' 	   { DOT }  
 
 | "int"    { INT }			
 | "bool"   { BOOL }			| "true"   { TRUE }			| "false"  { FALSE }
@@ -32,6 +34,7 @@ rule token = parse
 | "string" { STRING }
 
 | "struct" { STRUCT }		| "~"	   { TILDE }
+| "Queue"  { QUEUE }		
 
 | "void"   { VOID }
 

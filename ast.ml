@@ -6,7 +6,9 @@ type op = Add | Sub | Mult | Div |
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | String | Void | StructType of string
+type typ = Int | Bool | Float | String | Void | 
+           StructType of string |
+           QueueType of typ | AnyType
 
 type bind = typ * string
 
@@ -15,12 +17,14 @@ type expr =
   | BoolLit of bool
   | FloatLit of float
   | StringLit of string
+  | Queue of typ * expr list 
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
   | AccessStructField of expr * string 
   | Assign of expr * expr
   | Call of string * expr list
+  | ObjectCall of expr * string * expr list 
   | Noexpr
 
 type stmt =
@@ -67,6 +71,16 @@ let string_of_uop = function
     Neg -> "-"
   | Not -> "!"
 
+let rec string_of_typ = function
+    Int -> "int"
+  | Float -> "float"
+  | Bool -> "bool"
+  | String -> "string"
+  | Void -> "void"
+  | StructType(s) -> s
+  | QueueType(typ) -> "Queue " ^ string_of_typ typ
+  | AnyType -> "AnyType"
+
 let rec string_of_expr = function
     IntLit(l) -> string_of_int l
   | BoolLit(true) -> "true"
@@ -74,13 +88,14 @@ let rec string_of_expr = function
   | FloatLit(l) -> string_of_float l
   | StringLit(s) -> s
   | Id(s) -> s
+  | Queue(typ, e1) -> "new " ^ "Queue" ^ "<" ^ string_of_typ typ ^ ">" ^ "(" ^ String.concat ", " (List.map string_of_expr e1) ^ ")"
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
   | AccessStructField(v, e) -> string_of_expr v ^ "~" ^ e
   | Assign(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e
-  | Call(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | Call(f, el) -> f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | ObjectCall(o, f, e1) -> string_of_expr o ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr e1) ^ ")"
   | Noexpr -> ""
 
 let rec string_of_stmt = function
@@ -96,14 +111,7 @@ let rec string_of_stmt = function
       string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
 
-let string_of_typ = function
-    Int -> "int"
-  | Float -> "float"
-  | Bool -> "bool"
-  | String -> "string"
-  | Void -> "void"
-  | StructType(s) -> s
-
+ 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
 let string_of_fdecl fdecl =

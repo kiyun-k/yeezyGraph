@@ -29,7 +29,7 @@ let check (globals, functions, structs) =
   (* Raise an exception of the given rvalue type cannot be assigned to
      the given lvalue type *)
   let check_assign lvaluet rvaluet err =
-     if lvaluet == rvaluet then lvaluet else raise err
+     if (lvaluet) = (rvaluet) then lvaluet else raise err
   in
    
 
@@ -56,11 +56,23 @@ let check (globals, functions, structs) =
   if List.mem "print" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function print may not be defined")) else ();
 
+  if List.mem "printfloat" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function printfloat may not be defined")) else ();
+
+  if List.mem "printb" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function printb may not be defined")) else ();
+
   if List.mem "prints" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function prints may not be defined")) else ();
 
-  if List.mem "printfloat" (List.map (fun fd -> fd.fname) functions)
-  then raise (Failure ("function printfloat may not be defined")) else ();
+  if List.mem "qremove" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function qremove may not be defined")) else ();
+
+  if List.mem "qadd" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function qadd may not be defined")) else ();
+
+  if List.mem "qfront" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function qfront may not be defined")) else ();
 
 
   report_duplicate (fun n -> "duplicate function " ^ n)
@@ -83,11 +95,25 @@ let check (globals, functions, structs) =
      { typ = Void; fname = "prints"; formals = [(String, "x")];
        locals = []; body = [] } 
 
-       (StringMap.singleton "printbig"
+       (StringMap.add "printbig"
      { typ = Void; fname = "printbig"; formals = [(Int, "x")];
        locals = []; body = [] }
 
-     ))))
+       (StringMap.add "qremove"
+     { typ = Void; fname = "qremove"; formals = [];
+       locals = []; body = [] }
+
+       (StringMap.add "qadd"
+     { typ = QueueType(AnyType); fname = "qadd"; formals = [(AnyType, "x")];
+       locals = []; body = [] }
+
+       (StringMap.singleton "qfront"
+     { typ = AnyType; fname = "qfront"; formals = [];
+       locals = []; body = [] }
+
+     )))))))
+
+     
    in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
@@ -140,12 +166,18 @@ let check (globals, functions, structs) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
+    let getQueueType = function
+       QueueType(typ) -> typ
+      | _ -> String 
+    in 
+
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
 	      IntLit _ -> Int
       | BoolLit _ -> Bool
       | FloatLit _ -> Float
       | StringLit _ -> String
+      | Queue (t, _) -> QueueType(t)
       | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 
                                   and t2 = expr e2 in
@@ -189,11 +221,13 @@ let check (globals, functions, structs) =
       | Assign(e1, e2) as ex ->
         (match e1 with 
           Id s -> let lt = type_of_identifier s and rt = expr e2 in
-            check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
+            if rt <> AnyType then check_assign lt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
                                      " = " ^ string_of_typ rt ^ " in " ^ string_of_expr ex))
+            else  check_assign rt rt (Failure ("illegal assignment " ^ string_of_typ lt ^
+                                     " = " ^ string_of_typ rt ^ " in " ^ 
+                                     string_of_expr ex))
         | AccessStructField(_, _) -> expr e2
         | _ -> raise (Failure("illegal assignment")))
-
 
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
@@ -206,6 +240,25 @@ let check (globals, functions, structs) =
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
              fd.formals actuals;
            fd.typ
+
+      | ObjectCall(oname, fname, actuals) as objectcall -> let fd = function_decl fname in
+        let returntype = ref (fd.typ) in 
+        if List.length actuals != List.length fd.formals then
+          raise (Failure ("expecting " ^ string_of_int
+             (List.length fd.formals) ^ " arguments in " ^ string_of_expr objectcall))
+
+        else
+           List.iter2 (fun (ft, _) e -> let et = expr e in
+            let acttype = expr oname in 
+            let actqtype = getQueueType acttype in 
+            (* if fname = "qfront" then let _ = print_endline (string_of_typ actqtype) in returntype := actqtype *)
+                if fname = "qadd" then
+                ignore(check_assign actqtype et (Failure ("illegal actual queue argument found " ^ string_of_typ et ^
+                " expected " ^ string_of_typ actqtype ^ " in " ^ string_of_expr e))) 
+                else ignore (check_assign ft et (Failure ("illegal actual argument found 2 " ^ string_of_typ et ^
+                " expected " ^ "in" ^ string_of_expr e)))) fd.formals actuals;
+           !returntype
+
     in
 
     let check_bool_expr e = if expr e != Bool
