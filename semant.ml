@@ -195,6 +195,12 @@ let check (globals, functions, structs) =
         | AccessStructField(_, _) -> expr e2
         | _ -> raise (Failure("illegal assignment")))
 
+      | GraphOp(s1, gop, s2) as e -> let t1 = type_of_identifier s1 and t2 = type_of_identifier s2 in 
+
+        (match gop with 
+         AddNode when t1 = GraphTyp && t2 = String -> GraphTyp
+        | _ -> raise (Failure("illegal graph operator ")))
+
 
       | Call(fname, actuals) as call -> let fd = function_decl fname in
          if List.length actuals != List.length fd.formals then
@@ -207,6 +213,7 @@ let check (globals, functions, structs) =
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
              fd.formals actuals;
            fd.typ
+
     in
 
     let check_bool_expr e = if expr e != Bool

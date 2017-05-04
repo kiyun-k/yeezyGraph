@@ -56,6 +56,15 @@ void* l_get(struct List *list, int index) {
 	return temp->data;
 }
 
+struct ListNode* l2_get(struct List *list, int index) {
+	struct ListNode* temp = list->head;
+	while (index > 0) {
+		temp = temp->next;
+		index--;
+	}
+	return temp;
+}
+
 
 int l_isEmpty(struct List *list) {
 	return (list->head == NULL);

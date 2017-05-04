@@ -18,6 +18,8 @@ void l_delete(struct List *list, int index);
 
 void* l_get(struct List *list, int index);
 
+struct ListNode* l2_get(struct List *list, int index);
+
 int l_isEmpty(struct List *list);
 
 #endif

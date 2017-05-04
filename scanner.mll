@@ -9,6 +9,7 @@ rule token = parse
 | "/*"     { comment lexbuf }           (* Comments *)
 
 | '('      { LPAREN }		| ')'      { RPAREN }
+| '['      { LBRACKET }		| ']'      { RBRACKET }
 | '{'      { LBRACE }		| '}'      { RBRACE }
 | ';'      { SEMI }			| ','      { COMMA }
 
@@ -37,6 +38,10 @@ rule token = parse
 
 | "~+" { ADD_NODE }			| "~-" { REMOVE_NODE }
 | "->" { ADD_EDGE }			| "!->" { REMOVE_EDGE }
+
+| '_' { UNDERSCORE }   | '@' { AT } 
+
+
 
 | "new" { NEW }
 | "void"   { VOID }

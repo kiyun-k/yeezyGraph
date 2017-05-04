@@ -10,7 +10,7 @@
 
 
 /* Punctuation tokens */
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
+%token SEMI LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE COMMA 
 
 /* Primitive datatype tokens */
 %token INT BOOL FLOAT STRING
@@ -33,6 +33,9 @@
 /* Function tokens */
 %token RETURN VOID NEW
 
+%token UNDERSCORE AT 
+
+
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
 %token <string> STR_LITERAL
@@ -47,10 +50,16 @@
 %left EQ NEQ
 %left LT GT LEQ GEQ
 %left PLUS MINUS
-%left TIMES DIVIDE
+%left TIMES DIVIDE MOD
 %right NOT NEG
+%left DOT
 %left TILDE
+%nonassoc AT LBRACKET RBRACKET
+%left ADD_EDGE REMOVE_EDGE
+%nonassoc UNDERSCORE
 %left ADD_NODE REMOVE_NODE
+
+
 
 
 %start program
@@ -155,11 +164,14 @@ expr:
   | expr ASSIGN expr      { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN    { $2 }
+  | expr UNDERSCORE ID            { NodeOp($1, AccessNode, $3) } 
+  | expr AT ID                    { NodeOp($1, AccessNodeField, $3) } 
   | ID ADD_NODE ID       { GraphOp($1, AddNode, $3) }
   | ID REMOVE_NODE ID    { GraphOp($1, RemoveNode, $3) }
-  | ID ADD_EDGE ID       { GraphOp($1, AddEdge, $3) }
-  | ID REMOVE_NODE ID    { GraphOp($1, RemoveEdge, $3) }
+  | expr LBRACKET INT_LITERAL RBRACKET ADD_EDGE expr    { GraphOpAddEdge($1, $3, AddEdge, $6) }
+  | ID REMOVE_EDGE ID             { GraphOp($1, RemoveEdge, $3) }
   | NEW GRAPH LPAREN RPAREN { Graph }
+
 
 actuals_opt:
     /* nothing */ { [] }

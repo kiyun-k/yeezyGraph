@@ -39,6 +39,8 @@ int size(struct graph* g);
 
 bool contains(struct graph* g, char *name);
 
+struct node *getNode(struct graph* g, char *name);
+
 
 
 #endif

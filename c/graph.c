@@ -16,7 +16,7 @@ extern struct graph *g_init() {
 
 extern void addNode (struct graph* g, struct node *n) {
 	for (int i = 0; i < g->size; i++) {
-		struct node *no = (struct node *)((l_get(g->nodes, i))->data);
+		struct node *no = (struct node *)((l2_get(g->nodes, i))->data);
 		if (no->name == n->name) {
 			return;
 		}
@@ -27,16 +27,16 @@ extern void addNode (struct graph* g, struct node *n) {
 
 extern void removeNode (struct graph* g, struct node *n) {
 	for (int i = 0; i < g->size; i++) {
-		struct node *no = (struct node *)((l_get(g->nodes, i))->data);
+		struct node *no = (struct node *)((l2_get(g->nodes, i))->data);
 		if (strcmp(no->name, n->name) == 0) {
-			struct ListNode *listnode = l_get(g->nodes, i);
+			struct ListNode *listnode = l2_get(g->nodes, i);
 			l_delete(g->nodes, i);
 			g->size--;
 		}
 	}
 
 	for (int i = 0; i < g->size; i++) {
-		struct node *no = (struct node *)((l_get(g->nodes, i))->data);
+		struct node *no = (struct node *)((l2_get(g->nodes, i))->data);
 		if (m_get(no->inNodes, n->name) != -1) {		
 			m_remove(no->inNodes, n->name);
 		}
@@ -53,7 +53,7 @@ extern void addEdge(struct graph* g, struct node *n1, struct node *n2, int weigh
 	bool n2exist = false;
 	int n2index = -1;
 	for (int i = 0; i < g->size; i++) {
-		struct node *no = (struct node *)(l_get(g->nodes, i))->data;
+		struct node *no = (struct node *)(l2_get(g->nodes, i))->data;
 		if (no->name == n1->name) {
 			n1exist = true;
 			n1index = i;
@@ -67,8 +67,8 @@ extern void addEdge(struct graph* g, struct node *n1, struct node *n2, int weigh
 		return;
 	}
 
-	struct node *no1 = (struct node *)(l_get(g->nodes, n1index))->data;
-	struct node *no2 = (struct node *)(l_get(g->nodes, n2index))->data;
+	struct node *no1 = (struct node *)(l2_get(g->nodes, n1index))->data;
+	struct node *no2 = (struct node *)(l2_get(g->nodes, n2index))->data;
 
 
 	// add to outNodes of n1
@@ -86,7 +86,7 @@ extern void removeEdge(struct graph* g, struct node *n1, struct node *n2) {
 	bool n2exist = false;
 	int n2index = -1;
 	for (int i = 0; i < g->size; i++) {
-		struct node *no = (struct node *)(l_get(g->nodes, i))->data;
+		struct node *no = (struct node *)(l2_get(g->nodes, i))->data;
 		if (no->name == n1->name) {
 			n1exist = true;
 			n1index = i;
@@ -100,8 +100,8 @@ extern void removeEdge(struct graph* g, struct node *n1, struct node *n2) {
 		return;
 	}
 
-	struct node *no1 = (struct node *)(l_get(g->nodes, n1index))->data;
-	struct node *no2 = (struct node *)(l_get(g->nodes, n2index))->data;
+	struct node *no1 = (struct node *)(l2_get(g->nodes, n1index))->data;
+	struct node *no2 = (struct node *)(l2_get(g->nodes, n2index))->data;
 
 
 	//check outNodes of n1
@@ -119,13 +119,13 @@ extern void removeEdge(struct graph* g, struct node *n1, struct node *n2) {
 }
 
 extern struct node *indexNode(struct graph* g, int index) {
-	struct ListNode *listnode = l_get(g->nodes, index);
+	struct ListNode *listnode = l2_get(g->nodes, index);
 	return listnode->data;
 }
 
 void removeAllNodes(struct graph* g) {
 	for (int i = 0; i < g->size; i++) {
-		struct ListNode *listnode = l_get(g->nodes, i);
+		struct ListNode *listnode = l2_get(g->nodes, i);
 		struct node *no = listnode->data;
 		removeNode(g, no);
 	}
@@ -134,7 +134,7 @@ void removeAllNodes(struct graph* g) {
 
 void freeGraph(struct graph* g) {
 	for (int i = 0; i < g->size; i++) {
-		struct ListNode *listnode = l_get(g->nodes, i);
+		struct ListNode *listnode = l2_get(g->nodes, i);
 		free(listnode->data);
 		free(listnode);
 	}
@@ -145,7 +145,7 @@ void freeGraph(struct graph* g) {
 void printGraph(struct graph* g) {
 	printf("%s\n", "graph: ");
 	for (int i = 0; i < g->size; i++) {
-		struct ListNode *listnode = l_get(g->nodes, i);
+		struct ListNode *listnode = l2_get(g->nodes, i);
 		struct node *nod = (struct node *)listnode->data;
 		print_node(nod);
 		printf("%s", "\n");
@@ -167,12 +167,23 @@ int size(struct graph* g) {
 
 bool contains(struct graph* g, char *name) {
 	for (int i = 0; i < g->size; i++) {
-		struct node *no = (struct node *)(l_get(g->nodes, i))->data;
+		struct node *no = (struct node *)(l2_get(g->nodes, i))->data;
 		if (no->name == name ){
 			return true;
 		}
 	}
 	return false;
+
+}
+
+struct node *getNode(struct graph* g, char *name) {
+	for (int i = 0; i < g->size; i++) {
+		struct node *no = (struct node *)(l2_get(g->nodes, i))->data;
+		if (no->name == name ){
+			return no;
+		}
+	}
+	return NULL;
 
 }
 

@@ -94,11 +94,15 @@ let struct_types =
   let printbig_t = L.function_type i32_t [| i32_t |] in
   let printbig_func = L.declare_function "printbig" printbig_t the_module in
 
+
+  (* Node functions *)
+  let initNode_t = L.function_type node_t [| L.pointer_type i8_t |] in
+  let initNode_f = L.declare_function "n_init" initNode_t the_module in
+
+
   (* Graph functions *)
   let initGraph_t = L.function_type graph_t [| |] in
   let initGraph_f = L.declare_function "g_init" initGraph_t the_module in
-  let initNode_t = L.function_type node_t [| L.pointer_type i8_t |] in
-  let initNode_f = L.declare_function "n_init" initNode_t the_module in
   let addNode_t = L.function_type void_t [| graph_t; node_t |] in
   let addNode_f = L.declare_function "addNode" addNode_t the_module in
   let removeNode_t = L.function_type void_t [| graph_t; node_t |] in
@@ -107,6 +111,21 @@ let struct_types =
   let addEdge_f = L.declare_function "addEdge" addEdge_t the_module in
   let removeEdge_t = L.function_type void_t [| graph_t; node_t; node_t |] in
   let removeEdge_f = L.declare_function "removeEdge" removeEdge_t the_module in
+  let removeAllNodes_t = L.function_type void_t [| graph_t|] in 
+  let removeAllNodes_f = L.declare_function "removeAllNodes" removeAllNodes_t the_module in
+  let printGraph_t = L.function_type void_t [| graph_t|] in 
+  let printGraph_f = L.declare_function "printGraph" printGraph_t the_module in 
+  let isEmpty_t = L.function_type void_t [| graph_t|] in 
+  let isEmpty_f = L.declare_function "isEmpty" isEmpty_t the_module in 
+  let size_t = L.function_type void_t [| graph_t|] in 
+  let size_f = L.declare_function "size" size_t the_module in 
+  let contains_t = L.function_type i1_t [| graph_t; L.pointer_type i8_t|] in 
+  let contains_f = L.declare_function "contains" contains_t the_module in 
+  let getNode_t = L.function_type node_t [| graph_t; L.pointer_type i8_t|] in 
+  let getNode_f = L.declare_function "getNode" getNode_t the_module in 
+
+
+
 
   (* Define each user-defined function (arguments and return type); remember in a map *)
   let function_decls =
@@ -201,16 +220,20 @@ let struct_types =
          | A.Not     -> L.build_not) e' "tmp" builder
       | A.Graph -> 
           let graphptr = L.build_call initGraph_f [| |] "init" builder in graphptr
+          
       | A.GraphOp(g, gop, n) ->
           (match gop with
            A.AddNode -> 
-           let g_val = expr builder g in 
-           let n_strptr = L.build_global_stringptr n "str" builder in 
-           let n_ptr = L.build_call initNode_f [| n_strptr |] "init" builder in
-           ignore(L.build_call addNode_f [| g_val; n_ptr |] "" builder); g_val
+           let g_val = lookup g in 
+           let n_val = lookup n in  
+           let char_n_val_pointer = L.build_load n_val "char_n_val_pointer" builder in 
+           let n_ptr = L.build_call initNode_f [| char_n_val_pointer |] "init" builder in 
+           let n_val_ptr = L.build_alloca (L.type_of n_ptr) "node_alloca" builder in 
+           ignore (L.build_store n_ptr n_val_ptr builder); 
+           let graph_pointer = L.build_load g_val "graph_pointer" builder in 
+           let node_pointer = L.build_load n_val_ptr "node_pointer" builder in 
+           ignore(L.build_call addNode_f [| graph_pointer; node_pointer |] "" builder); g_val 
          )
-      
-
 
       | A.AccessStructField(e, field_name) -> 
         (match e with 
@@ -261,7 +284,8 @@ let struct_types =
             List.rev (List.map (expr builder) (List.rev act)) in
 	       let result = (match fdecl.A.typ with A.Void -> ""
                                               | _ -> f ^ "_result") in
-         L.build_call fdef (Array.of_list actuals) result builder
+         L.build_call fdef (Array.of_list actuals) result builder 
+
     in
 
     (* Invoke "f builder" if the current block doesn't already

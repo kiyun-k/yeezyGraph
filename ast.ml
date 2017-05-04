@@ -4,7 +4,10 @@ type op = Add | Sub | Mult | Div |
           Equal | Neq | Less | Leq | Greater | Geq |
           And | Or
 
-type gop = AddNode | RemoveNode | AddEdge | RemoveEdge
+type gop = AddNode | RemoveNode  | RemoveEdge | GetNode | AddEdge
+
+type nop = AccessNode (*underscore, e.g. g1_n1*) | AccessNodeField (* At, g1_n1@visited*)
+
 
 type uop = Neg | Not
 
@@ -24,7 +27,9 @@ type expr =
   | Assign of expr * expr
   | Call of string * expr list
   | Noexpr
-  | GraphOp of expr * gop * string
+  | NodeOp of expr * nop * string (* g1_n1 / g1_n1@name *) 
+  | GraphOp of string * gop * string
+  | GraphOpAddEdge of expr * int * gop * expr
   | Graph
 
 type stmt =
@@ -70,8 +75,9 @@ let string_of_op = function
 let string_of_gop = function
     AddNode -> "~+"
   | RemoveNode -> "~-"
-  | AddEdge -> "->"
   | RemoveEdge -> "!->"
+  | AddEdge -> "->"
+  | GetNode -> "_"
 
 let string_of_uop = function
     Neg -> "-"
@@ -93,7 +99,10 @@ let rec string_of_expr = function
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
   | Graph -> "new graph"
-  | GraphOp(s1, o, s2) -> string_of_expr s1 ^ string_of_gop o ^ s2
+  | GraphOp(s1, o, s2) ->  s1 ^ string_of_gop o ^  s2
+  | GraphOpAddEdge(s1, i, o, s2) -> string_of_expr s1 ^ string_of_int i ^ string_of_gop o ^ string_of_expr s2
+
+
 
 let rec string_of_stmt = function
     Block(stmts) ->
