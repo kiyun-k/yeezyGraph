@@ -17,7 +17,7 @@ open Ast
 /* Function tokens */
 %token RETURN VOID NEW
 /* Built-in Function tokens */
-
+%token DOT
 
 /* Collection tokens */
 %token LIST
@@ -128,6 +128,7 @@ expr:
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN { $2 }
   | NEW LIST LT typ GT LBRACKET actuals_opt RBRACKET { List($4,$7) }
+  | expr DOT ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }  
 
 actuals_opt:
     /* nothing */ { [] }

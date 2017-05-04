@@ -47,7 +47,8 @@ let check (globals, functions) =
     (List.map (fun fd -> fd.fname) functions);
 
   (* Function declaration for a named function *)
-  let built_in_decls =  StringMap.add "print"
+  let built_in_decls =  
+       StringMap.add "print"
      { typ = Void; fname = "print"; formals = [(Int, "x")];
        locals = []; body = [] } 
 
@@ -63,12 +64,21 @@ let check (globals, functions) =
      { typ = Void; fname = "prints"; formals = [(String, "x")];
        locals = []; body = [] } 
 
-       (StringMap.singleton "printbig"
+       (StringMap.add "printbig"
      { typ = Void; fname = "printbig"; formals = [(Int, "x")];
        locals = []; body = [] }
 
-     ))))
-   in
+       (StringMap.add "l_add"
+     { typ = Void; fname = "l_add"; formals = [(Int, "x")];
+       locals = []; body = [] }
+
+       (StringMap.singleton "l_delete"
+     { typ = Void; fname = "l_delete"; formals = [(Int, "x")];
+       locals = []; body = [] }
+
+
+     ))))))
+  in
      
   let function_decls = List.fold_left (fun m fd -> StringMap.add fd.fname fd m)
                          built_in_decls functions
@@ -164,6 +174,19 @@ let check (globals, functions) =
                 " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
              fd.formals actuals;
            fd.typ
+      | ObjectCall(oname, fname, actuals) as objectcall -> let fd = function_decl fname in 
+      if List.length actuals != List.length fd.formals then
+      raise (Failure ("expecting " ^ string_of_int
+             (List.length fd.formals) ^ " arguments in " ^ string_of_expr objectcall))
+
+      else
+           List.iter2 (fun (ft, _) e -> let et = expr e in
+              ignore (check_assign ft et
+                (Failure ("illegal actual argument found " ^ string_of_typ et ^
+                " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e))))
+             fd.formals actuals;
+           fd.typ
+
     in
 
     let check_bool_expr e = if expr e != Bool

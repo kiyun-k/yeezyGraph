@@ -21,7 +21,7 @@ module StringMap = Map.Make(String)
 let translate (globals, functions) =
   let context = L.global_context () in (* global data container *)
   let listcontext = L.global_context () in 
-  let the_module = L.create_module context "MicroC" in (* container *)
+  let the_module = L.create_module context "MicroC" in (* container *)  
   let listm = L.MemoryBuffer.of_file "linkedlist.bc" in
   let list_module = Llvm_bitreader.parse_bitcode listcontext listm in
   let i32_t  = L.i32_type  context
@@ -30,7 +30,9 @@ let translate (globals, functions) =
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context 
   and list_t = L.pointer_type (match L.type_by_name list_module "struct.List" with
-    None -> raise (Invalid_argument "Option.get struct.List") | Some x -> x) in 
+    None -> raise (Invalid_argument "Option.get struct.List") | Some x -> x) 
+  and listnode_t = L.pointer_type (match L.type_by_name list_module "struct.ListNode" with
+    None -> raise (Invalid_argument "Option.get struct.ListNode") | Some x -> x) in
   
 
   let ltype_of_typ = function (* LLVM type for a given AST type *)
@@ -57,10 +59,14 @@ let translate (globals, functions) =
   let printbig_func = L.declare_function "printbig" printbig_t the_module in
 
   (* Linked Lists *)
-  let init_list_t = L.function_type list_t [| |] in
-  let init_list_func = L.declare_function "init_list" init_list_t the_module in
-  let add_t = L.function_type void_t [| list_t; (L.pointer_type i8_t) |] in
-  let add_func = L.declare_function "add" add_t the_module in 
+  let initList_t = L.function_type list_t [| |] in
+  let initList_f = L.declare_function "l_init" initList_t the_module in
+  let addList_t = L.function_type void_t [| list_t; (L.pointer_type i8_t) |] in
+  let addList_f = L.declare_function "l_add" addList_t the_module in 
+  let delList_t = L.function_type void_t [| list_t; i32_t |] in
+  let delList_f = L.declare_function "l_delete" delList_t the_module in
+  let getList_t = L.function_type listnode_t [| list_t; i32_t |] in
+  let getList_f = L.declare_function "l_get" getList_t the_module in 
 
   (* Define each user-defined function (arguments and return type); remember in a map *)
   let function_decls =
@@ -151,7 +157,7 @@ let translate (globals, functions) =
 
       | A.List (typ, act) -> 
         let d_ltyp = ltype_of_typ typ in
-        let listptr = L.build_call init_list_func [||] "init" builder in
+        let listptr = L.build_call initList_f [||] "init" builder in
           let add_elmt elmt = 
             let d_ptr = match typ with
             A.ListTyp _ -> expr builder elmt
@@ -162,7 +168,7 @@ let translate (globals, functions) =
             d_ptr in
 
             let void_d_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
-            ignore (L.build_call add_func [| listptr; void_d_ptr |] "" builder) in
+            ignore (L.build_call addList_f [| listptr; void_d_ptr |] "" builder) in
           ignore (List.map add_elmt act);
         listptr
 
@@ -177,6 +183,21 @@ let translate (globals, functions) =
 	       L.build_call printbig_func 
             [| (expr builder e) |] 
             "printbig" builder
+
+      | A.ObjectCall (l, "l_add", [e]) ->
+        let l_ptr = expr builder l in 
+        let e_val = expr builder e in 
+        let d_ltyp = L.type_of e_val in
+        let d_ptr = L.build_malloc d_ltyp "tmp" builder in
+          ignore(L.build_store e_val d_ptr builder);
+        let void_e_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
+        ignore (L.build_call addList_f [| l_ptr ; void_e_ptr |] "" builder);
+        l_ptr
+      | A.ObjectCall (l, "l_delete", [e]) ->
+        let l_ptr = expr builder l in 
+        let e_val = expr builder e in
+        ignore (L.build_call delList_f [| l_ptr; e_val |] "" builder); l_ptr
+
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	       let actuals = 
@@ -184,6 +205,8 @@ let translate (globals, functions) =
 	       let result = (match fdecl.A.typ with A.Void -> ""
                                               | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
+
+
     in
 
     (* Invoke "f builder" if the current block doesn't already

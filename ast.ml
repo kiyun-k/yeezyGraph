@@ -22,6 +22,7 @@ type expr =
   | Unop of uop * expr
   | Assign of string * expr
   | Call of string * expr list
+  | ObjectCall of expr * string * expr list
   | Noexpr
 
 type stmt =
@@ -86,6 +87,7 @@ let rec string_of_expr = function
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | ObjectCall(o, f, el) -> string_of_expr o ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
 
 let rec string_of_stmt = function
