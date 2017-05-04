@@ -21,6 +21,9 @@
 /* Queue datatype tokens */
 %token QUEUE
 
+/* List datatype tokens */
+%token LIST
+
 /* Arithmetic tokens */
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 
@@ -94,6 +97,7 @@ typ:
   | VOID { Void }
   | STRUCT ID { StructType ($2) }
   | QUEUE LT typ GT { QueueType($3)}
+  | LIST LT typ GT { ListType($3) }
  
 
 vdecl_list:
@@ -137,6 +141,7 @@ expr:
   | TRUE                  { BoolLit(true) }
   | FALSE                 { BoolLit(false) }
   | NEW QUEUE LT typ GT LPAREN actuals_opt RPAREN { Queue($4, $7) }
+  | NEW LIST LT typ GT LPAREN actuals_opt RPAREN { List($4,$7) }
   | ID                    { Id($1) }
   | expr PLUS   expr      { Binop($1, Add,   $3) }
   | expr MINUS  expr      { Binop($1, Sub,   $3) }

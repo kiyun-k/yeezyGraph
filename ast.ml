@@ -8,7 +8,8 @@ type uop = Neg | Not
 
 type typ = Int | Bool | Float | String | Void | 
            StructType of string |
-           QueueType of typ | AnyType
+           QueueType of typ | ListType of typ |
+           AnyType
 
 type bind = typ * string
 
@@ -18,6 +19,7 @@ type expr =
   | FloatLit of float
   | StringLit of string
   | Queue of typ * expr list 
+  | List of typ * expr list
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
@@ -79,6 +81,7 @@ let rec string_of_typ = function
   | Void -> "void"
   | StructType(s) -> s
   | QueueType(typ) -> "Queue " ^ string_of_typ typ
+  | ListType(typ) -> "list " ^ string_of_typ typ
   | AnyType -> "AnyType"
 
 let rec string_of_expr = function
@@ -89,6 +92,7 @@ let rec string_of_expr = function
   | StringLit(s) -> s
   | Id(s) -> s
   | Queue(typ, e1) -> "new " ^ "Queue" ^ "<" ^ string_of_typ typ ^ ">" ^ "(" ^ String.concat ", " (List.map string_of_expr e1) ^ ")"
+  | List(typ, el) -> "new" ^ "list" ^ "<" ^ string_of_typ typ ^ ">" ^ "(" ^ String.concat "," (List.map string_of_expr el) ^ ")"
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e

@@ -74,6 +74,12 @@ let check (globals, functions, structs) =
   if List.mem "qfront" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function qfront may not be defined")) else ();
 
+  if List.mem "l_add" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function l_add may not be defined")) else ();
+
+  if List.mem "l_delete" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function l_delete may not be defined")) else ();
+
 
   report_duplicate (fun n -> "duplicate function " ^ n)
     (List.map (fun fd -> fd.fname) functions);
@@ -107,11 +113,19 @@ let check (globals, functions, structs) =
      { typ = QueueType(AnyType); fname = "qadd"; formals = [(AnyType, "x")];
        locals = []; body = [] }
 
-       (StringMap.singleton "qfront"
+       (StringMap.add "qfront"
      { typ = AnyType; fname = "qfront"; formals = [];
        locals = []; body = [] }
 
-     )))))))
+       (StringMap.add "l_add"
+     { typ = Void; fname = "l_add"; formals = [(Int, "x")];
+       locals = []; body = [] }
+
+       (StringMap.singleton "l_delete"
+     { typ = Void; fname = "l_delete"; formals = [(Int, "x")];
+       locals = []; body = [] }
+
+     )))))))))
 
      
    in
@@ -178,6 +192,7 @@ let check (globals, functions, structs) =
       | FloatLit _ -> Float
       | StringLit _ -> String
       | Queue (t, _) -> QueueType(t)
+      | List (t,_) -> ListType(t) 
       | Id s -> type_of_identifier s
       | Binop(e1, op, e2) as e -> let t1 = expr e1 
                                   and t2 = expr e2 in

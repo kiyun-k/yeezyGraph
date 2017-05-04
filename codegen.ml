@@ -19,17 +19,22 @@ module StringMap = Map.Make(String)
 
 let translate (globals, functions, structs) =
   let context = L.global_context () in (* global data container *)
+  let qqctx = L.global_context () in
   let llctx = L.global_context () in
   let the_module = L.create_module context "MicroC" in (* container *)
   let queuem = L.MemoryBuffer.of_file "queue.bc" in
-  let qqm = Llvm_bitreader.parse_bitcode llctx queuem in
+  let listm = L.MemoryBuffer.of_file "linkedlist.bc" in
+  let qqm = Llvm_bitreader.parse_bitcode qqctx queuem in
+  let llm = Llvm_bitreader.parse_bitcode llctx listm in
   let i32_t  = L.i32_type  context
   and i8_t   = L.i8_type   context (* for printf format string *)
   and float_t  = L.double_type context
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context 
   and queueid_t = L.pointer_type (match L.type_by_name qqm "struct.QueueId" with 
-    None -> raise (Invalid_argument "Option.get queueid") | Some x -> x) in 
+    None -> raise (Invalid_argument "Option.get queueid") | Some x -> x)
+  and list_t = L.pointer_type (match L.type_by_name llm "struct.List" with
+    None -> raise (Invalid_argument "Option.get struct.List") | Some x -> x) in
 
 
 let struct_types = 
@@ -47,6 +52,7 @@ let struct_types =
     | A.Void -> void_t 
     | A.StructType s -> (try StringMap.find s struct_types with Not_found -> raise (Failure("struct type " ^ s ^ " is undefined") ))
     | A.QueueType _ -> queueid_t
+    | A.ListType _ -> list_t
     | A.AnyType -> L.pointer_type i8_t in 
  
 
@@ -95,7 +101,7 @@ let struct_types =
   let printbig_func = L.declare_function "printbig" printbig_t the_module in
 
 
-  (* Declare the build-in queue functions *)
+  (* built-in queue functions *)
   let initQueueId_t = L.function_type queueid_t [| |] in 
   let initQueueId_f = L.declare_function "initQueueId" initQueueId_t the_module in
   let enqueue_t = L.function_type void_t [| queueid_t; L.pointer_type i8_t|] in 
@@ -104,6 +110,16 @@ let struct_types =
   let dequeue_f = L.declare_function "dequeue" dequeue_t the_module in
   let front_t = L.function_type (L.pointer_type i8_t) [| queueid_t |] in
   let front_f = L.declare_function "front" front_t the_module in
+
+  (* built-in linked list functions *)
+  let initList_t = L.function_type list_t [| |] in
+  let initList_f = L.declare_function "l_init" initList_t the_module in
+  let addList_t = L.function_type void_t [| list_t; (L.pointer_type i8_t) |] in
+  let addList_f = L.declare_function "l_add" addList_t the_module in 
+  let delList_t = L.function_type void_t [| list_t; i32_t |] in
+  let delList_f = L.declare_function "l_delete" delList_t the_module in
+  let getList_t = L.function_type (L.pointer_type i8_t) [| list_t; i32_t |] in
+  let getList_f = L.declare_function "l_get" getList_t the_module in 
 
 
   (* Define each user-defined function (arguments and return type); remember in a map *)
@@ -188,6 +204,22 @@ let struct_types =
           ignore (L.build_call enqueue_f [| queue_ptr; void_d_ptr |] "" builder)
         in ignore (List.map add_element act);
         queue_ptr
+      | A.List (typ, act) -> 
+        let d_ltyp = ltype_of_typ typ in
+        let listptr = L.build_call initList_f [||] "init" builder in
+          let add_elmt elmt = 
+            let d_ptr = match typ with
+            A.ListType _ -> expr builder elmt
+          | _ ->
+            let d_val = expr builder elmt in
+            let d_ptr = L.build_malloc d_ltyp "tmp" builder in
+            ignore (L.build_store d_val d_ptr builder);
+            d_ptr in
+
+            let void_d_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
+            ignore (L.build_call addList_f [| listptr; void_d_ptr |] "" builder) in
+          ignore (List.map add_elmt act);
+        listptr
       | A.Binop (e1, op, e2) ->
          let e1' = expr builder e1
 	       and e2' = expr builder e2 
@@ -290,7 +322,20 @@ let struct_types =
             let l_dtyp = ltype_of_typ q_type in
             let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
             (L.build_load d_ptr "d_ptr" builder)) 
-
+      | A.ObjectCall (l, "l_add", [e]) ->
+        let l_ptr = expr builder l in 
+        let e_val = expr builder e in 
+        let d_ltyp = L.type_of e_val in
+        let d_ptr = L.build_malloc d_ltyp "tmp" builder in
+          ignore(L.build_store e_val d_ptr builder);
+        let void_e_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
+        ignore (L.build_call addList_f [| l_ptr ; void_e_ptr |] "" builder);
+        l_ptr
+      | A.ObjectCall (l, "l_delete", [e]) ->
+        let l_ptr = expr builder l in 
+        let e_val = expr builder e in
+        ignore (L.build_call delList_f [| l_ptr; e_val |] "" builder);
+        l_ptr
       |  A.ObjectCall(_, f, act) -> 
          let (fdef, fdecl) = StringMap.find f function_decls in
          let actuals = 

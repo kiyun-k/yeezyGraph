@@ -34,7 +34,7 @@ rule token = parse
 | "string" { STRING }
 
 | "struct" { STRUCT }		| "~"	   { TILDE }
-| "Queue"  { QUEUE }		
+| "Queue"  { QUEUE }		| "list"   { LIST }	
 
 | "void"   { VOID }
 
