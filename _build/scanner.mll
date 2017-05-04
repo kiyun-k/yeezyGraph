@@ -25,15 +25,16 @@ rule token = parse
 
 | "if"     { IF }			| "else"   { ELSE }
 | "for"    { FOR }			| "while"  { WHILE }
-| "return" { RETURN }
+| "return" { RETURN }		| "new"    { NEW }
+| '.' 	   { DOT }  
 
 | "int"    { INT }			
 | "bool"   { BOOL }			| "true"   { TRUE }			| "false"  { FALSE }
 | "float"  { FLOAT } 
 | "string" { STRING }
 
-
 | "struct" { STRUCT }		| "~"	   { TILDE }
+| "Queue"  { QUEUE }		
 | "graph" { GRAPH }   		| "node"   { NODE }
 
 | "~+" { ADD_NODE }			| "~-" { REMOVE_NODE }

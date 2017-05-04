@@ -21,6 +21,9 @@
 /* Graph tokens */
 %token ADD_NODE REMOVE_NODE ADD_EDGE REMOVE_EDGE GRAPH NODE
 
+/* Queue datatype tokens */
+%token QUEUE
+
 /* Arithmetic tokens */
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
 
@@ -31,10 +34,9 @@
 %token IF ELSE FOR WHILE
 
 /* Function tokens */
-%token RETURN VOID NEW
+%token RETURN VOID NEW DOT
 
 %token UNDERSCORE AT 
-
 
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
@@ -50,7 +52,7 @@
 %left EQ NEQ
 %left LT GT LEQ GEQ
 %left PLUS MINUS
-%left TIMES DIVIDE MOD
+%left TIMES DIVIDE
 %right NOT NEG
 %left DOT
 %left TILDE
@@ -58,8 +60,6 @@
 %left ADD_EDGE REMOVE_EDGE
 %nonassoc UNDERSCORE
 %left ADD_NODE REMOVE_NODE
-
-
 
 
 %start program
@@ -100,10 +100,10 @@ typ:
   | BOOL { Bool } 
   | STRING { String }
   | VOID { Void }
+  | QUEUE LT typ GT { QueueType($3)}
   | STRUCT ID { StructType ($2) } 
   | GRAPH { GraphTyp }
   | NODE { Node }
-
 
 vdecl_list:
     /* nothing */    { [] }
@@ -145,6 +145,7 @@ expr:
   | STR_LITERAL           { StringLit($1) }
   | TRUE                  { BoolLit(true) }
   | FALSE                 { BoolLit(false) }
+  | NEW QUEUE LT typ GT LPAREN actuals_opt RPAREN { Queue($4, $7) }
   | ID                    { Id($1) }
   | expr PLUS   expr      { Binop($1, Add,   $3) }
   | expr MINUS  expr      { Binop($1, Sub,   $3) }
@@ -163,6 +164,7 @@ expr:
   | expr TILDE  ID        { AccessStructField($1, $3) }
   | expr ASSIGN expr      { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
+  | expr DOT ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }  
   | LPAREN expr RPAREN    { $2 }
   | expr UNDERSCORE ID            { NodeOp($1, AccessNode, $3) } 
   | expr AT ID                    { NodeOp($1, AccessNodeField, $3) } 
@@ -171,7 +173,6 @@ expr:
   | expr LBRACKET INT_LITERAL RBRACKET ADD_EDGE expr    { GraphOpAddEdge($1, $3, AddEdge, $6) }
   | ID REMOVE_EDGE ID             { GraphOp($1, RemoveEdge, $3) }
   | NEW GRAPH LPAREN RPAREN { Graph }
-
 
 actuals_opt:
     /* nothing */ { [] }

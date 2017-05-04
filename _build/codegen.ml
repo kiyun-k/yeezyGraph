@@ -22,6 +22,9 @@ let translate (globals, functions, structs) =
   let nodecontext = L.global_context () in
   let graphcontext = L.global_context () in
   let the_module = L.create_module context "MicroC" in(* container *)
+  let llctx = L.global_context () in
+  let queuem = L.MemoryBuffer.of_file "queue.bc" in
+  let qqm = Llvm_bitreader.parse_bitcode llctx queuem in
   let nodem = L.MemoryBuffer.of_file "node.bc" in
   let node_module = Llvm_bitreader.parse_bitcode nodecontext nodem in
   let graphm = L.MemoryBuffer.of_file "graph.bc" in
@@ -32,6 +35,8 @@ let translate (globals, functions, structs) =
   and float_t  = L.double_type context
   and i1_t   = L.i1_type   context
   and void_t = L.void_type context
+  and queueid_t = L.pointer_type (match L.type_by_name qqm "struct.QueueId" with
+    None -> raise (Invalid_argument "Option.get queueid") | Some x -> x)
   and graph_t = L.pointer_type (match L.type_by_name graph_module "struct.graph" with
     None -> raise (Invalid_argument "Option.get graph") | Some x -> x )
   and node_t = L.pointer_type (match L.type_by_name graph_module "struct.node" with
@@ -52,7 +57,9 @@ let struct_types =
     | A.Void -> void_t 
     | A.StructType s -> (try StringMap.find s struct_types with Not_found -> raise (Failure("struct type " ^ s ^ " is undefined") ))
     | A.GraphTyp -> graph_t
-    | A.Node -> node_t in
+    | A.Node -> node_t 
+    | A.QueueType _ -> queueid_t
+    | A.AnyType -> L.pointer_type i8_t in
 
 
 
@@ -80,11 +87,17 @@ let struct_types =
 
 
   (* Declare and initialize each global variable; remember its value in a map *)
+  let global_types = 
+    let global_type m (t, n) = StringMap.add n t m in 
+    List.fold_left global_type StringMap.empty globals in
+
   let global_vars =
     let global_var m (t, n) =
       let init = L.const_null (ltype_of_typ t) 
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
+
+
 
   (* Declare printf(), which the print built-in function will call *)
   let printf_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in (* Declare a function type *)
@@ -93,6 +106,18 @@ let struct_types =
   (* Declare the built-in printbig() function *)
   let printbig_t = L.function_type i32_t [| i32_t |] in
   let printbig_func = L.declare_function "printbig" printbig_t the_module in
+
+
+  (* Declare the build-in queue functions *)
+  let initQueueId_t = L.function_type queueid_t [| |] in 
+  let initQueueId_f = L.declare_function "initQueueId" initQueueId_t the_module in
+  let enqueue_t = L.function_type void_t [| queueid_t; L.pointer_type i8_t|] in 
+  let enqueue_f = L.declare_function "enqueue" enqueue_t the_module in
+  let dequeue_t = L.function_type void_t [| queueid_t |] in 
+  let dequeue_f = L.declare_function "dequeue" dequeue_t the_module in
+  let front_t = L.function_type (L.pointer_type i8_t) [| queueid_t |] in
+  let front_f = L.declare_function "front" front_t the_module in
+
 
 
   (* Node functions *)
@@ -163,29 +188,30 @@ let struct_types =
           (Array.to_list (L.params the_function)) in
           List.fold_left add_local formals fdecl.A.locals in
 
+
+    let local_types = 
+      let add_type m (t, n) = StringMap.add n t m in 
+      let formal_types = List.fold_left add_type StringMap.empty fdecl.A.formals in
+          List.fold_left add_type formal_types fdecl.A.locals in
+
+
     (* Return the value for a variable or formal argument *)
     let lookup n = try StringMap.find n local_vars
                    with Not_found -> StringMap.find n global_vars
     in
 
-(*
-    let get_type_from_expr expr = match expr with 
-    A.IntLit(_) -> ltype_of_typ A.Int
-    | A.BoolLit(_) -> ltype_of_typ A.Bool
-    | A.StringLit(_) -> ltype_of_typ A.String
-    | A.FloatLit(_) -> ltype_of_typ A.Float
-    | A.Noexpr -> ltype_of_typ A.Void 
-    | A.Id(s) -> ltype_of_typ A.Void
-    | A.Binop(_, _, _) -> ltype_of_typ A.Void
-    | A.Unop(_, _) -> ltype_of_typ A.Void 
-    | A.Assign(_,_) -> ltype_of_typ A.Void 
-    | A.Call(_,_) -> ltype_of_typ A.Void in 
+    let lookup_types n = try StringMap.find n local_types
+                         with Not_found -> StringMap.find n global_types in
 
-*)
+
+    let getQueueType = function
+       A.QueueType(typ) -> typ
+      | _ -> A.String in 
 
     let idtostring = function 
-      A.Id s -> s
+        A.Id s -> s 
       | _ -> "" in 
+
 
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
@@ -195,6 +221,20 @@ let struct_types =
       | A.FloatLit f -> L.const_float float_t f
       | A.Noexpr -> L.const_int i32_t 0
       | A.Id s -> L.build_load (lookup s) s builder
+      | A.Queue (typ, act) ->
+        let d_ltyp = ltype_of_typ typ in
+        let queue_ptr = L.build_call initQueueId_f [| |] "init" builder in 
+        let add_element elem = 
+          let d_ptr = match typ with 
+          | A.QueueType _ -> expr builder elem 
+          | _ -> 
+            let element = expr builder elem in 
+            let d_ptr = L.build_malloc d_ltyp "tmp" builder in 
+            ignore (L.build_store element d_ptr builder); d_ptr in 
+          let void_d_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
+          ignore (L.build_call enqueue_f [| queue_ptr; void_d_ptr |] "" builder)
+        in ignore (List.map add_element act);
+        queue_ptr
       | A.Binop (e1, op, e2) ->
          let e1' = expr builder e1
 	       and e2' = expr builder e2 
@@ -284,8 +324,45 @@ let struct_types =
             List.rev (List.map (expr builder) (List.rev act)) in
 	       let result = (match fdecl.A.typ with A.Void -> ""
                                               | _ -> f ^ "_result") in
+         L.build_call fdef (Array.of_list actuals) result builder
+
+      | A.ObjectCall (q, "qadd", [e]) -> 
+        let q_val = expr builder q in
+        let e_val = expr builder e in 
+        let d_ltyp = L.type_of e_val in 
+        let d_ptr = L.build_malloc d_ltyp "tmp" builder in 
+        ignore(L.build_store e_val d_ptr builder); 
+        let void_e_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in 
+        ignore (L.build_call enqueue_f [| q_val; void_e_ptr|] "" builder); q_val
+
+      | A.ObjectCall (q, "qremove", []) -> 
+        let q_val = expr builder q in
+        ignore (L.build_call dequeue_f [| q_val|] "" builder); q_val
+
+      | A.ObjectCall (q, "qfront", []) -> 
+        let q_val = expr builder q in 
+        let n = idtostring q in
+        let q_type = getQueueType (lookup_types n) in 
+        let val_ptr = L.build_call front_f [| q_val|] "val_ptr" builder in
+        (match q_type with 
+          A.QueueType _ ->
+            let l_dtyp = ltype_of_typ q_type in 
+            let void_d_ptr = L.build_load val_ptr "void_d_ptr" builder in
+            (L.build_bitcast void_d_ptr l_dtyp "data" builder)
+          | _ -> 
+            let l_dtyp = ltype_of_typ q_type in
+            let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
+            (L.build_load d_ptr "d_ptr" builder)) 
+
+      |  A.ObjectCall(_, f, act) -> 
+         let (fdef, fdecl) = StringMap.find f function_decls in
+         let actuals = 
+            List.rev (List.map (expr builder) (List.rev act)) in
+         let result = (match fdecl.A.typ with A.Void -> ""
+                                              | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder 
 
+         
     in
 
     (* Invoke "f builder" if the current block doesn't already

@@ -4,14 +4,14 @@ type op = Add | Sub | Mult | Div |
           Equal | Neq | Less | Leq | Greater | Geq |
           And | Or
 
-type gop = AddNode | RemoveNode  | RemoveEdge | GetNode | AddEdge
+type gop = AddNode | RemoveNode  | RemoveEdge | AddEdge
 
 type nop = AccessNode (*underscore, e.g. g1_n1*) | AccessNodeField (* At, g1_n1@visited*)
 
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | String | Void | StructType of string | GraphTyp | Node
+type typ = Int | Bool | Float | String | Void | StructType of string | GraphTyp | Node | QueueType of typ | AnyType
 
 type bind = typ * string
 
@@ -20,12 +20,14 @@ type expr =
   | BoolLit of bool
   | FloatLit of float
   | StringLit of string
+  | Queue of typ * expr list 
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
   | AccessStructField of expr * string 
   | Assign of expr * expr
   | Call of string * expr list
+  | ObjectCall of expr * string * expr list 
   | Noexpr
   | NodeOp of expr * nop * string (* g1_n1 / g1_n1@name *) 
   | GraphOp of string * gop * string
@@ -72,16 +74,32 @@ let string_of_op = function
   | And -> "&&"
   | Or -> "||"
 
+
+let string_of_nop = function
+    AccessNode -> "_"
+  | AccessNodeField -> "@"
+
 let string_of_gop = function
     AddNode -> "~+"
   | RemoveNode -> "~-"
   | RemoveEdge -> "!->"
   | AddEdge -> "->"
-  | GetNode -> "_"
 
 let string_of_uop = function
     Neg -> "-"
   | Not -> "!"
+
+let rec string_of_typ = function
+    Int -> "int"
+  | Float -> "float"
+  | Bool -> "bool"
+  | String -> "string"
+  | Void -> "void"
+  | GraphTyp -> "graph"
+  | Node -> "node"
+  | StructType(s) -> s
+  | QueueType(typ) -> "Queue " ^ string_of_typ typ
+  | AnyType -> "AnyType"
 
 let rec string_of_expr = function
     IntLit(l) -> string_of_int l
@@ -90,14 +108,16 @@ let rec string_of_expr = function
   | FloatLit(l) -> string_of_float l
   | StringLit(s) -> s
   | Id(s) -> s
+  | Queue(typ, e1) -> "new " ^ "Queue" ^ "<" ^ string_of_typ typ ^ ">" ^ "(" ^ String.concat ", " (List.map string_of_expr e1) ^ ")"
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e
   | AccessStructField(v, e) -> string_of_expr v ^ "~" ^ e
   | Assign(v, e) -> string_of_expr v ^ " = " ^ string_of_expr e
-  | Call(f, el) ->
-      f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | Call(f, el) -> f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+  | ObjectCall(o, f, e1) -> string_of_expr o ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr e1) ^ ")"
   | Noexpr -> ""
+  | NodeOp(e, o, s) -> string_of_expr e ^ string_of_nop o  ^ s 
   | Graph -> "new graph"
   | GraphOp(s1, o, s2) ->  s1 ^ string_of_gop o ^  s2
   | GraphOpAddEdge(s1, i, o, s2) -> string_of_expr s1 ^ string_of_int i ^ string_of_gop o ^ string_of_expr s2
@@ -117,16 +137,7 @@ let rec string_of_stmt = function
       string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
 
-let string_of_typ = function
-    Int -> "int"
-  | Float -> "float"
-  | Bool -> "bool"
-  | String -> "string"
-  | Void -> "void"
-  | StructType(s) -> s
-  | GraphTyp -> "graph"
-  | Node -> "node"
-
+ 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"
 
 let string_of_fdecl fdecl =

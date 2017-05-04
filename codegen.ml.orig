@@ -19,28 +19,37 @@ module StringMap = Map.Make(String)
 
 let translate (globals, functions, structs) =
   let context = L.global_context () in (* global data container *)
+<<<<<<< HEAD
   let nodecontext = L.global_context () in
   let graphcontext = L.global_context () in
   let the_module = L.create_module context "MicroC" in(* container *)
-  let llctx = L.global_context () in
-  let queuem = L.MemoryBuffer.of_file "queue.bc" in
-  let qqm = Llvm_bitreader.parse_bitcode llctx queuem in
   let nodem = L.MemoryBuffer.of_file "node.bc" in
   let node_module = Llvm_bitreader.parse_bitcode nodecontext nodem in
   let graphm = L.MemoryBuffer.of_file "graph.bc" in
   let graph_module = Llvm_bitreader.parse_bitcode graphcontext graphm in
 
+=======
+  let llctx = L.global_context () in
+  let the_module = L.create_module context "MicroC" in (* container *)
+  let queuem = L.MemoryBuffer.of_file "queue.bc" in
+  let qqm = Llvm_bitreader.parse_bitcode llctx queuem in
+>>>>>>> master
   let i32_t  = L.i32_type  context
   and i8_t   = L.i8_type   context (* for printf format string *)
   and float_t  = L.double_type context
   and i1_t   = L.i1_type   context
+<<<<<<< HEAD
   and void_t = L.void_type context
-  and queueid_t = L.pointer_type (match L.type_by_name qqm "struct.QueueId" with
-    None -> raise (Invalid_argument "Option.get queueid") | Some x -> x)
   and graph_t = L.pointer_type (match L.type_by_name graph_module "struct.graph" with
     None -> raise (Invalid_argument "Option.get graph") | Some x -> x )
   and node_t = L.pointer_type (match L.type_by_name graph_module "struct.node" with
     None -> raise (Invalid_argument "Option.get graph") | Some x -> x ) in
+=======
+  and void_t = L.void_type context 
+  and queueid_t = L.pointer_type (match L.type_by_name qqm "struct.QueueId" with 
+    None -> raise (Invalid_argument "Option.get queueid") | Some x -> x) in 
+
+>>>>>>> master
 
 let struct_types = 
   let add_struct m sdecl = 
@@ -56,12 +65,16 @@ let struct_types =
     | A.String -> L.pointer_type i8_t
     | A.Void -> void_t 
     | A.StructType s -> (try StringMap.find s struct_types with Not_found -> raise (Failure("struct type " ^ s ^ " is undefined") ))
+<<<<<<< HEAD
     | A.GraphTyp -> graph_t
-    | A.Node -> node_t 
+    | A.Node -> node_t in
+
+
+=======
     | A.QueueType _ -> queueid_t
-    | A.AnyType -> L.pointer_type i8_t in
-
-
+    | A.AnyType -> L.pointer_type i8_t in 
+ 
+>>>>>>> master
 
   (* Build struct body*)
   let build_struct_body sdecl = 
@@ -108,18 +121,7 @@ let struct_types =
   let printbig_func = L.declare_function "printbig" printbig_t the_module in
 
 
-  (* Declare the build-in queue functions *)
-  let initQueueId_t = L.function_type queueid_t [| |] in 
-  let initQueueId_f = L.declare_function "initQueueId" initQueueId_t the_module in
-  let enqueue_t = L.function_type void_t [| queueid_t; L.pointer_type i8_t|] in 
-  let enqueue_f = L.declare_function "enqueue" enqueue_t the_module in
-  let dequeue_t = L.function_type void_t [| queueid_t |] in 
-  let dequeue_f = L.declare_function "dequeue" dequeue_t the_module in
-  let front_t = L.function_type (L.pointer_type i8_t) [| queueid_t |] in
-  let front_f = L.declare_function "front" front_t the_module in
-
-
-
+<<<<<<< HEAD
   (* Node functions *)
   let initNode_t = L.function_type node_t [| L.pointer_type i8_t |] in
   let initNode_f = L.declare_function "n_init" initNode_t the_module in
@@ -150,6 +152,17 @@ let struct_types =
   let getNode_f = L.declare_function "getNode" getNode_t the_module in 
 
 
+=======
+  (* Declare the build-in queue functions *)
+  let initQueueId_t = L.function_type queueid_t [| |] in 
+  let initQueueId_f = L.declare_function "initQueueId" initQueueId_t the_module in
+  let enqueue_t = L.function_type void_t [| queueid_t; L.pointer_type i8_t|] in 
+  let enqueue_f = L.declare_function "enqueue" enqueue_t the_module in
+  let dequeue_t = L.function_type void_t [| queueid_t |] in 
+  let dequeue_f = L.declare_function "dequeue" dequeue_t the_module in
+  let front_t = L.function_type (L.pointer_type i8_t) [| queueid_t |] in
+  let front_f = L.declare_function "front" front_t the_module in
+>>>>>>> master
 
 
   (* Define each user-defined function (arguments and return type); remember in a map *)
@@ -197,8 +210,7 @@ let struct_types =
 
     (* Return the value for a variable or formal argument *)
     let lookup n = try StringMap.find n local_vars
-                   with Not_found -> StringMap.find n global_vars
-    in
+                   with Not_found -> StringMap.find n global_vars in
 
     let lookup_types n = try StringMap.find n local_types
                          with Not_found -> StringMap.find n global_types in
@@ -213,6 +225,15 @@ let struct_types =
       | _ -> "" in 
 
 
+<<<<<<< HEAD
+*)
+
+    let idtostring = function 
+      A.Id s -> s
+      | _ -> "" in 
+
+=======
+>>>>>>> master
     (* Construct code for an expression; return its value *)
     let rec expr builder = function
 	      A.IntLit i -> L.const_int i32_t i
@@ -324,6 +345,10 @@ let struct_types =
             List.rev (List.map (expr builder) (List.rev act)) in
 	       let result = (match fdecl.A.typ with A.Void -> ""
                                               | _ -> f ^ "_result") in
+<<<<<<< HEAD
+         L.build_call fdef (Array.of_list actuals) result builder 
+
+=======
          L.build_call fdef (Array.of_list actuals) result builder
 
       | A.ObjectCall (q, "qadd", [e]) -> 
@@ -363,6 +388,7 @@ let struct_types =
          L.build_call fdef (Array.of_list actuals) result builder 
 
          
+>>>>>>> master
     in
 
     (* Invoke "f builder" if the current block doesn't already
