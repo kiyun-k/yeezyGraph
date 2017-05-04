@@ -155,10 +155,10 @@ expr:
   | expr ASSIGN expr      { Assign($1, $3) }
   | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
   | LPAREN expr RPAREN    { $2 }
-  | expr ADD_NODE ID       { GraphOp($1, AddNode, $3) }
-  | expr REMOVE_NODE ID    { GraphOp($1, RemoveNode, $3) }
-  | expr LBRACKET INT_LITERAL RBRACKET ADD_EDGE expr    { GraphOp($1, $3, AddEdge, $6) }
-  | ID REMOVE_EDGE ID             { GraphOp($1, RemoveEdge, $3) }
+  | ID ADD_NODE ID       { GraphOp($1, AddNode, $3) }
+  | ID REMOVE_NODE ID    { GraphOp($1, RemoveNode, $3) }
+  | ID ADD_EDGE ID       { GraphOp($1, AddEdge, $3) }
+  | ID REMOVE_NODE ID    { GraphOp($1, RemoveEdge, $3) }
   | NEW GRAPH LPAREN RPAREN { Graph }
 
 actuals_opt:

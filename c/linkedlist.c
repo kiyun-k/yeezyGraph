@@ -47,13 +47,13 @@ void l_delete(struct List *list, int index) {
 	free(temp);
 }
 
-struct ListNode* l_get(struct List *list, int index) {
+void* l_get(struct List *list, int index) {
 	struct ListNode* temp = list->head;
 	while (index > 0) {
 		temp = temp->next;
 		index--;
 	}
-	return temp;
+	return temp->data;
 }
 
 

@@ -16,7 +16,7 @@ void l_add(struct List *list, void *data);
 
 void l_delete(struct List *list, int index);
 
-struct ListNode* l_get(struct List *list, int index);
+void* l_get(struct List *list, int index);
 
 int l_isEmpty(struct List *list);
 
