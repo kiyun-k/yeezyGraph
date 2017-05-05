@@ -5,6 +5,9 @@ int main() {
 	char *a = "abc";
 	struct node *n = n_init(a);
 	addNode(g, n);
+	char *d = get_name(getNode(g, "abc"));
+	int x = 4;
+	addEdge(g, n, n, x);
 	/*set_data(n, "hello word");
 	struct node *n2 = n_init("def");
 	set_data(n, "hello word");

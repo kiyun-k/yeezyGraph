@@ -40,8 +40,9 @@ rule token = parse
 | "~+" { ADD_NODE }			| "~-" { REMOVE_NODE }
 | "->" { ADD_EDGE }			| "!->" { REMOVE_EDGE }
 
-| '_' { UNDERSCORE }   | '@' { AT } 
-
+| "~_" { UNDERSCORE }   
+| "@name" { GET_NAME }      | "@visited" { GET_VISITED } 
+| "@data" { GET_DATA }
 
 
 | "new" { NEW }

@@ -99,6 +99,34 @@ let check (globals, functions, structs) =
      { typ = Void; fname = "printbig"; formals = [(Int, "x")];
        locals = []; body = [] }
 
+      (StringMap.add "modifyVisited"
+     { typ = Void; fname = "modifyVisited"; formals = [(Bool, "x")];
+       locals = []; body = [] }
+
+      (StringMap.add "printGraph"
+     { typ = Void; fname = "printGraph"; formals = [];
+       locals = []; body = [] }
+
+      (StringMap.add "isEmpty"
+     { typ = Bool; fname = "isEmpty"; formals = [];
+       locals = []; body = [] }
+
+      (StringMap.add "size"
+     { typ = Int; fname = "size"; formals = [];
+       locals = []; body = [] }
+
+      (StringMap.add "contains"
+     { typ = Bool; fname = "isEmpty"; formals = [(String, "x")];
+       locals = []; body = [] }
+
+      (StringMap.add "setData"
+     { typ = Void; fname = "setData"; formals = [(AnyType, "x")];
+       locals = []; body = [] }
+
+       (StringMap.add "removeAllNodes"
+     { typ = Void; fname = "removeAllNodes"; formals = [];
+       locals = []; body = [] }
+
        (StringMap.add "qremove"
      { typ = Void; fname = "qremove"; formals = [];
        locals = []; body = [] }
@@ -111,7 +139,9 @@ let check (globals, functions, structs) =
      { typ = AnyType; fname = "qfront"; formals = [];
        locals = []; body = [] }
 
-     )))))))
+
+
+     ))))))))))))))
 
      
    in
@@ -168,7 +198,12 @@ let check (globals, functions, structs) =
 
     let getQueueType = function
        QueueType(typ) -> typ
-      | _ -> String 
+      | _ -> Void  
+    in 
+
+     let getNodeType = function
+       NodeType(typ) -> typ
+      | _ -> Void 
     in 
 
     (* Return the type of an expression or throw an exception *)
@@ -178,8 +213,9 @@ let check (globals, functions, structs) =
       | FloatLit _ -> Float
       | StringLit _ -> String
       | Queue (t, _) -> QueueType(t)
+      | Node(_, t) -> NodeType(t)
       | Id s -> type_of_identifier s
-      | Graph -> GraphTyp
+      | Graph(t) -> GraphType(t)
       | Binop(e1, op, e2) as e -> let t1 = expr e1 
                                   and t2 = expr e2 in
 	      (match op with
@@ -231,10 +267,61 @@ let check (globals, functions, structs) =
         | _ -> raise (Failure("illegal assignment")))
 
       | GraphOp(s1, gop, s2) -> let t1 = type_of_identifier s1 and t2 = type_of_identifier s2 in 
+        (match t1 with 
+            GraphType(typ) -> 
+            (match gop with 
+              AddNode when t1 = GraphType typ && t2 = String -> GraphType typ
+            | RemoveNode when t1 = GraphType typ && t2 = String -> GraphType typ
+            | _ -> raise (Failure("illegal graph operator "))
+            )
+          | _ -> raise(Failure("not a graph"))
+        )
 
-        (match gop with 
-         AddNode when t1 = GraphTyp && t2 = String -> GraphTyp
-        | _ -> raise (Failure("illegal graph operator ")))
+      | GraphOpAddEdge(e, _, gop2, s1, s2) -> let t1 = expr e and 
+       t2 = type_of_identifier s1 and t3 = type_of_identifier s2 in 
+       let _ = print_endline (string_of_gop2 gop2) in 
+        (match t1 with 
+            GraphType(typ) -> 
+            (match gop2 with 
+              AddEdge when t2 = NodeType typ && t3 = NodeType typ -> GraphType typ
+              | _ -> raise(Failure("Need to fix this "))
+            )
+          | _ -> raise(Failure("not a graph"))
+        )
+        
+       | GraphOpRemoveEdge(e, gop3, s1, s2) -> let t1 = type_of_identifier e and 
+       t2 = type_of_identifier s1 and t3 = type_of_identifier s2 in 
+       let _ = print_endline (string_of_gop3 gop3) in 
+        (match t1 with 
+            GraphType(typ) -> 
+            (match gop3 with 
+              removeEdge when t2 = NodeType typ && t3 = NodeType typ -> GraphType typ
+              | _ -> raise(Failure("Need to Fix this"))
+            )
+          | _ -> raise(Failure("not a graph"))
+        )
+        
+
+      | NodeOp(e, nop, s) -> let t1 = expr e and t2 = type_of_identifier s in 
+
+        (match nop with 
+          AccessNode -> 
+          (match t1 with 
+           GraphType typ when t1 = GraphType(typ) && t2 = String -> NodeType(typ)
+           | _ -> raise (Failure("not a graph"))
+          )
+        )
+
+      | NodeOp2(e, nop2) -> let t1 = expr e in
+        (match t1 with 
+          NodeType typ -> 
+          (match nop2 with 
+             GetName -> String
+           | GetData -> typ 
+           | GetVisited -> Bool
+          )
+          | _ -> raise(Failure("Not a vaild node operator"))
+        )
 
 
       | Call(fname, actuals) as call -> let fd = function_decl fname in
@@ -257,13 +344,19 @@ let check (globals, functions, structs) =
 
         else
            List.iter2 (fun (ft, _) e -> let et = expr e in
-            let acttype = expr oname in 
-            let actqtype = getQueueType acttype in 
+           
             (* if fname = "qfront" then let _ = print_endline (string_of_typ actqtype) in returntype := actqtype *)
-                if fname = "qadd" then
+              if fname = "qadd" then
+                 let acttype = expr oname in 
+                 let actqtype = getQueueType acttype in 
                 ignore(check_assign actqtype et (Failure ("illegal actual queue argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ actqtype ^ " in " ^ string_of_expr e))) 
-                else ignore (check_assign ft et (Failure ("illegal actual argument found 2 " ^ string_of_typ et ^
+              else if fname = "setData" then 
+                 let acttype = expr oname in 
+                 let actntype = getNodeType acttype in 
+                  ignore(check_assign actntype et (Failure ("illegal actual node argument found " ^ string_of_typ et ^
+                " expected " ^ string_of_typ actntype ^ " in " ^ string_of_expr e)))
+              else ignore (check_assign ft et (Failure ("illegal actual argument found 2 " ^ string_of_typ et ^
                 " expected " ^ "in" ^ string_of_expr e)))) fd.formals actuals;
            !returntype
 

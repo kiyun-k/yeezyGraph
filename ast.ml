@@ -4,14 +4,17 @@ type op = Add | Sub | Mult | Div |
           Equal | Neq | Less | Leq | Greater | Geq |
           And | Or
 
-type gop = AddNode | RemoveNode  | RemoveEdge | AddEdge
+type gop = AddNode | RemoveNode  
+type gop2 = AddEdge 
+type gop3 = RemoveEdge
 
-type nop = AccessNode (*underscore, e.g. g1_n1*) | AccessNodeField (* At, g1_n1@visited*)
+type nop = AccessNode (*underscore, e.g. g1_n1*) 
+type nop2 = GetName | GetData | GetVisited
 
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | String | Void | StructType of string | GraphTyp | Node | QueueType of typ | AnyType
+type typ = Int | Bool | Float | String | Void | StructType of string | GraphType of typ | NodeType of typ | QueueType of typ | AnyType 
 
 type bind = typ * string
 
@@ -30,9 +33,12 @@ type expr =
   | ObjectCall of expr * string * expr list 
   | Noexpr
   | NodeOp of expr * nop * string (* g1_n1 / g1_n1@name *) 
+  | NodeOp2 of expr * nop2 
   | GraphOp of string * gop * string
-  | GraphOpAddEdge of expr * int * gop * expr
-  | Graph
+  | GraphOpRemoveEdge of string * gop3 * string * string 
+  | GraphOpAddEdge of expr * int * gop2 * string * string
+  | Graph of typ
+  | Node of string * typ
 
 type stmt =
     Block of stmt list
@@ -76,14 +82,24 @@ let string_of_op = function
 
 
 let string_of_nop = function
-    AccessNode -> "_"
-  | AccessNodeField -> "@"
+  | AccessNode -> "~_"
+
+let string_of_nop2 = function
+    GetName -> "@name"
+  | GetVisited -> "@visited"
+  | GetData -> "@data"
 
 let string_of_gop = function
     AddNode -> "~+"
   | RemoveNode -> "~-"
-  | RemoveEdge -> "!->"
-  | AddEdge -> "->"
+  
+
+
+let string_of_gop2 = function
+    AddEdge -> "->"
+
+let string_of_gop3 = function
+    RemoveEdge -> "!->"
 
 let string_of_uop = function
     Neg -> "-"
@@ -95,10 +111,10 @@ let rec string_of_typ = function
   | Bool -> "bool"
   | String -> "string"
   | Void -> "void"
-  | GraphTyp -> "graph"
-  | Node -> "node"
+  | GraphType(typ) -> "Graph " ^ string_of_typ typ 
   | StructType(s) -> s
   | QueueType(typ) -> "Queue " ^ string_of_typ typ
+  | NodeType(typ) -> "Node " ^ string_of_typ typ 
   | AnyType -> "AnyType"
 
 let rec string_of_expr = function
@@ -118,9 +134,12 @@ let rec string_of_expr = function
   | ObjectCall(o, f, e1) -> string_of_expr o ^ "." ^ f ^ "(" ^ String.concat ", " (List.map string_of_expr e1) ^ ")"
   | Noexpr -> ""
   | NodeOp(e, o, s) -> string_of_expr e ^ string_of_nop o  ^ s 
-  | Graph -> "new graph"
+  | NodeOp2(e, o) -> string_of_expr e ^ string_of_nop2 o  
+  | Graph(typ) -> "new Graph" ^ "<" ^ string_of_typ typ ^ ">"
+  | Node(n, typ) -> "new Node" ^ "<" ^ string_of_typ typ ^ ">" ^ "(" ^ n ^ ")"
   | GraphOp(s1, o, s2) ->  s1 ^ string_of_gop o ^  s2
-  | GraphOpAddEdge(s1, i, o, s2) -> string_of_expr s1 ^ string_of_int i ^ string_of_gop o ^ string_of_expr s2
+  | GraphOpRemoveEdge(s1, o, s2, s3) ->   s1 ^ string_of_gop3 o ^  "(" ^ s2 ^ ", " ^ s3 ^ ")"
+  | GraphOpAddEdge(s1, i, o, s2, s3) -> string_of_expr s1 ^ string_of_int i ^ string_of_gop2 o ^ "(" ^ s2 ^ ", " ^ s3 ^ ")"
 
 
 

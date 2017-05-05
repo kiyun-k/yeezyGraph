@@ -96,3 +96,5 @@ void print_map(struct map *curr_map) {
 
 }
 
+
+

@@ -39,15 +39,14 @@ let translate (globals, functions, structs) =
     None -> raise (Invalid_argument "Option.get queueid") | Some x -> x)
   and graph_t = L.pointer_type (match L.type_by_name graph_module "struct.graph" with
     None -> raise (Invalid_argument "Option.get graph") | Some x -> x )
-  and node_t = L.pointer_type (match L.type_by_name graph_module "struct.node" with
-    None -> raise (Invalid_argument "Option.get graph") | Some x -> x ) in
+  and node_t = L.pointer_type (match L.type_by_name node_module "struct.node" with
+    None -> raise (Invalid_argument "Option.get node") | Some x -> x ) in
 
 let struct_types = 
   let add_struct m sdecl = 
     let struct_t = L.named_struct_type context sdecl.A.sname 
     in StringMap.add sdecl.A.sname struct_t m in
   List.fold_left add_struct StringMap.empty structs in
-
 
   let ltype_of_typ = function (* LLVM type for a given AST type *)
       A.Int -> i32_t
@@ -56,8 +55,8 @@ let struct_types =
     | A.String -> L.pointer_type i8_t
     | A.Void -> void_t 
     | A.StructType s -> (try StringMap.find s struct_types with Not_found -> raise (Failure("struct type " ^ s ^ " is undefined") ))
-    | A.GraphTyp -> graph_t
-    | A.Node -> node_t 
+    | A.GraphType _ -> graph_t
+    | A.NodeType _  -> node_t 
     | A.QueueType _ -> queueid_t
     | A.AnyType -> L.pointer_type i8_t in
 
@@ -123,6 +122,16 @@ let struct_types =
   (* Node functions *)
   let initNode_t = L.function_type node_t [| L.pointer_type i8_t |] in
   let initNode_f = L.declare_function "n_init" initNode_t the_module in
+  let setData_t = L.function_type void_t [| node_t; L.pointer_type i8_t|] in 
+  let setData_f = L.declare_function "set_data" setData_t the_module in 
+  let getName_t = L.function_type (L.pointer_type i8_t) [| node_t |] in 
+  let getName_f = L.declare_function "get_name" getName_t the_module in 
+  let getVisited_t = L.function_type i1_t [| node_t |] in
+  let getVisited_f = L.declare_function "get_visited" getVisited_t the_module in 
+  let modifyVisited_t = L.function_type void_t [| node_t; i1_t|] in
+  let modifyVisited_f = L.declare_function "modify_visited" modifyVisited_t the_module in 
+  let getData_t = L.function_type (L.pointer_type i8_t) [| node_t |] in 
+  let getData_f = L.declare_function "get_data" getData_t the_module in 
 
 
   (* Graph functions *)
@@ -140,9 +149,9 @@ let struct_types =
   let removeAllNodes_f = L.declare_function "removeAllNodes" removeAllNodes_t the_module in
   let printGraph_t = L.function_type void_t [| graph_t|] in 
   let printGraph_f = L.declare_function "printGraph" printGraph_t the_module in 
-  let isEmpty_t = L.function_type void_t [| graph_t|] in 
+  let isEmpty_t = L.function_type i1_t [| graph_t|] in 
   let isEmpty_f = L.declare_function "isEmpty" isEmpty_t the_module in 
-  let size_t = L.function_type void_t [| graph_t|] in 
+  let size_t = L.function_type i32_t [| graph_t|] in 
   let size_f = L.declare_function "size" size_t the_module in 
   let contains_t = L.function_type i1_t [| graph_t; L.pointer_type i8_t|] in 
   let contains_f = L.declare_function "contains" contains_t the_module in 
@@ -258,23 +267,82 @@ let struct_types =
 	       (match op with
 	         A.Neg     -> L.build_neg
          | A.Not     -> L.build_not) e' "tmp" builder
-      | A.Graph -> 
+
+      | A.NodeOp(e, nop, s ) -> 
+          let e_val = expr builder e in 
+          let s_val = lookup s in 
+          (match nop with 
+            A.AccessNode -> 
+           let char_s_val_pointer = L.build_load s_val "char_n_val_pointer" builder in 
+           let node_pointer = L.build_call getNode_f [| e_val; char_s_val_pointer|] "" builder in 
+           node_pointer 
+          )
+
+      | A.NodeOp2(e, nop2) -> 
+            let e_val = expr builder e in 
+            (match nop2 with 
+              A.GetName -> 
+                let c_pointer = L.build_call getName_f [| e_val |] "getName" builder in c_pointer
+            | A.GetVisited ->
+                let b_pointer = L.build_call getVisited_f [| e_val |] "getVisited" builder in b_pointer
+            | A.GetData ->
+                let v_pointer = L.build_call getData_f [| e_val |] "getData" builder in v_pointer 
+            )
+      | A.Node(n, _) -> 
+          let n_val = lookup n in 
+          let char_n_val_pointer = L.build_load n_val "char_n_val_pointer" builder in 
+          let nodeptr = L.build_call initNode_f [| char_n_val_pointer |] "init_n" builder in nodeptr 
+
+      | A.Graph(_) -> 
           let graphptr = L.build_call initGraph_f [| |] "init" builder in graphptr
           
       | A.GraphOp(g, gop, n) ->
+          let g_val = lookup g in 
+          let n_val = lookup n in  
+          let char_n_val_pointer = L.build_load n_val "char_n_val_pointer" builder in 
+
           (match gop with
            A.AddNode -> 
-           let g_val = lookup g in 
-           let n_val = lookup n in  
-           let char_n_val_pointer = L.build_load n_val "char_n_val_pointer" builder in 
+           
            let n_ptr = L.build_call initNode_f [| char_n_val_pointer |] "init" builder in 
            let n_val_ptr = L.build_alloca (L.type_of n_ptr) "node_alloca" builder in 
            ignore (L.build_store n_ptr n_val_ptr builder); 
            let graph_pointer = L.build_load g_val "graph_pointer" builder in 
            let node_pointer = L.build_load n_val_ptr "node_pointer" builder in 
            ignore(L.build_call addNode_f [| graph_pointer; node_pointer |] "" builder); g_val 
+          | A.RemoveNode ->
+           let n_ptr = L.build_call initNode_f [| char_n_val_pointer |] "init" builder in 
+           let n_val_ptr = L.build_alloca (L.type_of n_ptr) "node_alloca" builder in 
+           ignore (L.build_store n_ptr n_val_ptr builder); 
+           let graph_pointer = L.build_load g_val "graph_pointer" builder in 
+           let node_pointer = L.build_load n_val_ptr "node_pointer" builder in 
+           ignore(L.build_call removeNode_f [| graph_pointer; node_pointer |] "" builder); g_val 
+          
          )
+      | A.GraphOpAddEdge(g, i, gop2, e1, e2) ->
+        (match gop2 with
+          A.AddEdge ->  
+          let g_val = expr builder g in 
+          let i_val = L.const_int i32_t i in 
+          let e1_val = lookup e1 in 
+          let e1_val_pointer = L.build_load e1_val "e1_val_pointer" builder in 
+          let e2_val = lookup e2 in 
+          let e2_val_pointer = L.build_load e2_val "e2_val_pointer" builder in 
+          let g_pointer = L.build_call addEdge_f [| g_val; e1_val_pointer; e2_val_pointer; i_val|] "addEdge" builder in g_pointer
+        )
 
+      | A.GraphOpRemoveEdge(g, gop3, e1, e2) ->
+        (match gop3 with
+          A.RemoveEdge ->  
+          let g_val = lookup g in
+          let g_val_pointer = L.build_load g_val "g_val_pointer" builder in  
+          let e1_val = lookup e1 in 
+          let e1_val_pointer = L.build_load e1_val "e1_val_pointer" builder in 
+          let e2_val = lookup e2 in 
+          let e2_val_pointer = L.build_load e2_val "e2_val_pointer" builder in 
+          let g_pointer = L.build_call removeEdge_f [| g_val_pointer; e1_val_pointer; e2_val_pointer|] "removeEdge" builder in g_pointer
+        )
+        
       | A.AccessStructField(e, field_name) -> 
         (match e with 
            A.Id s -> let etype = fst(List.find (fun local -> snd(local) = s) fdecl.A.locals) in
@@ -318,6 +386,7 @@ let struct_types =
 	       L.build_call printbig_func 
             [| (expr builder e) |] 
             "printbig" builder
+
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	       let actuals = 
@@ -325,6 +394,34 @@ let struct_types =
 	       let result = (match fdecl.A.typ with A.Void -> ""
                                               | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list actuals) result builder
+
+      | A.ObjectCall (g, "printGraph", []) -> let g_val = expr builder g in 
+        ignore(L.build_call printGraph_f [| g_val |] "" builder); g_val
+
+      | A.ObjectCall(g, "isEmpty", []) -> let g_val = expr builder g in 
+        let bool_ptr = L.build_call isEmpty_f [| g_val |] "isEmpty" builder in 
+        bool_ptr
+
+      | A.ObjectCall(g, "size", []) -> let g_val = expr builder g in 
+        let size_ptr = L.build_call size_f [| g_val |] "isEmpty" builder in 
+        size_ptr
+
+      (* NEEDS TO BE FIXED *)
+      | A.ObjectCall(g, "removeAllNodes", []) -> let g_val = expr builder g in 
+        ignore(L.build_call removeAllNodes_f [| g_val |] "" builder); g_val
+
+      | A.ObjectCall(n, "modifyVisited", [e]) -> let n_val = expr builder n in 
+        let bool_visited = expr builder e in 
+        ignore(L.build_call modifyVisited_f [| n_val; bool_visited|] "" builder); n_val
+
+      | A.ObjectCall(g, "contains", [e]) -> let g_val = expr builder g in 
+        let e_val = expr builder e in 
+        let bool_ptr = L.build_call contains_f [| g_val; e_val |] "contains" builder in bool_ptr 
+
+      | A.ObjectCall(g, "setData", [e]) -> let g_val = expr builder g in 
+        let e_val = expr builder e in  
+        let e_val_ptr = L.build_bitcast e_val (L.pointer_type i8_t) "ptr" builder in 
+        ignore(L.build_call setData_f [| g_val; e_val_ptr |] "" builder); g_val 
 
       | A.ObjectCall (q, "qadd", [e]) -> 
         let q_val = expr builder q in
@@ -352,7 +449,8 @@ let struct_types =
           | _ -> 
             let l_dtyp = ltype_of_typ q_type in
             let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
-            (L.build_load d_ptr "d_ptr" builder)) 
+            (L.build_load d_ptr "d_ptr" builder))
+
 
       |  A.ObjectCall(_, f, act) -> 
          let (fdef, fdecl) = StringMap.find f function_decls in

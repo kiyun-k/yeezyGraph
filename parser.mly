@@ -19,7 +19,7 @@
 %token STRUCT TILDE 
 
 /* Graph tokens */
-%token ADD_NODE REMOVE_NODE ADD_EDGE REMOVE_EDGE GRAPH NODE
+%token ADD_NODE REMOVE_NODE ADD_EDGE REMOVE_EDGE GRAPH NODE 
 
 /* Queue datatype tokens */
 %token QUEUE
@@ -36,7 +36,10 @@
 /* Function tokens */
 %token RETURN VOID NEW DOT
 
-%token UNDERSCORE AT 
+
+
+%token UNDERSCORE 
+%token GET_NAME GET_VISITED GET_DATA 
 
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
@@ -56,7 +59,7 @@
 %right NOT NEG
 %left DOT
 %left TILDE
-%nonassoc AT LBRACKET RBRACKET
+%nonassoc GET_NAME GET_VISITED GET_DATA LBRACKET RBRACKET
 %left ADD_EDGE REMOVE_EDGE
 %nonassoc UNDERSCORE
 %left ADD_NODE REMOVE_NODE
@@ -102,8 +105,8 @@ typ:
   | VOID { Void }
   | QUEUE LT typ GT { QueueType($3)}
   | STRUCT ID { StructType ($2) } 
-  | GRAPH { GraphTyp }
-  | NODE { Node }
+  | GRAPH LT typ GT { GraphType($3)}
+  | NODE LT typ GT { NodeType($3) }
 
 vdecl_list:
     /* nothing */    { [] }
@@ -139,6 +142,7 @@ expr_opt:
     /* nothing */ { Noexpr }
   | expr          { $1 }
 
+
 expr:
     INT_LITERAL           { IntLit($1) }
   | FLOAT_LITERAL         { FloatLit($1) } 
@@ -167,12 +171,15 @@ expr:
   | expr DOT ID LPAREN actuals_opt RPAREN { ObjectCall($1, $3, $5) }  
   | LPAREN expr RPAREN    { $2 }
   | expr UNDERSCORE ID            { NodeOp($1, AccessNode, $3) } 
-  | expr AT ID                    { NodeOp($1, AccessNodeField, $3) } 
+  | expr GET_NAME                    { NodeOp2($1, GetName) } 
+  | expr GET_DATA                    { NodeOp2($1, GetData) } 
+  | expr GET_VISITED                 { NodeOp2($1, GetVisited) } 
   | ID ADD_NODE ID       { GraphOp($1, AddNode, $3) }
   | ID REMOVE_NODE ID    { GraphOp($1, RemoveNode, $3) }
-  | expr LBRACKET INT_LITERAL RBRACKET ADD_EDGE expr    { GraphOpAddEdge($1, $3, AddEdge, $6) }
-  | ID REMOVE_EDGE ID             { GraphOp($1, RemoveEdge, $3) }
-  | NEW GRAPH LPAREN RPAREN { Graph }
+  | expr LBRACKET INT_LITERAL RBRACKET ADD_EDGE LPAREN ID COMMA ID RPAREN    { GraphOpAddEdge($1, $3, AddEdge, $7, $9) }
+  | ID REMOVE_EDGE LPAREN ID COMMA ID RPAREN          { GraphOpRemoveEdge($1, RemoveEdge, $4, $6) }
+  | NEW GRAPH LT typ GT LPAREN RPAREN { Graph($4) }
+  | NEW NODE LT typ GT LPAREN ID RPAREN {Node($7, $4)}
 
 actuals_opt:
     /* nothing */ { [] }
