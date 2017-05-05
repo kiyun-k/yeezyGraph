@@ -96,7 +96,7 @@ typ:
   | STRING { String }
   | VOID { Void }
   | STRUCT ID { StructType ($2) }
-  | QUEUE LT typ GT { QueueType($3)}
+  | QUEUE LT typ GT { QueueType($3) }
   | LIST LT typ GT { ListType($3) }
  
 
