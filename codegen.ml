@@ -175,7 +175,11 @@ let struct_types =
 
     let getQueueType = function
        A.QueueType(typ) -> typ
-      | _ -> A.String in 
+      | _ -> A.String in
+
+    let getListType = function
+      A.ListType(typ) -> typ
+    | _ -> A.String in
 
     let idtostring = function 
         A.Id s -> s 
@@ -312,7 +316,7 @@ let struct_types =
         let q_val = expr builder q in 
         let n = idtostring q in
         let q_type = getQueueType (lookup_types n) in 
-        let val_ptr = L.build_call front_f [| q_val|] "val_ptr" builder in
+        let val_ptr = L.build_call front_f [| q_val |] "val_ptr" builder in
         (match q_type with 
           A.QueueType _ ->
             let l_dtyp = ltype_of_typ q_type in 
@@ -336,6 +340,21 @@ let struct_types =
         let e_val = expr builder e in
         ignore (L.build_call delList_f [| l_ptr; e_val |] "" builder);
         l_ptr
+      | A.ObjectCall (l, "l_get", [e]) ->
+        let l_ptr = expr builder l in
+        let e_val = expr builder e in
+        let n = idtostring l in
+        let l_type = getListType (lookup_types n) in
+        let val_ptr = L.build_call getList_f [| l_ptr; e_val |] "val_ptr" builder in
+        (match l_type with
+          A.ListType _ ->
+            let l_dtyp = ltype_of_typ l_type in
+            let void_d_ptr = L.build_load val_ptr "void_d_ptr" builder in
+              (L.build_bitcast void_d_ptr l_dtyp "data" builder)
+        | _ ->
+            let l_dtyp = ltype_of_typ l_type in
+            let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
+            (L.build_load d_ptr "d_ptr" builder))
       |  A.ObjectCall(_, f, act) -> 
          let (fdef, fdecl) = StringMap.find f function_decls in
          let actuals = 

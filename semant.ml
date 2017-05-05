@@ -118,14 +118,19 @@ let check (globals, functions, structs) =
        locals = []; body = [] }
 
        (StringMap.add "l_add"
-     { typ = Void; fname = "l_add"; formals = [(Int, "x")];
+     { typ = Void; fname = "l_add"; formals = [(AnyType, "x")];
        locals = []; body = [] }
 
-       (StringMap.singleton "l_delete"
+       (StringMap.add "l_delete"
      { typ = Void; fname = "l_delete"; formals = [(Int, "x")];
        locals = []; body = [] }
 
-     )))))))))
+       (StringMap.singleton "l_get"
+     { typ = AnyType; fname = "qfront"; formals = [(Int, "x")];
+       locals = []; body = [] }
+
+
+     ))))))))))
 
      
    in
@@ -182,6 +187,11 @@ let check (globals, functions, structs) =
 
     let getQueueType = function
        QueueType(typ) -> typ
+      | _ -> String 
+    in 
+
+    let getListType = function
+       ListType(typ) -> typ
       | _ -> String 
     in 
 
@@ -264,13 +274,17 @@ let check (globals, functions, structs) =
 
         else
            List.iter2 (fun (ft, _) e -> let et = expr e in
-            let acttype = expr oname in 
-            let actqtype = getQueueType acttype in 
-            (* if fname = "qfront" then let _ = print_endline (string_of_typ actqtype) in returntype := actqtype *)
-                if fname = "qadd" then
+              if fname = "qadd" then
+                let acttype = expr oname in 
+                let actqtype = getQueueType acttype in 
                 ignore(check_assign actqtype et (Failure ("illegal actual queue argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ actqtype ^ " in " ^ string_of_expr e))) 
-                else ignore (check_assign ft et (Failure ("illegal actual argument found 2 " ^ string_of_typ et ^
+              else if fname = "l_add" then
+                let acttype = expr oname in 
+                let actltype = getListType acttype in
+                ignore(check_assign actltype et (Failure ("illegal actual list argument found " ^ string_of_typ et ^
+                " expected " ^ string_of_typ actltype ^ " in " ^ string_of_expr e)))
+              else ignore (check_assign ft et (Failure ("illegal actual argument found 2 " ^ string_of_typ et ^
                 " expected " ^ "in" ^ string_of_expr e)))) fd.formals actuals;
            !returntype
 
