@@ -328,7 +328,7 @@ let struct_types =
           let e1_val_pointer = L.build_load e1_val "e1_val_pointer" builder in 
           let e2_val = lookup e2 in 
           let e2_val_pointer = L.build_load e2_val "e2_val_pointer" builder in 
-          let g_pointer = L.build_call addEdge_f [| g_val; e1_val_pointer; e2_val_pointer; i_val|] "addEdge" builder in g_pointer
+          let g_pointer = L.build_call addEdge_f [| g_val; e1_val_pointer; e2_val_pointer; i_val|] "" builder in g_pointer
         )
 
       | A.GraphOpRemoveEdge(g, gop3, e1, e2) ->
@@ -340,7 +340,7 @@ let struct_types =
           let e1_val_pointer = L.build_load e1_val "e1_val_pointer" builder in 
           let e2_val = lookup e2 in 
           let e2_val_pointer = L.build_load e2_val "e2_val_pointer" builder in 
-          let g_pointer = L.build_call removeEdge_f [| g_val_pointer; e1_val_pointer; e2_val_pointer|] "removeEdge" builder in g_pointer
+          let g_pointer = L.build_call removeEdge_f [| g_val_pointer; e1_val_pointer; e2_val_pointer|] "" builder in g_pointer
         )
         
       | A.AccessStructField(e, field_name) -> 
