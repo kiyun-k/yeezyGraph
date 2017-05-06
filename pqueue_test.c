@@ -1,3 +1,5 @@
+/*To compile: clang pqueue.c node.c map.c linkedlist.c pqueue_test.c -o pqueue_test */
+
 #include "pqueue.h"
 
 int main() {
