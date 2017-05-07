@@ -279,7 +279,7 @@ let check (globals, functions, structs) =
 
       | GraphOpAddEdge(e, _, gop2, s1, s2) -> let t1 = expr e and 
        t2 = type_of_identifier s1 and t3 = type_of_identifier s2 in 
-       let _ = print_endline (string_of_gop2 gop2) in 
+       
         (match t1 with 
             GraphType(typ) -> 
             (match gop2 with 
@@ -291,7 +291,6 @@ let check (globals, functions, structs) =
         
        | GraphOpRemoveEdge(e, gop3, s1, s2) -> let t1 = type_of_identifier e and 
        t2 = type_of_identifier s1 and t3 = type_of_identifier s2 in 
-       let _ = print_endline (string_of_gop3 gop3) in 
         (match t1 with 
             GraphType(typ) -> 
             (match gop3 with 
