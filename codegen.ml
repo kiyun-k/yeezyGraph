@@ -22,9 +22,15 @@ let translate (globals, functions, structs) =
   let nodecontext = L.global_context () in
   let graphcontext = L.global_context () in
   let the_module = L.create_module context "MicroC" in(* container *)
-  let llctx = L.global_context () in
+  
+  let qqctx = L.global_context () in
   let queuem = L.MemoryBuffer.of_file "queue.bc" in
-  let qqm = Llvm_bitreader.parse_bitcode llctx queuem in
+  let qqm = Llvm_bitreader.parse_bitcode qqctx queuem in
+
+  let ppctx = L.global_context () in
+  let pqueuem = L.MemoryBuffer.of_file "pqueue.bc" in
+  let ppm = Llvm_bitreader.parse_bitcode ppctx pqueuem in
+
   let nodem = L.MemoryBuffer.of_file "node.bc" in
   let node_module = Llvm_bitreader.parse_bitcode nodecontext nodem in
   let graphm = L.MemoryBuffer.of_file "graph.bc" in
@@ -37,6 +43,8 @@ let translate (globals, functions, structs) =
   and void_t = L.void_type context
   and queueid_t = L.pointer_type (match L.type_by_name qqm "struct.QueueId" with
     None -> raise (Invalid_argument "Option.get queueid") | Some x -> x)
+  and pqueue_t = L.pointer_type (match L.type_by_name ppm "struct.pqueue" with
+    None -> raise (Invalid_argument "Option.get pqueue") | Some x -> x)
   and graph_t = L.pointer_type (match L.type_by_name graph_module "struct.graph" with
     None -> raise (Invalid_argument "Option.get graph") | Some x -> x )
   and node_t = L.pointer_type (match L.type_by_name node_module "struct.node" with
@@ -58,6 +66,7 @@ let struct_types =
     | A.GraphType _ -> graph_t
     | A.NodeType _  -> node_t 
     | A.QueueType _ -> queueid_t
+    | A.PQueueType -> pqueue_t
     | A.AnyType -> L.pointer_type i8_t in
 
 
@@ -117,7 +126,15 @@ let struct_types =
   let front_t = L.function_type (L.pointer_type i8_t) [| queueid_t |] in
   let front_f = L.declare_function "front" front_t the_module in
 
-
+  (* Pqueue functions *)
+  let initPQueue_t = L.function_type pqueue_t [| |] in
+  let initPQueue_f = L.declare_function "pq_init" initPQueue_t the_module in
+  let pushPQ_t = L.function_type void_t [| pqueue_t; node_t |] in 
+  let pushPQ_f = L.declare_function "pq_push" pushPQ_t the_module in 
+  let deletePQ_t = L.function_type node_t [| pqueue_t |] in 
+  let deletePQ_f = L.declare_function "pq_delete" deletePQ_t the_module in 
+  let sizePQ_t = L.function_type i32_t [| pqueue_t |] in 
+  let sizePQ_f = L.declare_function "p_size" sizePQ_t the_module in 
 
   (* Node functions *)
   let initNode_t = L.function_type node_t [| L.pointer_type i8_t |] in
@@ -244,6 +261,13 @@ let struct_types =
           ignore (L.build_call enqueue_f [| queue_ptr; void_d_ptr |] "" builder)
         in ignore (List.map add_element act);
         queue_ptr
+      | A.PQueue (act) -> 
+        let pqptr = L.build_call initPQueue_f [| |] "init" builder in 
+          let add_elmt elmt = 
+            let element = expr builder elmt in
+          ignore (L.build_call pushPQ_f [| pqptr; element |] "" builder) in 
+        ignore (List.map add_elmt act);
+        pqptr
       | A.Binop (e1, op, e2) ->
          let e1' = expr builder e1
 	       and e2' = expr builder e2 
@@ -451,7 +475,19 @@ let struct_types =
             let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
             (L.build_load d_ptr "d_ptr" builder))
 
-
+      |  A.ObjectCall (p, "p_push", [e]) -> 
+          let pqptr = expr builder p in
+          let e_val = expr builder e in 
+          ignore (L.build_call pushPQ_f [| pqptr; e_val |] "" builder);
+          pqptr
+      |  A.ObjectCall (p, "p_delete", []) -> 
+          let pqptr = expr builder p in 
+          let nodeptr = L.build_call deletePQ_f [| pqptr |] "data" builder in
+          nodeptr
+      | A.ObjectCall (p, "p_size", []) ->
+          let pqptr = expr builder p in 
+          let size_ptr = L.build_call sizePQ_f [| pqptr |] "isEmpty" builder in 
+          size_ptr
       |  A.ObjectCall(_, f, act) -> 
          let (fdef, fdecl) = StringMap.find f function_decls in
          let actuals = 

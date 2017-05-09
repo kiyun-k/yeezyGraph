@@ -22,7 +22,10 @@
 %token ADD_NODE REMOVE_NODE ADD_EDGE REMOVE_EDGE GRAPH NODE 
 
 /* Queue datatype tokens */
-%token QUEUE
+%token QUEUE 
+
+/* PQueue datatype tokens */
+%token PQUEUE 
 
 /* Arithmetic tokens */
 %token PLUS MINUS TIMES DIVIDE ASSIGN NOT
@@ -104,6 +107,7 @@ typ:
   | STRING { String }
   | VOID { Void }
   | QUEUE LT typ GT { QueueType($3)}
+  | PQUEUE { PQueueType }
   | STRUCT ID { StructType ($2) } 
   | GRAPH LT typ GT { GraphType($3)}
   | NODE LT typ GT { NodeType($3) }
@@ -150,6 +154,7 @@ expr:
   | TRUE                  { BoolLit(true) }
   | FALSE                 { BoolLit(false) }
   | NEW QUEUE LT typ GT LPAREN actuals_opt RPAREN { Queue($4, $7) }
+  | NEW PQUEUE LPAREN actuals_opt RPAREN { PQueue($4) }
   | ID                    { Id($1) }
   | expr PLUS   expr      { Binop($1, Add,   $3) }
   | expr MINUS  expr      { Binop($1, Sub,   $3) }
