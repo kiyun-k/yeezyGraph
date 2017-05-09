@@ -10,8 +10,13 @@ LLI="lli"
 # LLI="/usr/local/opt/llvm@3.7/bin/lli-3.7"
 
 # Path to the LLVM compiler
+<<<<<<< HEAD
+# LLC="llc"
+LLC="/usr/local/opt/llvm@3.7/bin/llc-3.7"
+=======
 LLC="llc"
 #LLC="/usr/local/opt/llvm@3.7/bin/llc-3.7"
+>>>>>>> 570b4f6c9dd120a57c759296b0d466eaf8c8f4ed
 
 # Path to the C compiler
 CC="cc"
@@ -40,8 +45,8 @@ Usage() {
 
 SignalError() {
     if [ $error -eq 0 ] ; then
-	echo "FAILED"
-	error=1
+    echo "FAILED"
+    error=1
     fi
     echo "  $1"
 }
@@ -52,8 +57,8 @@ Compare() {
     generatedfiles="$generatedfiles $3"
     echo diff -b $1 $2 ">" $3 1>&2
     diff -b "$1" "$2" > "$3" 2>&1 || {
-	SignalError "$1 differs"
-	echo "FAILED $1 differs from $2" 1>&2
+    SignalError "$1 differs"
+    echo "FAILED $1 differs from $2" 1>&2
     }
 }
 
