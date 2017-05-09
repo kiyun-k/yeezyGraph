@@ -93,6 +93,10 @@ let check (globals, functions, structs) =
   (* Function declaration for a named function *)
   let built_in_decls =  StringMap.add "print"
      { typ = Void; fname = "print"; formals = [(Int, "x")];
+       locals = []; body = [] }
+
+       (StringMap.add "printint"
+    { typ = Void; fname = "printint"; formals = [(Int, "x")];
        locals = []; body = [] } 
 
        (StringMap.add "printfloat"
@@ -105,6 +109,10 @@ let check (globals, functions, structs) =
 
        (StringMap.add "prints"
      { typ = Void; fname = "prints"; formals = [(String, "x")];
+       locals = []; body = [] } 
+
+      (StringMap.add "printstring"
+     { typ = Void; fname = "printstring"; formals = [(String, "x")];
        locals = []; body = [] } 
 
        (StringMap.add "printbig"
@@ -189,7 +197,7 @@ let check (globals, functions, structs) =
        locals = []; body = [] }
 
 
-     )))))))))))))))))))))))
+     )))))))))))))))))))))))))
 
      
    in

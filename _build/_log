@@ -1,6 +1,6 @@
 ### Starting build.
-# Target: microc.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:microc.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules microc.ml > microc.ml.depends
+# Target: yeezygraph.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:yeezygraph.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules yeezygraph.ml > yeezygraph.ml.depends
 # Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:ast.ml, ocaml, ocamldep, quiet }
 ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules ast.ml > ast.ml.depends
 # Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet }
@@ -21,15 +21,20 @@ ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -pack
 ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules semant.ml > semant.ml.depends
 # Target: codegen.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet }
 ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o codegen.cmo codegen.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o codegen.cmo codegen.ml
+File "codegen.ml", line 125, characters 6-19:
+Warning 26: unused variable printbig_func.
+File "codegen.ml", line 589, characters 12-18:
+Warning 26: unused variable l_type.
 # Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet }
 ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o scanner.cmo scanner.ml
 # Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet }
 ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o semant.cmo semant.ml
 + ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o semant.cmo semant.ml
-File "semant.ml", line 358, characters 14-24:
+File "semant.ml", line 366, characters 14-24:
 Warning 27: unused variable removeEdge.
-# Target: microc.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:microc.cmo, file:microc.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o microc.cmo microc.ml
+# Target: yeezygraph.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:yeezygraph.cmo, file:yeezygraph.ml, implem, ocaml, quiet }
+ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o yeezygraph.cmo yeezygraph.ml
 # Target: ast.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet }
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o ast.cmx ast.ml
 # Target: parser.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
@@ -38,15 +43,20 @@ ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o parser.cmx parser.ml
 # Target: codegen.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:codegen.cmx, file:codegen.ml, implem, native, ocaml, quiet }
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o codegen.cmx codegen.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o codegen.cmx codegen.ml
+File "codegen.ml", line 125, characters 6-19:
+Warning 26: unused variable printbig_func.
+File "codegen.ml", line 589, characters 12-18:
+Warning 26: unused variable l_type.
 # Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet }
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o scanner.cmx scanner.ml
 # Target: semant.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet }
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o semant.cmx semant.ml
 + ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o semant.cmx semant.ml
-File "semant.ml", line 358, characters 14-24:
+File "semant.ml", line 366, characters 14-24:
 Warning 27: unused variable removeEdge.
-# Target: microc.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:microc.cmx, file:microc.ml, implem, native, ocaml, quiet }
-ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o microc.cmx microc.ml
-# Target: microc.native, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), dont_link_with, extension:native, file:microc.native, link, native, ocaml, program, quiet }
-ocamlfind ocamlopt -linkpkg -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm ast.cmx codegen.cmx parser.cmx scanner.cmx semant.cmx microc.cmx -o microc.native
+# Target: yeezygraph.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:yeezygraph.cmx, file:yeezygraph.ml, implem, native, ocaml, quiet }
+ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o yeezygraph.cmx yeezygraph.ml
+# Target: yeezygraph.native, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), dont_link_with, extension:native, file:yeezygraph.native, link, native, ocaml, program, quiet }
+ocamlfind ocamlopt -linkpkg -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm ast.cmx codegen.cmx parser.cmx scanner.cmx semant.cmx yeezygraph.cmx -o yeezygraph.native
 # Compilation successful.

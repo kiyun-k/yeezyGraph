@@ -10,15 +10,16 @@
 LLI="/usr/local/opt/llvm@3.7/bin/lli-3.7"
 
 # Path to the LLVM compiler
+# LLC="llc"
 LLC="/usr/local/opt/llvm@3.7/bin/llc-3.7"
 
 # Path to the C compiler
 CC="cc"
 
-# Path to the microc compiler.  Usually "./microc.native"
-# Try "_build/microc.native" if ocamlbuild was unable to create a symbolic link.
-MICROC="./microc.native"
-#MICROC="_build/microc.native"
+# Path to the yeezygraph compiler.  Usually "./yeezygraph.native"
+# Try "_build/yeezygraph.native" if ocamlbuild was unable to create a symbolic link.
+YEEZYGRAPH="./yeezygraph.native"
+#yeezygraph="_build/yeezygraph.native"
 
 # Set time limit for all operations
 ulimit -t 30
@@ -31,7 +32,7 @@ globalerror=0
 keep=0
 
 Usage() {
-    echo "Usage: testall.sh [options] [.mc files]"
+    echo "Usage: testall.sh [options] [.yg files]"
     echo "-k    Keep intermediate files"
     echo "-h    Print this help"
     exit 1
@@ -39,8 +40,8 @@ Usage() {
 
 SignalError() {
     if [ $error -eq 0 ] ; then
-	echo "FAILED"
-	error=1
+    echo "FAILED"
+    error=1
     fi
     echo "  $1"
 }
@@ -51,8 +52,8 @@ Compare() {
     generatedfiles="$generatedfiles $3"
     echo diff -b $1 $2 ">" $3 1>&2
     diff -b "$1" "$2" > "$3" 2>&1 || {
-	SignalError "$1 differs"
-	echo "FAILED $1 differs from $2" 1>&2
+    SignalError "$1 differs"
+    echo "FAILED $1 differs from $2" 1>&2
     }
 }
 
@@ -61,8 +62,8 @@ Compare() {
 Run() {
     echo $* 1>&2
     eval $* || {
-	SignalError "$1 failed on $*"
-	return 1
+    SignalError "$1 failed on $*"
+    return 1
     }
 }
 
@@ -71,8 +72,8 @@ Run() {
 RunFail() {
     echo $* 1>&2
     eval $* && {
-	SignalError "failed: $* did not report an error"
-	return 1
+    SignalError "failed: $* did not report an error"
+    return 1
     }
     return 0
 }
@@ -80,8 +81,8 @@ RunFail() {
 Check() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.yg//'`
+    reffile=`echo $1 | sed 's/.yg$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -92,33 +93,31 @@ Check() {
     generatedfiles=""
 
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&
-    Run "$MICROC" "<" $1 ">" "${basename}.ll" &&
+    Run "$YEEZYGRAPH" "<" $1 ">" "${basename}.ll" &&
     Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-
-    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" "map.bc" "node.bc" "graph.bc" "linkedlist.bc" "queue.bc" &&
-    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" "node.bc" "graph.bc" "linkedlist.bc" "map.bc" "queue.bc" "pqueue.bc"  &&
+    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" "queue.bc" "map.bc" "graph.bc" "node.bc" "pqueue.bc" "linkedlist.bc" &&
     Run "./${basename}.exe" > "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 
     # Report the status and clean up the generated files
 
     if [ $error -eq 0 ] ; then
-	if [ $keep -eq 0 ] ; then
-	    rm -f $generatedfiles
-	fi
-	echo "OK"
-	echo "###### SUCCESS" 1>&2
+    if [ $keep -eq 0 ] ; then
+        rm -f $generatedfiles
+    fi
+    echo "OK"
+    echo "###### SUCCESS" 1>&2
     else
-	echo "###### FAILED" 1>&2
-	globalerror=$error
+    echo "###### FAILED" 1>&2
+    globalerror=$error
     fi
 }
 
 CheckFail() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
-                             s/.mc//'`
-    reffile=`echo $1 | sed 's/.mc$//'`
+                             s/.yg//'`
+    reffile=`echo $1 | sed 's/.yg$//'`
     basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
     echo -n "$basename..."
@@ -129,31 +128,31 @@ CheckFail() {
     generatedfiles=""
 
     generatedfiles="$generatedfiles ${basename}.err ${basename}.diff" &&
-    RunFail "$MICROC" "<" $1 "2>" "${basename}.err" ">>" $globallog &&
+    RunFail "$YEEZYGRAPH" "<" $1 "2>" "${basename}.err" ">>" $globallog &&
     Compare ${basename}.err ${reffile}.err ${basename}.diff
 
     # Report the status and clean up the generated files
 
     if [ $error -eq 0 ] ; then
-	if [ $keep -eq 0 ] ; then
-	    rm -f $generatedfiles
-	fi
-	echo "OK"
-	echo "###### SUCCESS" 1>&2
+    if [ $keep -eq 0 ] ; then
+        rm -f $generatedfiles
+    fi
+    echo "OK"
+    echo "###### SUCCESS" 1>&2
     else
-	echo "###### FAILED" 1>&2
-	globalerror=$error
+    echo "###### FAILED" 1>&2
+    globalerror=$error
     fi
 }
 
 while getopts kdpsh c; do
     case $c in
-	k) # Keep intermediate files
-	    keep=1
-	    ;;
-	h) # Help
-	    Usage
-	    ;;
+    k) # Keep intermediate files
+        keep=1
+        ;;
+    h) # Help
+        Usage
+        ;;
     esac
 done
 
@@ -178,22 +177,22 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/test-*.mc tests/fail-*.mc"
+    files="tests/test-*.yg tests/fail-*.yg"
 fi
 
 for file in $files
 do
     case $file in
-	*test-*)
-	    Check $file 2>> $globallog
-	    ;;
-	*fail-*)
-	    CheckFail $file 2>> $globallog
-	    ;;
-	*)
-	    echo "unknown file type $file"
-	    globalerror=1
-	    ;;
+    *test-*)
+        Check $file 2>> $globallog
+        ;;
+    *fail-*)
+        CheckFail $file 2>> $globallog
+        ;;
+    *)
+        echo "unknown file type $file"
+        globalerror=1
+        ;;
     esac
 done
 

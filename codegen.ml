@@ -227,6 +227,9 @@ let struct_types =
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in 
     let str_format_str = L.build_global_stringptr "%s\n" "fmt" builder in 
 
+    let int_format_str2 = L.build_global_stringptr "%d" "fmt" builder in 
+    let str_format_str2 = L.build_global_stringptr "%s" "fmt" builder in 
+
     let float_format_str = L.build_global_stringptr "%f\n" "fmt" builder in
     
     (* Construct the function's "locals": formal arguments and locally
@@ -473,10 +476,8 @@ let struct_types =
       | A.Call ("printfloat", [e]) -> L.build_call printf_func [| float_format_str; (expr builder e) |] "printf" builder
       | A.Call ("prints", [e]) -> 
          L.build_call printf_func [| str_format_str; (expr builder e) |] "printf" builder
-      | A.Call ("printbig", [e]) ->
-	       L.build_call printbig_func 
-            [| (expr builder e) |] 
-            "printbig" builder
+      | A.Call ("printint", [e]) ->  L.build_call printf_func [| int_format_str2; (expr builder e) |] "printf" builder
+      | A.Call ("printstring", [e]) ->  L.build_call printf_func [| str_format_str2; (expr builder e) |] "printf" builder
 
       | A.Call (f, act) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
@@ -579,21 +580,15 @@ let struct_types =
         let e_val = expr builder e in
         ignore (L.build_call delList_f [| l_ptr; e_val |] "" builder);
         l_ptr
+        
+      (* TO BE INCORPORATED WITH INT *)
       | A.ObjectCall (l, "l_get", [e]) ->
         let l_ptr = expr builder l in
         let e_val = expr builder e in
         let n = idtostring l in
         let l_type = getListType (lookup_types n) in
         let val_ptr = L.build_call getList_f [| l_ptr; e_val |] "val_ptr" builder in
-        (match l_type with
-          A.ListType _ ->
-            let l_dtyp = ltype_of_typ l_type in
-            let void_d_ptr = L.build_load val_ptr "void_d_ptr" builder in
-              (L.build_bitcast void_d_ptr l_dtyp "data" builder)
-        | _ ->
-            let l_dtyp = ltype_of_typ l_type in
-            let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
-            (L.build_load d_ptr "d_ptr" builder))
+        val_ptr
       |  A.ObjectCall(_, f, act) -> 
          let (fdef, fdecl) = StringMap.find f function_decls in
          let actuals = 

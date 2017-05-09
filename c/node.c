@@ -39,6 +39,7 @@ void modify_visited(struct node *curr_node, bool val){
 struct List *get_inNodes(struct node *curr_node) {
 	struct List *l = l_init();
 	for (int i = 0; i < curr_node->inNodes->size; i++) {
+		
 		char *key = m_key(curr_node->inNodes, i);
 		l_add(l, key);
 	}
