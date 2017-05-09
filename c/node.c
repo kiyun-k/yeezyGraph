@@ -36,12 +36,22 @@ void modify_visited(struct node *curr_node, bool val){
 	return;
 }
 
-struct map *get_inNodes(struct node *curr_node) {
-	return curr_node->inNodes;
+struct List *get_inNodes(struct node *curr_node) {
+	struct List *l = l_init();
+	for (int i = 0; i < curr_node->inNodes->size; i++) {
+		char *key = m_key(curr_node->inNodes, i);
+		l_add(l, key);
+	}
+	return l;
 }
 
-struct map *get_outNodes(struct node *curr_node) {
-	return curr_node->outNodes;
+struct List *get_outNodes(struct node *curr_node) {
+	struct List *l = l_init();
+	for (int i = 0; i < curr_node->outNodes->size; i++) {
+		char *key = m_key(curr_node->outNodes, i);
+		l_add(l, key);
+	}
+	return l;
 }
 
 void *get_data(struct node *curr_node) {

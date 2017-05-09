@@ -77,6 +77,8 @@ let check (globals, functions, structs) =
 
   if List.mem "p_push" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function p_push may not be defined")) else ();
+  if List.mem "l_add" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function l_add may not be defined")) else ();
 
   if List.mem "p_delete" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function p_delete may not be defined")) else ();
@@ -161,12 +163,24 @@ let check (globals, functions, structs) =
      { typ = QueueType(AnyType); fname = "qadd"; formals = [(AnyType, "x")];
        locals = []; body = [] }
 
-       (StringMap.singleton "qfront"
+       (StringMap.add "qfront"
      { typ = AnyType; fname = "qfront"; formals = [];
        locals = []; body = [] }
 
-     ))))))))))))))))))
+       (StringMap.add "l_add"
+     { typ = Void; fname = "l_add"; formals = [(AnyType, "x")];
+       locals = []; body = [] }
 
+       (StringMap.add "l_delete"
+     { typ = Void; fname = "l_delete"; formals = [(Int, "x")];
+       locals = []; body = [] }
+
+       (StringMap.singleton "l_get"
+     { typ = AnyType; fname = "qfront"; formals = [(Int, "x")];
+       locals = []; body = [] }
+
+
+     )))))))))))))))))))))
 
      
    in
@@ -235,6 +249,11 @@ let check (globals, functions, structs) =
 
 
 
+    let getListType = function
+       ListType(typ) -> typ
+      | _ -> String 
+    in 
+
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
 	      IntLit _ -> Int
@@ -244,6 +263,7 @@ let check (globals, functions, structs) =
       | FloatLit _ -> Float
       | StringLit _ -> String
       | Queue (t, _) -> QueueType(t)
+      | List (t,_) -> ListType(t) 
       | PQueue _ -> PQueueType
       | Node(_, t) -> NodeType(t)
       | Id s -> type_of_identifier s
@@ -393,6 +413,11 @@ let check (globals, functions, structs) =
                  let actntype = getNodeType acttype in 
                   ignore(check_assign actntype et (Failure ("illegal actual node argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ actntype ^ " in " ^ string_of_expr e)))
+              else if fname = "l_add" then
+                let acttype = expr oname in 
+                let actltype = getListType acttype in
+                ignore(check_assign actltype et (Failure ("illegal actual list argument found " ^ string_of_typ et ^
+                " expected " ^ string_of_typ actltype ^ " in " ^ string_of_expr e)))
               else ignore (check_assign ft et (Failure ("illegal actual argument found 2 " ^ string_of_typ et ^
                 " expected " ^ "in" ^ string_of_expr e)))) fd.formals actuals;
            !returntype

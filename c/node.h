@@ -1,4 +1,5 @@
 #include "map.h"
+#include "linkedlist.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -25,9 +26,9 @@ bool get_visited(struct node *curr_node);
 
 void modify_visited(struct node *curr_node, bool val);
 
-struct map *get_inNodes(struct node *curr_node);
+struct List *get_inNodes(struct node *curr_node);
 
-struct map *get_outNodes(struct node *curr_node);
+struct List *get_outNodes(struct node *curr_node);
 
 void *get_data(struct node *curr_node);
 

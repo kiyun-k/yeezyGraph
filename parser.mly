@@ -24,6 +24,9 @@
 /* Queue datatype tokens */
 %token QUEUE 
 
+/* List datatype tokens */
+%token LIST
+
 /* PQueue datatype tokens */
 %token PQUEUE 
 
@@ -113,6 +116,8 @@ typ:
   | STRUCT ID { StructType ($2) } 
   | GRAPH LT typ GT { GraphType($3)}
   | NODE LT typ GT { NodeType($3) }
+  | LIST LT typ GT { ListType($3) }
+
 
 vdecl_list:
     /* nothing */    { [] }
@@ -157,6 +162,7 @@ expr:
   | FALSE                 { BoolLit(false) }
   | NEW QUEUE LT typ GT LPAREN actuals_opt RPAREN { Queue($4, $7) }
   | NEW PQUEUE LPAREN actuals_opt RPAREN { PQueue($4) }
+  | NEW LIST LT typ GT LPAREN actuals_opt RPAREN { List($4,$7) }
   | ID                    { Id($1) }
   | expr PLUS   expr      { Binop($1, Add,   $3) }
   | expr MINUS  expr      { Binop($1, Sub,   $3) }

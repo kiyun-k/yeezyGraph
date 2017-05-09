@@ -15,6 +15,8 @@ extern void m_insert(struct map *curr_map, char *node, int val);
 
 extern int m_get(struct map *curr_map, char *node);
 
+extern char *m_key(struct map *curr_map, int index);
+
 extern void m_remove(struct map *curr_map, char *node);
 
 extern int m_size(struct map *curr_map);

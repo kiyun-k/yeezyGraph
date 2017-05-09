@@ -42,6 +42,15 @@ void m_insert(struct map *curr_map, char *node, int val) {
 
 }
 
+extern char *m_key(struct map *curr_map, int index) {
+	for (int i = 0; i < curr_map->size; i++) {
+		if (i == index) {
+			return curr_map->nodes[i];
+		}
+	}
+	return NULL;
+}
+
 int m_get(struct map *curr_map, char *node) {
 	for (int i = 0; i < curr_map->size; i++) {
 		if (strcmp(curr_map->nodes[i], node) == 0) {

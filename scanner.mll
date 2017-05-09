@@ -36,6 +36,8 @@ rule token = parse
 | "struct" { STRUCT }		| "~"	   { TILDE }
 | "Queue"  { QUEUE }		| "pqueue" { PQUEUE }
 | "graph" { GRAPH }   		| "node"   { NODE }
+| "list"   { LIST }
+
 
 | "~+" { ADD_NODE }			| "~-" { REMOVE_NODE }
 | "->" { ADD_EDGE }			| "!->" { REMOVE_EDGE }
