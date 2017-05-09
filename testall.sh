@@ -94,11 +94,9 @@ Check() {
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&
     Run "$MICROC" "<" $1 ">" "${basename}.ll" &&
     Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-<<<<<<< HEAD
+
     Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" "map.bc" "node.bc" "graph.bc" "linkedlist.bc" "queue.bc" &&
-=======
     Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" "node.bc" "graph.bc" "linkedlist.bc" "map.bc" "queue.bc" "pqueue.bc"  &&
->>>>>>> 6554fc256f8b735a976fe87a146c274ead202ba3
     Run "./${basename}.exe" > "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 
