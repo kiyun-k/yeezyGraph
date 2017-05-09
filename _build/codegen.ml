@@ -373,7 +373,9 @@ let struct_types =
                 let d_ptr = L.build_bitcast v_pointer (L.pointer_type l_dtyp) "d_ptr" builder in
                 (L.build_load d_ptr "d_ptr" builder)
             | A.GetinNodes ->
-                let v_pointer = L.build_call getinNodes_f [| e_val |] "getinNodes" builder in v_pointer 
+                let v_pointer = L.build_call getinNodes_f [| e_val |] "getinNodes" builder in v_pointer (*in
+                (L.build_load v_pointer "v_pointer" builder)*)
+
             
             | A.GetoutNodes ->
                 let v_pointer = L.build_call getoutNodes_f [| e_val |] "getOutNodes" builder in 

@@ -1,6 +1,6 @@
 abc
 2
-graph:
+graph: 
 node name:  abc
 node visited:  0
 node inNodes:  {}
@@ -11,3 +11,5 @@ node visited:  0
 node inNodes:  {(abc, 2), }
 node outNodes:  {}
 
+{def, }
+1
