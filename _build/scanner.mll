@@ -34,7 +34,7 @@ rule token = parse
 | "string" { STRING }
 
 | "struct" { STRUCT }		| "~"	   { TILDE }
-| "Queue"  { QUEUE }		
+| "Queue"  { QUEUE }		| "pqueue" { PQUEUE }
 | "graph" { GRAPH }   		| "node"   { NODE }
 
 | "~+" { ADD_NODE }			| "~-" { REMOVE_NODE }
@@ -45,6 +45,7 @@ rule token = parse
 | "@data" { GET_DATA }
 
 | "INFINITY" {INF }         | "NEG-INFINITY" {NEG_INF}
+
 
 
 | "new" { NEW }

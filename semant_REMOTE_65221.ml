@@ -2,7 +2,6 @@
 
 open Ast
 
-
 module StringMap = Map.Make(String)
 
 (* Semantic checking of a program. Returns void if successful,
@@ -125,10 +124,6 @@ let check (globals, functions, structs) =
      { typ = Int; fname = "size"; formals = [];
        locals = []; body = [] }
 
-      (StringMap.add "weight"
-     { typ = Int; fname = "weight"; formals = [(String, "x"); (String, "x")];
-       locals = []; body = [] }
-
       (StringMap.add "contains"
      { typ = Bool; fname = "isEmpty"; formals = [(String, "x")];
        locals = []; body = [] }
@@ -167,11 +162,7 @@ let check (globals, functions, structs) =
 
 
 
-<<<<<<< HEAD
-     )))))))))))))))
-=======
      )))))))))))))))))
->>>>>>> 6554fc256f8b735a976fe87a146c274ead202ba3
 
      
    in
@@ -243,8 +234,6 @@ let check (globals, functions, structs) =
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
 	      IntLit _ -> Int
-      | Infinity -> Int
-      | NegInfinity -> Int
       | BoolLit _ -> Bool
       | FloatLit _ -> Float
       | StringLit _ -> String
@@ -321,7 +310,7 @@ let check (globals, functions, structs) =
             GraphType(typ) -> 
             (match gop2 with 
               AddEdge when t2 = NodeType typ && t3 = NodeType typ -> GraphType typ
-              | _ -> raise(Failure("Need to fix this add edge"))
+              | _ -> raise(Failure("Need to fix this "))
             )
           | _ -> raise(Failure("not a graph"))
         )
@@ -401,8 +390,6 @@ let check (globals, functions, structs) =
               else ignore (check_assign ft et (Failure ("illegal actual argument found 2 " ^ string_of_typ et ^
                 " expected " ^ "in" ^ string_of_expr e)))) fd.formals actuals;
            !returntype
-
-     
 
     in
 

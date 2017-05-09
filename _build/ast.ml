@@ -14,7 +14,9 @@ type nop2 = GetName | GetData | GetVisited
 
 type uop = Neg | Not
 
-type typ = Int | Bool | Float | String | Void | StructType of string | GraphType of typ | NodeType of typ | QueueType of typ | AnyType 
+type typ = Int | Bool | Float | String | Void 
+          | StructType of string | GraphType of typ | NodeType of typ 
+          | QueueType of typ | PQueueType | AnyType 
 
 type bind = typ * string
 
@@ -24,6 +26,7 @@ type expr =
   | FloatLit of float
   | StringLit of string
   | Queue of typ * expr list 
+  | PQueue of expr list
   | Id of string
   | Binop of expr * op * expr
   | Unop of uop * expr
@@ -113,10 +116,11 @@ let rec string_of_typ = function
   | Bool -> "bool"
   | String -> "string"
   | Void -> "void"
-  | GraphType(typ) -> "Graph " ^ string_of_typ typ 
+  | GraphType(typ) -> "graph " ^ string_of_typ typ 
   | StructType(s) -> s
-  | QueueType(typ) -> "Queue " ^ string_of_typ typ
-  | NodeType(typ) -> "Node " ^ string_of_typ typ 
+  | QueueType(typ) -> "queue " ^ string_of_typ typ
+  | PQueueType -> "pqueue"
+  | NodeType(typ) -> "node " ^ string_of_typ typ 
   | AnyType -> "AnyType"
 
 let rec string_of_expr = function
@@ -127,6 +131,7 @@ let rec string_of_expr = function
   | StringLit(s) -> s
   | Id(s) -> s
   | Queue(typ, e1) -> "new " ^ "Queue" ^ "<" ^ string_of_typ typ ^ ">" ^ "(" ^ String.concat ", " (List.map string_of_expr e1) ^ ")"
+  | PQueue(el) -> "new" ^ "pqueue" ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Unop(o, e) -> string_of_uop o ^ string_of_expr e

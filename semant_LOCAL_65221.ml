@@ -75,15 +75,6 @@ let check (globals, functions, structs) =
   if List.mem "qfront" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function qfront may not be defined")) else ();
 
-  if List.mem "p_push" (List.map (fun fd -> fd.fname) functions)
-  then raise (Failure ("function p_push may not be defined")) else ();
-
-  if List.mem "p_delete" (List.map (fun fd -> fd.fname) functions)
-  then raise (Failure ("function p_delete may not be defined")) else ();
-
-  if List.mem "p_size" (List.map (fun fd -> fd.fname) functions)
-  then raise (Failure ("function p_size may not be defined")) else ();
-
 
   report_duplicate (fun n -> "duplicate function " ^ n)
     (List.map (fun fd -> fd.fname) functions);
@@ -141,18 +132,6 @@ let check (globals, functions, structs) =
      { typ = Void; fname = "removeAllNodes"; formals = [];
        locals = []; body = [] }
 
-       (StringMap.add "p_push"
-     { typ = Void; fname = "p_push"; formals = [(AnyType, "x")];
-       locals = []; body = [] }
-
-       (StringMap.add "p_delete"
-     { typ = AnyType; fname = "p_delete"; formals = [];
-       locals = []; body = [] }
-
-       (StringMap.add "p_size"
-     { typ = Int; fname = "p_size"; formals = [];
-       locals = []; body = [] }
-
        (StringMap.add "qremove"
      { typ = Void; fname = "qremove"; formals = [];
        locals = []; body = [] }
@@ -167,11 +146,7 @@ let check (globals, functions, structs) =
 
 
 
-<<<<<<< HEAD
      )))))))))))))))
-=======
-     )))))))))))))))))
->>>>>>> 6554fc256f8b735a976fe87a146c274ead202ba3
 
      
    in
@@ -236,10 +211,6 @@ let check (globals, functions, structs) =
       | _ -> Void 
     in 
 
-    
-
-
-
     (* Return the type of an expression or throw an exception *)
     let rec expr = function
 	      IntLit _ -> Int
@@ -249,7 +220,6 @@ let check (globals, functions, structs) =
       | FloatLit _ -> Float
       | StringLit _ -> String
       | Queue (t, _) -> QueueType(t)
-      | PQueue _ -> PQueueType
       | Node(_, t) -> NodeType(t)
       | Id s -> type_of_identifier s
       | Graph(t) -> GraphType(t)
@@ -387,12 +357,6 @@ let check (globals, functions, structs) =
                  let actqtype = getQueueType acttype in 
                 ignore(check_assign actqtype et (Failure ("illegal actual queue argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ actqtype ^ " in " ^ string_of_expr e))) 
-              
-              else if fname = "p_push" then 
-                 let acttype = expr (List.hd actuals) in 
-                  ignore(check_assign acttype et (Failure ("illegal actual pqueue argument found " ^ string_of_typ et ^
-                " expected " ^ string_of_typ acttype ^ " in " ^ string_of_expr e)))
-              
               else if fname = "setData" then 
                  let acttype = expr oname in 
                  let actntype = getNodeType acttype in 

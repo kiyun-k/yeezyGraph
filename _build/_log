@@ -1,32 +1,35 @@
 ### Starting build.
 # Target: microc.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:microc.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules microc.ml > microc.ml.depends
+ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules microc.ml > microc.ml.depends # cached
 # Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:ast.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules ast.ml > ast.ml.depends
-# Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules codegen.ml > codegen.ml.depends
+ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules ast.ml > ast.ml.depends # cached
 # Target: ast.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o ast.cmo ast.ml
+ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o ast.cmo ast.ml # cached
+# Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules codegen.ml > codegen.ml.depends # cached
 # Target: parser.mly, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
-ocamlyacc parser.mly
+ocamlyacc parser.mly # cached
 # Target: parser.mli.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules parser.mli > parser.mli.depends
-# Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet }
-ocamllex.opt -q scanner.mll
-# Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules scanner.ml > scanner.ml.depends
+ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules parser.mli > parser.mli.depends # cached
 # Target: parser.cmi, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
-ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o parser.cmi parser.mli
+ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o parser.cmi parser.mli # cached
+# Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet }
+ocamllex.opt -q scanner.mll # cached
+# Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet }
+ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules scanner.ml > scanner.ml.depends # cached
 # Target: semant.ml.depends, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), extension:ml, file:semant.ml, ocaml, ocamldep, quiet }
 ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -modules semant.ml > semant.ml.depends
 # Target: codegen.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet }
 ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o codegen.cmo codegen.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o codegen.cmo codegen.ml
+File "codegen.ml", line 26, characters 6-11:
+Warning 26: unused variable llctx.
 # Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet }
 ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o scanner.cmo scanner.ml
 # Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet }
 ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o semant.cmo semant.ml
 + ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o semant.cmo semant.ml
-File "semant.ml", line 304, characters 14-24:
+File "semant.ml", line 329, characters 14-24:
 Warning 27: unused variable removeEdge.
 # Target: microc.cmo, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), byte, compile, extension:cmo, extension:ml, file:microc.cmo, file:microc.ml, implem, ocaml, quiet }
 ocamlfind ocamlc -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o microc.cmo microc.ml
@@ -38,12 +41,15 @@ ocamlfind ocamldep -package llvm.irreader -package llvm.bitreader -package llvm.
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o parser.cmx parser.ml
 # Target: codegen.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:codegen.cmx, file:codegen.ml, implem, native, ocaml, quiet }
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o codegen.cmx codegen.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o codegen.cmx codegen.ml
+File "codegen.ml", line 26, characters 6-11:
+Warning 26: unused variable llctx.
 # Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet }
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o scanner.cmx scanner.ml
 # Target: semant.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet }
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o semant.cmx semant.ml
 + ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o semant.cmx semant.ml
-File "semant.ml", line 304, characters 14-24:
+File "semant.ml", line 329, characters 14-24:
 Warning 27: unused variable removeEdge.
 # Target: microc.cmx, tags: { package(llvm), package(llvm.analysis), package(llvm.bitreader), package(llvm.irreader), package(llvm.linker), compile, extension:cmx, extension:ml, file:microc.cmx, file:microc.ml, implem, native, ocaml, quiet }
 ocamlfind ocamlopt -c -w +a-4 -package llvm.irreader -package llvm.bitreader -package llvm.linker -package llvm.analysis -package llvm -o microc.cmx microc.ml
