@@ -111,12 +111,21 @@ extern void removeEdge(struct graph* g, struct node *n1, struct node *n2) {
 		m_remove(no1->outNodes, no2->name);
 		m_remove(no2->inNodes, no1->name);
 	}
+}
 
 
-
-
+extern int getWeight(struct graph* g, char *n1, char *n2) {
+	struct node *node1 = getNode(g, n1);
+	struct node *node2 = getNode(g, n2);
+	struct map *m = node1->outNodes;
+	int result = m_get(m, n2);
+	if (result != INFINITY) {
+		return result;
+	}
+	else return INFINITY;
 
 }
+
 
 extern struct node *indexNode(struct graph* g, int index) {
 	struct ListNode *listnode = l2_get(g->nodes, index);

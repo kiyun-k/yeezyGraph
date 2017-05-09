@@ -1,0 +1,13 @@
+abc
+2
+graph:
+node name:  abc
+node visited:  0
+node inNodes:  {}
+node outNodes:  {(def, 2), }
+
+node name:  def
+node visited:  0
+node inNodes:  {(abc, 2), }
+node outNodes:  {}
+

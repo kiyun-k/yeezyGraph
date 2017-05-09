@@ -1,0 +1,19 @@
+int main() {
+	Queue<int> a;
+	Queue<int> x;
+	int d;
+	Queue<Queue<int>> q;
+	q = new Queue<Queue<int>>();
+	a = new Queue<int>();
+	/* adding to a queue */
+	a = 3.1;
+	b = 5.8;
+	a.qadd(a);
+	a.qadd(b);
+	q.qadd(a);
+	x = q.qfront();
+	d = a.qfront();
+	print(d);
+	return 0;
+
+}

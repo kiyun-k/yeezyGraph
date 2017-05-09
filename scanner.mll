@@ -44,6 +44,9 @@ rule token = parse
 | "@name" { GET_NAME }      | "@visited" { GET_VISITED } 
 | "@data" { GET_DATA }
 
+| "INFINITY" {INF }         | "NEG-INFINITY" {NEG_INF}
+
+
 
 | "new" { NEW }
 | "void"   { VOID }

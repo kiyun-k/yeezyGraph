@@ -1,14 +1,10 @@
-string foo()
+string foo() {
+    return "hello";    
+}
+int main()
 {
   string x;
   x = "hello";
-  return x;
-}
-
-int main()
-{
-  string s;
-  s = foo();
-  prints(s);
-  return 0;
+    
+  return 0; 
 }

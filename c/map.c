@@ -23,7 +23,8 @@ struct map *m_init() {
 }
 
 void m_insert(struct map *curr_map, char *node, int val) {
-	if(m_get(curr_map, node) != -1) {
+
+	if(m_get(curr_map, node) != INFINITY) {
 		return;
 	}
 	if (curr_map->size == curr_map->table_size) {
@@ -38,6 +39,7 @@ void m_insert(struct map *curr_map, char *node, int val) {
 	curr_map->weight[curr_map->size] = val;
 	curr_map->size += 1;
 
+
 }
 
 int m_get(struct map *curr_map, char *node) {
@@ -46,7 +48,7 @@ int m_get(struct map *curr_map, char *node) {
 			return curr_map->weight[i];
 		}
 	}
-	return -1;
+	return INFINITY;
 }
 
 void m_remove(struct map *curr_map, char *node) {
@@ -84,6 +86,7 @@ void print_map(struct map *curr_map) {
 	printf("%s", "{");
 	for (int i = 0; i < curr_map->size; i++) {
 		printf("%s", "(");
+
 		char *nod = curr_map->nodes[i];
 		int w = curr_map->weight[i];
 		printf("%s", nod);

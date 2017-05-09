@@ -1,6 +1,7 @@
 #ifndef __MAP_H__
 #define __MAP_H__
 
+#define INFINITY 50000
 struct map {
 	int table_size;
 	int size;

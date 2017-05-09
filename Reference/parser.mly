@@ -186,7 +186,7 @@ expr:
   | ID REMOVE_NODE ID             { GraphOp($1, RemoveNode, $3) }
   | expr LBRACKET INT_LITERAL RBRACKET ADD_EDGE expr    { GraphOpAddEdgeInt($1, $3, AddEdge, $6) } 
   | expr LBRACKET FLOAT_LITERAL RBRACKET ADD_EDGE expr  { GraphOpAddEdgeFloat($1, $3, AddEdge, $6) }
-  | ID REMOVE_EDGE ID             { GraphOp($1, RemoveEdge, $3) }
+  | ID REMOVE_EDGE ID             { ($1, RemoveEdge, $3) }
   | MINUS expr %prec NEG          { Unop(Neg, $2) }
   | NOT expr                      { Unop(Not, $2) }
   | ID ASSIGN expr                { Assign($1, $3) }
