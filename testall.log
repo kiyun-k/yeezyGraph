@@ -1,0 +1,573 @@
+/usr/bin/lli
+
+###### Testing test-BFS
+./yeezygraph.native < tests/test-BFS.yg > test-BFS.ll
+llc test-BFS.ll > test-BFS.s
+cc -o test-BFS.exe test-BFS.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-add1
+./yeezygraph.native < tests/test-add1.yg > test-add1.ll
+llc test-add1.ll > test-add1.s
+cc -o test-add1.exe test-add1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-arith1
+./yeezygraph.native < tests/test-arith1.yg > test-arith1.ll
+llc test-arith1.ll > test-arith1.s
+cc -o test-arith1.exe test-arith1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-arith2
+./yeezygraph.native < tests/test-arith2.yg > test-arith2.ll
+llc test-arith2.ll > test-arith2.s
+cc -o test-arith2.exe test-arith2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-arith3
+./yeezygraph.native < tests/test-arith3.yg > test-arith3.ll
+llc test-arith3.ll > test-arith3.s
+cc -o test-arith3.exe test-arith3.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-dijkstra
+./yeezygraph.native < tests/test-dijkstra.yg > test-dijkstra.ll
+llc test-dijkstra.ll > test-dijkstra.s
+cc -o test-dijkstra.exe test-dijkstra.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-fib
+./yeezygraph.native < tests/test-fib.yg > test-fib.ll
+llc test-fib.ll > test-fib.s
+cc -o test-fib.exe test-fib.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-for1
+./yeezygraph.native < tests/test-for1.yg > test-for1.ll
+llc test-for1.ll > test-for1.s
+cc -o test-for1.exe test-for1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-for2
+./yeezygraph.native < tests/test-for2.yg > test-for2.ll
+llc test-for2.ll > test-for2.s
+cc -o test-for2.exe test-for2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-func1
+./yeezygraph.native < tests/test-func1.yg > test-func1.ll
+llc test-func1.ll > test-func1.s
+cc -o test-func1.exe test-func1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-func2
+./yeezygraph.native < tests/test-func2.yg > test-func2.ll
+llc test-func2.ll > test-func2.s
+cc -o test-func2.exe test-func2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-func3
+./yeezygraph.native < tests/test-func3.yg > test-func3.ll
+llc test-func3.ll > test-func3.s
+cc -o test-func3.exe test-func3.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-func4
+./yeezygraph.native < tests/test-func4.yg > test-func4.ll
+llc test-func4.ll > test-func4.s
+cc -o test-func4.exe test-func4.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-func5
+./yeezygraph.native < tests/test-func5.yg > test-func5.ll
+llc test-func5.ll > test-func5.s
+cc -o test-func5.exe test-func5.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-func6
+./yeezygraph.native < tests/test-func6.yg > test-func6.ll
+llc test-func6.ll > test-func6.s
+cc -o test-func6.exe test-func6.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-func7
+./yeezygraph.native < tests/test-func7.yg > test-func7.ll
+llc test-func7.ll > test-func7.s
+cc -o test-func7.exe test-func7.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-func8
+./yeezygraph.native < tests/test-func8.yg > test-func8.ll
+llc test-func8.ll > test-func8.s
+cc -o test-func8.exe test-func8.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-gcd
+./yeezygraph.native < tests/test-gcd.yg > test-gcd.ll
+llc test-gcd.ll > test-gcd.s
+cc -o test-gcd.exe test-gcd.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-gcd2
+./yeezygraph.native < tests/test-gcd2.yg > test-gcd2.ll
+llc test-gcd2.ll > test-gcd2.s
+cc -o test-gcd2.exe test-gcd2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-global1
+./yeezygraph.native < tests/test-global1.yg > test-global1.ll
+llc test-global1.ll > test-global1.s
+cc -o test-global1.exe test-global1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-global2
+./yeezygraph.native < tests/test-global2.yg > test-global2.ll
+llc test-global2.ll > test-global2.s
+cc -o test-global2.exe test-global2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-global3
+./yeezygraph.native < tests/test-global3.yg > test-global3.ll
+llc test-global3.ll > test-global3.s
+cc -o test-global3.exe test-global3.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-graphdeclstring
+./yeezygraph.native < tests/test-graphdeclstring.yg > test-graphdeclstring.ll
+llc test-graphdeclstring.ll > test-graphdeclstring.s
+cc -o test-graphdeclstring.exe test-graphdeclstring.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-graphdeclstruct
+./yeezygraph.native < tests/test-graphdeclstruct.yg > test-graphdeclstruct.ll
+llc test-graphdeclstruct.ll > test-graphdeclstruct.s
+cc -o test-graphdeclstruct.exe test-graphdeclstruct.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-hello
+./yeezygraph.native < tests/test-hello.yg > test-hello.ll
+llc test-hello.ll > test-hello.s
+cc -o test-hello.exe test-hello.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-if1
+./yeezygraph.native < tests/test-if1.yg > test-if1.ll
+llc test-if1.ll > test-if1.s
+cc -o test-if1.exe test-if1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-if2
+./yeezygraph.native < tests/test-if2.yg > test-if2.ll
+llc test-if2.ll > test-if2.s
+cc -o test-if2.exe test-if2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-if3
+./yeezygraph.native < tests/test-if3.yg > test-if3.ll
+llc test-if3.ll > test-if3.s
+cc -o test-if3.exe test-if3.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-if4
+./yeezygraph.native < tests/test-if4.yg > test-if4.ll
+llc test-if4.ll > test-if4.s
+cc -o test-if4.exe test-if4.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-if5
+./yeezygraph.native < tests/test-if5.yg > test-if5.ll
+llc test-if5.ll > test-if5.s
+cc -o test-if5.exe test-if5.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-infinity
+./yeezygraph.native < tests/test-infinity.yg > test-infinity.ll
+llc test-infinity.ll > test-infinity.s
+cc -o test-infinity.exe test-infinity.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-listdecl
+./yeezygraph.native < tests/test-listdecl.yg > test-listdecl.ll
+llc test-listdecl.ll > test-listdecl.s
+cc -o test-listdecl.exe test-listdecl.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-listget
+./yeezygraph.native < tests/test-listget.yg > test-listget.ll
+llc test-listget.ll > test-listget.s
+cc -o test-listget.exe test-listget.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-local1
+./yeezygraph.native < tests/test-local1.yg > test-local1.ll
+llc test-local1.ll > test-local1.s
+cc -o test-local1.exe test-local1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-local2
+./yeezygraph.native < tests/test-local2.yg > test-local2.ll
+llc test-local2.ll > test-local2.s
+cc -o test-local2.exe test-local2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-ops1
+./yeezygraph.native < tests/test-ops1.yg > test-ops1.ll
+llc test-ops1.ll > test-ops1.s
+cc -o test-ops1.exe test-ops1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-ops2
+./yeezygraph.native < tests/test-ops2.yg > test-ops2.ll
+llc test-ops2.ll > test-ops2.s
+cc -o test-ops2.exe test-ops2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-pqueuedecl
+./yeezygraph.native < tests/test-pqueuedecl.yg > test-pqueuedecl.ll
+llc test-pqueuedecl.ll > test-pqueuedecl.s
+cc -o test-pqueuedecl.exe test-pqueuedecl.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-queueint
+./yeezygraph.native < tests/test-queueint.yg > test-queueint.ll
+llc test-queueint.ll > test-queueint.s
+cc -o test-queueint.exe test-queueint.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-queuequeue
+./yeezygraph.native < tests/test-queuequeue.yg > test-queuequeue.ll
+llc test-queuequeue.ll > test-queuequeue.s
+cc -o test-queuequeue.exe test-queuequeue.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-queuestring
+./yeezygraph.native < tests/test-queuestring.yg > test-queuestring.ll
+llc test-queuestring.ll > test-queuestring.s
+cc -o test-queuestring.exe test-queuestring.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-stringdecl
+./yeezygraph.native < tests/test-stringdecl.yg > test-stringdecl.ll
+llc test-stringdecl.ll > test-stringdecl.s
+cc -o test-stringdecl.exe test-stringdecl.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-stringprint
+./yeezygraph.native < tests/test-stringprint.yg > test-stringprint.ll
+llc test-stringprint.ll > test-stringprint.s
+cc -o test-stringprint.exe test-stringprint.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-stringreturn
+./yeezygraph.native < tests/test-stringreturn.yg > test-stringreturn.ll
+llc test-stringreturn.ll > test-stringreturn.s
+cc -o test-stringreturn.exe test-stringreturn.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-struct1
+./yeezygraph.native < tests/test-struct1.yg > test-struct1.ll
+llc test-struct1.ll > test-struct1.s
+cc -o test-struct1.exe test-struct1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-var1
+./yeezygraph.native < tests/test-var1.yg > test-var1.ll
+llc test-var1.ll > test-var1.s
+cc -o test-var1.exe test-var1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-var2
+./yeezygraph.native < tests/test-var2.yg > test-var2.ll
+llc test-var2.ll > test-var2.s
+cc -o test-var2.exe test-var2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-while1
+./yeezygraph.native < tests/test-while1.yg > test-while1.ll
+llc test-while1.ll > test-while1.s
+cc -o test-while1.exe test-while1.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing test-while2
+./yeezygraph.native < tests/test-while2.yg > test-while2.ll
+llc test-while2.ll > test-while2.s
+cc -o test-while2.exe test-while2.s queue.bc pqueue.bc linkedlist.bc graph.bc node.bc map.bc
+queue.bc: file not recognized: File format not recognized
+collect2: error: ld returned 1 exit status
+###### FAILED
+
+###### Testing fail-assign1
+./yeezygraph.native < tests/fail-assign1.yg 2> fail-assign1.err >> testall.log
+diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
+###### SUCCESS
+
+###### Testing fail-assign2
+./yeezygraph.native < tests/fail-assign2.yg 2> fail-assign2.err >> testall.log
+diff -b fail-assign2.err tests/fail-assign2.err > fail-assign2.diff
+###### SUCCESS
+
+###### Testing fail-assign3
+./yeezygraph.native < tests/fail-assign3.yg 2> fail-assign3.err >> testall.log
+diff -b fail-assign3.err tests/fail-assign3.err > fail-assign3.diff
+###### SUCCESS
+
+###### Testing fail-dead1
+./yeezygraph.native < tests/fail-dead1.yg 2> fail-dead1.err >> testall.log
+diff -b fail-dead1.err tests/fail-dead1.err > fail-dead1.diff
+###### SUCCESS
+
+###### Testing fail-dead2
+./yeezygraph.native < tests/fail-dead2.yg 2> fail-dead2.err >> testall.log
+diff -b fail-dead2.err tests/fail-dead2.err > fail-dead2.diff
+###### SUCCESS
+
+###### Testing fail-expr1
+./yeezygraph.native < tests/fail-expr1.yg 2> fail-expr1.err >> testall.log
+diff -b fail-expr1.err tests/fail-expr1.err > fail-expr1.diff
+###### SUCCESS
+
+###### Testing fail-expr2
+./yeezygraph.native < tests/fail-expr2.yg 2> fail-expr2.err >> testall.log
+diff -b fail-expr2.err tests/fail-expr2.err > fail-expr2.diff
+###### SUCCESS
+
+###### Testing fail-for1
+./yeezygraph.native < tests/fail-for1.yg 2> fail-for1.err >> testall.log
+diff -b fail-for1.err tests/fail-for1.err > fail-for1.diff
+###### SUCCESS
+
+###### Testing fail-for2
+./yeezygraph.native < tests/fail-for2.yg 2> fail-for2.err >> testall.log
+diff -b fail-for2.err tests/fail-for2.err > fail-for2.diff
+###### SUCCESS
+
+###### Testing fail-for3
+./yeezygraph.native < tests/fail-for3.yg 2> fail-for3.err >> testall.log
+diff -b fail-for3.err tests/fail-for3.err > fail-for3.diff
+###### SUCCESS
+
+###### Testing fail-for4
+./yeezygraph.native < tests/fail-for4.yg 2> fail-for4.err >> testall.log
+diff -b fail-for4.err tests/fail-for4.err > fail-for4.diff
+###### SUCCESS
+
+###### Testing fail-for5
+./yeezygraph.native < tests/fail-for5.yg 2> fail-for5.err >> testall.log
+diff -b fail-for5.err tests/fail-for5.err > fail-for5.diff
+###### SUCCESS
+
+###### Testing fail-func1
+./yeezygraph.native < tests/fail-func1.yg 2> fail-func1.err >> testall.log
+diff -b fail-func1.err tests/fail-func1.err > fail-func1.diff
+###### SUCCESS
+
+###### Testing fail-func2
+./yeezygraph.native < tests/fail-func2.yg 2> fail-func2.err >> testall.log
+diff -b fail-func2.err tests/fail-func2.err > fail-func2.diff
+###### SUCCESS
+
+###### Testing fail-func3
+./yeezygraph.native < tests/fail-func3.yg 2> fail-func3.err >> testall.log
+diff -b fail-func3.err tests/fail-func3.err > fail-func3.diff
+###### SUCCESS
+
+###### Testing fail-func4
+./yeezygraph.native < tests/fail-func4.yg 2> fail-func4.err >> testall.log
+diff -b fail-func4.err tests/fail-func4.err > fail-func4.diff
+###### SUCCESS
+
+###### Testing fail-func5
+./yeezygraph.native < tests/fail-func5.yg 2> fail-func5.err >> testall.log
+diff -b fail-func5.err tests/fail-func5.err > fail-func5.diff
+###### SUCCESS
+
+###### Testing fail-func6
+./yeezygraph.native < tests/fail-func6.yg 2> fail-func6.err >> testall.log
+diff -b fail-func6.err tests/fail-func6.err > fail-func6.diff
+###### SUCCESS
+
+###### Testing fail-func7
+./yeezygraph.native < tests/fail-func7.yg 2> fail-func7.err >> testall.log
+diff -b fail-func7.err tests/fail-func7.err > fail-func7.diff
+###### SUCCESS
+
+###### Testing fail-func8
+./yeezygraph.native < tests/fail-func8.yg 2> fail-func8.err >> testall.log
+diff -b fail-func8.err tests/fail-func8.err > fail-func8.diff
+###### SUCCESS
+
+###### Testing fail-func9
+./yeezygraph.native < tests/fail-func9.yg 2> fail-func9.err >> testall.log
+diff -b fail-func9.err tests/fail-func9.err > fail-func9.diff
+###### SUCCESS
+
+###### Testing fail-global1
+./yeezygraph.native < tests/fail-global1.yg 2> fail-global1.err >> testall.log
+diff -b fail-global1.err tests/fail-global1.err > fail-global1.diff
+###### SUCCESS
+
+###### Testing fail-global2
+./yeezygraph.native < tests/fail-global2.yg 2> fail-global2.err >> testall.log
+diff -b fail-global2.err tests/fail-global2.err > fail-global2.diff
+###### SUCCESS
+
+###### Testing fail-if1
+./yeezygraph.native < tests/fail-if1.yg 2> fail-if1.err >> testall.log
+diff -b fail-if1.err tests/fail-if1.err > fail-if1.diff
+###### SUCCESS
+
+###### Testing fail-if2
+./yeezygraph.native < tests/fail-if2.yg 2> fail-if2.err >> testall.log
+diff -b fail-if2.err tests/fail-if2.err > fail-if2.diff
+###### SUCCESS
+
+###### Testing fail-if3
+./yeezygraph.native < tests/fail-if3.yg 2> fail-if3.err >> testall.log
+diff -b fail-if3.err tests/fail-if3.err > fail-if3.diff
+###### SUCCESS
+
+###### Testing fail-nomain
+./yeezygraph.native < tests/fail-nomain.yg 2> fail-nomain.err >> testall.log
+diff -b fail-nomain.err tests/fail-nomain.err > fail-nomain.diff
+###### SUCCESS
+
+###### Testing fail-return1
+./yeezygraph.native < tests/fail-return1.yg 2> fail-return1.err >> testall.log
+diff -b fail-return1.err tests/fail-return1.err > fail-return1.diff
+###### SUCCESS
+
+###### Testing fail-return2
+./yeezygraph.native < tests/fail-return2.yg 2> fail-return2.err >> testall.log
+diff -b fail-return2.err tests/fail-return2.err > fail-return2.diff
+###### SUCCESS
+
+###### Testing fail-struct1
+./yeezygraph.native < tests/fail-struct1.yg 2> fail-struct1.err >> testall.log
+diff -b fail-struct1.err tests/fail-struct1.err > fail-struct1.diff
+###### SUCCESS
+
+###### Testing fail-struct2
+./yeezygraph.native < tests/fail-struct2.yg 2> fail-struct2.err >> testall.log
+diff -b fail-struct2.err tests/fail-struct2.err > fail-struct2.diff
+###### SUCCESS
+
+###### Testing fail-struct3
+./yeezygraph.native < tests/fail-struct3.yg 2> fail-struct3.err >> testall.log
+diff -b fail-struct3.err tests/fail-struct3.err > fail-struct3.diff
+###### SUCCESS
+
+###### Testing fail-struct4
+./yeezygraph.native < tests/fail-struct4.yg 2> fail-struct4.err >> testall.log
+diff -b fail-struct4.err tests/fail-struct4.err > fail-struct4.diff
+###### SUCCESS
+
+###### Testing fail-struct5
+./yeezygraph.native < tests/fail-struct5.yg 2> fail-struct5.err >> testall.log
+diff -b fail-struct5.err tests/fail-struct5.err > fail-struct5.diff
+###### SUCCESS
+
+###### Testing fail-while1
+./yeezygraph.native < tests/fail-while1.yg 2> fail-while1.err >> testall.log
+diff -b fail-while1.err tests/fail-while1.err > fail-while1.diff
+###### SUCCESS
+
+###### Testing fail-while2
+./yeezygraph.native < tests/fail-while2.yg 2> fail-while2.err >> testall.log
+diff -b fail-while2.err tests/fail-while2.err > fail-while2.diff
+###### SUCCESS
