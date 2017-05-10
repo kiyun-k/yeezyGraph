@@ -98,6 +98,32 @@ let check (globals, functions, structs) =
    if List.mem "modifyVisited" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function modifyVisited may not be defined")) else ();
 
+  if List.mem "isEmpty" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function isEmpty may not be defined")) else ();
+
+  if List.mem "printGraph" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function printGraph may not be defined")) else ();
+
+  if List.mem "printList" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function printList may not be defined")) else ();
+
+  if List.mem "size" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function size may not be defined")) else ();
+
+  if List.mem "lsize" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function lsize may not be defined")) else ();
+
+  if List.mem "weight" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function weight may not be defined")) else ();
+
+  if List.mem "contains" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function contains may not be defined")) else ();
+
+  if List.mem "setData" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function setData may not be defined")) else ();
+
+  if List.mem "l_delete" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function l_delete may not be defined")) else ();
 
   report_duplicate (fun n -> "duplicate function " ^ n)
     (List.map (fun fd -> fd.fname) functions);
@@ -167,10 +193,6 @@ let check (globals, functions, structs) =
      { typ = Void; fname = "setData"; formals = [(AnyType, "x")];
        locals = []; body = [] }
 
-       (StringMap.add "removeAllNodes"
-     { typ = Void; fname = "removeAllNodes"; formals = [];
-       locals = []; body = [] }
-
        (StringMap.add "p_push"
      { typ = Void; fname = "p_push"; formals = [(AnyType, "x")];
        locals = []; body = [] }
@@ -211,8 +233,7 @@ let check (globals, functions, structs) =
      { typ = AnyType; fname = "l_get"; formals = [(Int, "x")];
        locals = []; body = [] }
 
-
-     ))))))))))))))))))))))))))
+     )))))))))))))))))))))))))
 
      
    in
