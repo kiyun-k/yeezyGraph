@@ -24,18 +24,21 @@ void dijkstra(graph<struct nodedata> g1, node<struct nodedata> source) {
 		printstring(temp@name);
 		printstring("                       ");
 		sourcedata = temp@data;
-		printint(sourcedata~dist);
+		print(sourcedata~dist);
+		temp.modifyVisited(true);
 		listtemp = temp@outNodes;
-		print(listtemp.lsize());
 		for (i = 0; i < listtemp.lsize(); i = i + 1) {
 			tmpstring = listtemp.l_get(i);
 			temp2 = g1~_tmpstring;
 			sourcedata2 = temp2@data;
-			if (sourcedata2~dist > sourcedata~dist + g1.weight(temp, temp2)) {
-				sourcedata2~dist = sourcedata~dist + g1.weight(temp, temp2);
-				temp2.setData(sourcedata2);
-				p.p_push(temp2);
-			}		
+			if (temp2@visited == false) {
+				if (sourcedata2~dist > sourcedata~dist + g1.weight(temp, temp2)) {
+					sourcedata2~dist = sourcedata~dist + g1.weight(temp, temp2);
+					temp2.setData(sourcedata2);
+					p.p_push(temp2);
+				}		
+			}
+			
 		}
 	}
 	

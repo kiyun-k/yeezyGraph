@@ -120,11 +120,6 @@ let struct_types =
   let printf_t = L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in (* Declare a function type *)
   let printf_func = L.declare_function "printf" printf_t the_module in
 
-  (* Declare the built-in printbig() function *)
-  let printbig_t = L.function_type i32_t [| i32_t |] in
-  let printbig_func = L.declare_function "printbig" printbig_t the_module in
-
-
   (* built-in queue functions *)
   let initQueueId_t = L.function_type queueid_t [| |] in 
   let initQueueId_f = L.declare_function "initQueueId" initQueueId_t the_module in
@@ -134,6 +129,8 @@ let struct_types =
   let dequeue_f = L.declare_function "dequeue" dequeue_t the_module in
   let front_t = L.function_type (L.pointer_type i8_t) [| queueid_t |] in
   let front_f = L.declare_function "front" front_t the_module in
+  let sizeQ_t = L.function_type i32_t [| queueid_t |] in 
+  let sizeQ_f = L.declare_function "q_size" sizeQ_t the_module in 
 
   (* built-in linked list functions *)
   let initList_t = L.function_type list_t [| |] in
@@ -190,8 +187,6 @@ let struct_types =
   let addEdge_f = L.declare_function "addEdge" addEdge_t the_module in
   let removeEdge_t = L.function_type void_t [| graph_t; node_t; node_t |] in
   let removeEdge_f = L.declare_function "removeEdge" removeEdge_t the_module in
-  let removeAllNodes_t = L.function_type void_t [| graph_t|] in 
-  let removeAllNodes_f = L.declare_function "removeAllNodes" removeAllNodes_t the_module in
   let printGraph_t = L.function_type void_t [| graph_t|] in 
   let printGraph_f = L.declare_function "printGraph" printGraph_t the_module in 
   let isEmpty_t = L.function_type i1_t [| graph_t|] in 
@@ -511,9 +506,6 @@ let struct_types =
         let weight_ptr = L.build_call getWeight_f [| g_val; e1'; e2' |] "getWeight" builder in 
         weight_ptr 
 
-      (* NEEDS TO BE FIXED *)
-      | A.ObjectCall(g, "removeAllNodes", []) -> let g_val = expr builder g in 
-        ignore(L.build_call removeAllNodes_f [| g_val |] "" builder); g_val
 
       | A.ObjectCall(n, "modifyVisited", [e]) -> let n_val = expr builder n in 
         let bool_visited = expr builder e in 
@@ -552,6 +544,11 @@ let struct_types =
         let l_dtyp = ltype_of_typ q_type in
         let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
         (L.build_load d_ptr "d_ptr" builder)
+
+      | A.ObjectCall (q, "qsize", []) -> 
+        let q_val = expr builder q in
+        let size_ptr = L.build_call sizeQ_f [| q_val|] "" builder in size_ptr
+
       |  A.ObjectCall (p, "p_push", [e]) ->
         let pqptr = expr builder p in
         let e_val = expr builder e in
@@ -569,12 +566,21 @@ let struct_types =
       | A.ObjectCall (l, "l_add", [e]) ->
         let l_ptr = expr builder l in
         let e_val = expr builder e in
-        let d_ltyp = L.type_of e_val in
-        let d_ptr = L.build_malloc d_ltyp "tmp" builder in
-          ignore(L.build_store e_val d_ptr builder);
-        let void_e_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
-        ignore (L.build_call addList_f [| l_ptr ; void_e_ptr |] "" builder);
+        let n = idtostring l in
+        let l_type = getListType (lookup_types n) in
+        ( match l_type with 
+           A.String -> ignore(L.build_call addList_f [| l_ptr; e_val |] "" builder); l_ptr
+          | _ ->
+            let d_ltyp = L.type_of e_val in
+            let d_ptr = L.build_malloc d_ltyp "tmp" builder in
+            ignore(L.build_store e_val d_ptr builder);
+          let void_e_ptr = L.build_bitcast d_ptr (L.pointer_type i8_t) "ptr" builder in
+          ignore (L.build_call addList_f [| l_ptr ; void_e_ptr |] "" builder);
         l_ptr
+
+
+        )
+        
       | A.ObjectCall (l, "l_delete", [e]) ->
         let l_ptr = expr builder l in 
         let e_val = expr builder e in
@@ -588,7 +594,13 @@ let struct_types =
         let n = idtostring l in
         let l_type = getListType (lookup_types n) in
         let val_ptr = L.build_call getList_f [| l_ptr; e_val |] "val_ptr" builder in
-        val_ptr
+        (match l_type with 
+           A.String -> val_ptr
+          | _ -> 
+            let l_dtyp = ltype_of_typ l_type in
+            let d_ptr = L.build_bitcast val_ptr (L.pointer_type l_dtyp) "d_ptr" builder in
+            (L.build_load d_ptr "d_ptr" builder))
+
       |  A.ObjectCall(_, f, act) -> 
          let (fdef, fdecl) = StringMap.find f function_decls in
          let actuals = 

@@ -184,6 +184,10 @@ let check (globals, functions, structs) =
      { typ = AnyType; fname = "qfront"; formals = [];
        locals = []; body = [] }
 
+      (StringMap.add "qsize"
+     { typ = Int; fname = "qsize"; formals = [];
+       locals = []; body = [] }
+
        (StringMap.add "l_add"
      { typ = Void; fname = "l_add"; formals = [(AnyType, "x")];
        locals = []; body = [] }
@@ -197,7 +201,7 @@ let check (globals, functions, structs) =
        locals = []; body = [] }
 
 
-     )))))))))))))))))))))))))
+     ))))))))))))))))))))))))))
 
      
    in
@@ -333,7 +337,7 @@ let check (globals, functions, structs) =
                                      " = " ^ string_of_typ rt ^ " in " ^ 
                                      string_of_expr ex))
         | AccessStructField(_, _) -> expr e2
-        | _ -> raise (Failure("illegal assignment")))
+        | _ -> raise (Failure("illegal graph operator")))
 
       | GraphOp(s1, gop, s2) -> let t1 = type_of_identifier s1 and t2 = type_of_identifier s2 in 
         (match t1 with 
@@ -341,9 +345,9 @@ let check (globals, functions, structs) =
             (match gop with 
               AddNode when t1 = GraphType typ && t2 = String -> GraphType typ
             | RemoveNode when t1 = GraphType typ && t2 = String -> GraphType typ
-            | _ -> raise (Failure("illegal graph operator "))
+            | _ -> raise (Failure("illegal graph operator"))
             )
-          | _ -> raise(Failure("not a graph"))
+          | _ -> raise(Failure("operand is not a graph"))
         )
 
       | GraphOpAddEdge(e, _, gop2, s1, s2) -> let t1 = expr e and 
@@ -353,9 +357,9 @@ let check (globals, functions, structs) =
             GraphType(typ) -> 
             (match gop2 with 
               AddEdge when t2 = NodeType typ && t3 = NodeType typ -> GraphType typ
-              | _ -> raise(Failure("Need to fix this add edge"))
+              | _ -> raise(Failure("illegal graph operator"))
             )
-          | _ -> raise(Failure("not a graph"))
+          | _ -> raise(Failure("operand is not a graph"))
         )
         
        | GraphOpRemoveEdge(e, gop3, s1, s2) -> let t1 = type_of_identifier e and 
@@ -363,10 +367,10 @@ let check (globals, functions, structs) =
         (match t1 with 
             GraphType(typ) -> 
             (match gop3 with 
-              removeEdge when t2 = NodeType typ && t3 = NodeType typ -> GraphType typ
-              | _ -> raise(Failure("Need to Fix this"))
+              RemoveEdge when t2 = NodeType typ && t3 = NodeType typ -> GraphType typ
+              | _ -> raise(Failure("illegal graph operator"))
             )
-          | _ -> raise(Failure("not a graph"))
+          | _ -> raise(Failure("operand is not a graph"))
         )
         
 
@@ -442,8 +446,8 @@ let check (globals, functions, structs) =
                 let actltype = getListType acttype in
                 ignore(check_assign actltype et (Failure ("illegal actual list argument found " ^ string_of_typ et ^
                 " expected " ^ string_of_typ actltype ^ " in " ^ string_of_expr e)))
-              else ignore (check_assign ft et (Failure ("illegal actual argument found 2 " ^ string_of_typ et ^
-                " expected " ^ string_of_typ ft ^ "in" ^ string_of_expr e)))) fd.formals actuals;
+              else ignore (check_assign ft et (Failure ("illegal actual argument found " ^ string_of_typ et ^
+                " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e)))) fd.formals actuals;
            !returntype
 
      

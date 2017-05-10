@@ -1,0 +1,84 @@
+void BFS(graph<int> g1, node<int> source) {
+	Queue<node<int>> p;
+	list<string> listtemp; 
+	node<int> temp;
+	node<int> temp2;
+	int i;
+	string tmpstring;
+
+	p = new Queue<node<int>>();
+	/* set distance of source vertex to 0 */
+	
+	source.modifyVisited(true);
+	p.qadd(source);
+	
+	prints("BFS traversal of the graph: ");
+	while(p.qsize() != 0) {
+		temp = p.qfront();
+		printstring(temp@name);
+		p.qremove();
+		listtemp = temp@outNodes;
+		for (i = 0; i < listtemp.lsize(); i = i + 1) {
+			tmpstring = listtemp.l_get(i);
+			temp2 = g1~_tmpstring;
+			if(temp2@visited == false) {
+				temp2.modifyVisited(true);
+				p.qadd(temp2);
+			}
+		}
+		if (p.qsize() != 0) {
+			printstring (" -> ");
+		}
+	}
+}
+
+int main() {
+	
+	/* create an undirected graph g1 */
+	graph<int> g1; 
+	string a1;
+	string a2;
+	string a3;
+	string a4;
+
+	int i;
+
+	node<int> a;
+	node<int> b;
+	node<int> c;
+	node<int> d;
+
+	a1 = "a";
+	a2 = "b";
+	a3 = "c";
+	a4 = "d";
+
+	/* add nodes to g1 */
+	g1 = new graph<int>();
+	g1~+a1; 
+	g1~+a2;
+	g1~+a3;
+	g1~+a4;
+
+	a = g1~_a1;
+	b = g1~_a2;
+	c = g1~_a3;
+	d = g1~_a4;
+
+	g1[1]->(a, b); 
+	g1[2]->(a, c);
+
+	g1[1]->(b, a);
+	g1[10]->(b, d);
+
+	g1[2]->(c, a);
+	g1[5]->(c, d);
+
+	g1[10]->(d, b);
+	g1[5]->(d, c);
+
+	BFS(g1, a);
+	
+	
+
+}

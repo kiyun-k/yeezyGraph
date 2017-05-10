@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include "queue.h"
 
+
+int q_size(struct QueueId* queue) {
+	return queue->size;
+}
+
 struct QueueId* initQueueId() {
 	struct QueueId* new = (struct QueueId*) malloc(sizeof(struct QueueId));
 	new->front = 0;

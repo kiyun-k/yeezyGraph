@@ -1,0 +1,46 @@
+int main() {
+	list<string> listtemp;
+	list<int> listtemp1; 
+	list<node<int>> listtemp2;
+
+	string x;
+	int y;
+	node<int> z;
+
+	node<int> node1;
+	node<int> node2;
+	node<int> node3;
+	string a;
+	string b;
+	string c;
+
+	a = "a";
+	b = "b";
+	c = "c";
+
+	listtemp = new list<string>();
+	listtemp1 = new list<int>(1, 2, 3, 4);
+	listtemp2 = new list<node<int>>();
+
+	node1 = new node<int>(a);
+	node2 = new node<int>(b);
+	node3 = new node<int>(c);
+	
+	listtemp.l_add(a);
+	listtemp.l_add(b);
+	listtemp.l_add(c);
+
+	listtemp2.l_add(node1);
+	listtemp2.l_add(node2);
+	listtemp2.l_add(node3);
+
+
+	x = listtemp.l_get(0);
+	y = listtemp1.l_get(0); 
+	z = listtemp2.l_get(0);
+	prints(x);
+	print(y);
+	prints(z@name);
+
+	return 0;
+}

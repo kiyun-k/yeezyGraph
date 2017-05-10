@@ -16,5 +16,6 @@ struct QueueId *initQueueId();
 void enqueue(struct QueueId *queue, void *data);
 void dequeue(struct QueueId *queue);
 void *front(struct QueueId *queue);
+int q_size(struct QueueId* queue);
  
 #endif /* #ifndef _QUEUE_H_ */
