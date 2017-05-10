@@ -57,6 +57,9 @@ let check (globals, functions, structs) =
   if List.mem "print" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function print may not be defined")) else ();
 
+  if List.mem "printint" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function printint may not be defined")) else ();
+
   if List.mem "printfloat" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function printfloat may not be defined")) else ();
 
@@ -66,6 +69,9 @@ let check (globals, functions, structs) =
   if List.mem "prints" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function prints may not be defined")) else ();
 
+  if List.mem "printstring" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function printstring may not be defined")) else ();
+
   if List.mem "qremove" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function qremove may not be defined")) else ();
 
@@ -74,6 +80,9 @@ let check (globals, functions, structs) =
 
   if List.mem "qfront" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function qfront may not be defined")) else ();
+
+  if List.mem "qsize" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function qsize may not be defined")) else ();
 
   if List.mem "p_push" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function p_push may not be defined")) else ();
@@ -142,7 +151,6 @@ let check (globals, functions, structs) =
       (StringMap.add "lsize"
      { typ = Int; fname = "lsize"; formals = [];
        locals = []; body = [] }
-
 
       (StringMap.add "weight"
      { typ = Int; fname = "weight"; formals = [(AnyType, "x"); (AnyType, "x")];
