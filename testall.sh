@@ -6,19 +6,19 @@
 #  Compile and check the error of each expected-to-fail test
 
 # Path to the LLVM interpreter
-
- LLI="/usr/local/opt/llvm@3.7/bin/lli-3.7"
+LLI="lli"
+#LLI="/usr/local/opt/llvm/bin/lli"
 
 # Path to the LLVM compiler
- LLC="/usr/local/opt/llvm@3.7/bin/llc-3.7"
+LLC="llc"
 
 # Path to the C compiler
 CC="cc"
 
-# Path to the yeezygraph compiler.  Usually "./yeezygraph.native"
-# Try "_build/yeezygraph.native" if ocamlbuild was unable to create a symbolic link.
+# Path to the microc compiler.  Usually "./microc.native"
+# Try "_build/microc.native" if ocamlbuild was unable to create a symbolic link.
 YEEZYGRAPH="./yeezygraph.native"
-#yeezygraph="_build/yeezygraph.native"
+#MICROC="_build/microc.native"
 
 # Set time limit for all operations
 ulimit -t 30
@@ -61,8 +61,8 @@ Compare() {
 Run() {
     echo $* 1>&2
     eval $* || {
-    SignalError "$1 failed on $*"
-    return 1
+	SignalError "$1 failed on $*"
+	return 1
     }
 }
 
@@ -71,8 +71,8 @@ Run() {
 RunFail() {
     echo $* 1>&2
     eval $* && {
-    SignalError "failed: $* did not report an error"
-    return 1
+	SignalError "failed: $* did not report an error"
+	return 1
     }
     return 0
 }
@@ -94,21 +94,21 @@ Check() {
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&
     Run "$YEEZYGRAPH" "<" $1 ">" "${basename}.ll" &&
     Run "$LLC" "${basename}.ll" ">" "${basename}.s" &&
-    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" "queue.bc" "map.bc" "graph.bc" "node.bc" "pqueue.bc" "linkedlist.bc" &&
+    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "printbig.o" &&
     Run "./${basename}.exe" > "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 
     # Report the status and clean up the generated files
 
     if [ $error -eq 0 ] ; then
-    if [ $keep -eq 0 ] ; then
-        rm -f $generatedfiles
-    fi
-    echo "OK"
-    echo "###### SUCCESS" 1>&2
+	if [ $keep -eq 0 ] ; then
+	    rm -f $generatedfiles
+	fi
+	echo "OK"
+	echo "###### SUCCESS" 1>&2
     else
-    echo "###### FAILED" 1>&2
-    globalerror=$error
+	echo "###### FAILED" 1>&2
+	globalerror=$error
     fi
 }
 
@@ -133,25 +133,25 @@ CheckFail() {
     # Report the status and clean up the generated files
 
     if [ $error -eq 0 ] ; then
-    if [ $keep -eq 0 ] ; then
-        rm -f $generatedfiles
-    fi
-    echo "OK"
-    echo "###### SUCCESS" 1>&2
+	if [ $keep -eq 0 ] ; then
+	    rm -f $generatedfiles
+	fi
+	echo "OK"
+	echo "###### SUCCESS" 1>&2
     else
-    echo "###### FAILED" 1>&2
-    globalerror=$error
+	echo "###### FAILED" 1>&2
+	globalerror=$error
     fi
 }
 
 while getopts kdpsh c; do
     case $c in
-    k) # Keep intermediate files
-        keep=1
-        ;;
-    h) # Help
-        Usage
-        ;;
+	k) # Keep intermediate files
+	    keep=1
+	    ;;
+	h) # Help
+	    Usage
+	    ;;
     esac
 done
 
@@ -182,16 +182,16 @@ fi
 for file in $files
 do
     case $file in
-    *test-*)
-        Check $file 2>> $globallog
-        ;;
-    *fail-*)
-        CheckFail $file 2>> $globallog
-        ;;
-    *)
-        echo "unknown file type $file"
-        globalerror=1
-        ;;
+	*test-*)
+	    Check $file 2>> $globallog
+	    ;;
+	*fail-*)
+	    CheckFail $file 2>> $globallog
+	    ;;
+	*)
+	    echo "unknown file type $file"
+	    globalerror=1
+	    ;;
     esac
 done
 

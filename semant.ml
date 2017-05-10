@@ -95,6 +95,9 @@ let check (globals, functions, structs) =
   if List.mem "p_size" (List.map (fun fd -> fd.fname) functions)
   then raise (Failure ("function p_size may not be defined")) else ();
 
+   if List.mem "modifyVisited" (List.map (fun fd -> fd.fname) functions)
+  then raise (Failure ("function modifyVisited may not be defined")) else ();
+
 
   report_duplicate (fun n -> "duplicate function " ^ n)
     (List.map (fun fd -> fd.fname) functions);
