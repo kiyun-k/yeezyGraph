@@ -9,6 +9,7 @@ clang -emit-llvm -o pqueue.bc -c c/pqueue.c
 
 ./yeezygraph.native <$1> a.ll
 llvm-link linkedlist.bc node.bc graph.bc queue.bc map.bc pqueue.bc a.ll -S > run.ll
+clang run.ll
 ./a.out
 rm a.ll
 rm run.ll
